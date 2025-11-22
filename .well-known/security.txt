@@ -1,0 +1,149 @@
+# security.txt - RFC 9116 compliant security contact information
+# https://securitytxt.org/
+
+Contact: mailto:security@academic-workflow-suite.org
+Contact: https://github.com/Hyperpolymath/academic-workflow-suite/security/advisories/new
+Expires: 2026-11-22T00:00:00.000Z
+Encryption: https://academic-workflow-suite.org/pgp-key.asc
+Preferred-Languages: en
+Canonical: https://academic-workflow-suite.org/.well-known/security.txt
+
+# Security Policy
+
+Policy: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/SECURITY.md
+
+# Acknowledgments
+
+Acknowledgments: https://academic-workflow-suite.org/security/hall-of-fame
+
+# Scope
+
+## In Scope
+
+- All repositories under github.com/Hyperpolymath/academic-workflow-suite
+- Core engine (Rust components)
+- AI jail container security
+- Office add-in
+- Backend API
+- Cryptographic implementations (SHA3-512 anonymization)
+- Event store security
+- PII detection and sanitization
+- Container isolation
+- Network security
+
+## Out of Scope
+
+- Third-party dependencies (report to upstream)
+- Social engineering attacks
+- Physical security
+- Denial of service (DoS) attacks
+- Issues in older unsupported versions
+
+## Vulnerability Disclosure
+
+We follow responsible disclosure:
+
+1. **Report** via security@academic-workflow-suite.org or GitHub Security Advisories
+2. **Acknowledgment** within 24-48 hours
+3. **Investigation** within 7 days
+4. **Fix Development** coordinated timeline
+5. **Disclosure** after patch release (typically 90 days)
+
+## Severity Classification
+
+**Critical** (CVSS 9.0-10.0)
+- Remote code execution
+- Authentication bypass
+- PII data leakage to AI
+- Student ID de-anonymization
+- Container escape
+
+**High** (CVSS 7.0-8.9)
+- Privilege escalation
+- Information disclosure (non-PII)
+- SQL injection
+- XSS in Office add-in
+
+**Medium** (CVSS 4.0-6.9)
+- Limited information disclosure
+- CSRF
+- Insecure defaults
+
+**Low** (CVSS 0.1-3.9)
+- Minor information leaks
+- UI bugs with security implications
+
+## Response Times
+
+- **Critical**: Patch within 7 days
+- **High**: Patch within 30 days
+- **Medium**: Patch within 90 days
+- **Low**: Patch in next release
+
+## Bug Bounty
+
+Currently no formal bug bounty program. We recognize security researchers in:
+- Hall of Fame: https://academic-workflow-suite.org/security/hall-of-fame
+- Release notes
+- CONTRIBUTORS.md
+
+## Safe Harbor
+
+We will not pursue legal action against researchers who:
+- Act in good faith
+- Follow responsible disclosure
+- Avoid privacy violations
+- Do not access real student data
+- Do not cause harm or disruption
+- Comply with all applicable laws
+
+## Secure Communication
+
+**PGP Key**: Download from https://academic-workflow-suite.org/pgp-key.asc
+
+Fingerprint: (To be added when key generated)
+
+## Additional Resources
+
+- Security documentation: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/docs/SECURITY.md
+- Architecture security: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/docs/ARCHITECTURE.md#security
+- Privacy guarantees: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/docs/SECURITY.md#privacy
+
+---
+
+# Academic Context
+
+This is educational software handling student data. Special considerations:
+
+## Student Privacy is Paramount
+
+The primary security goal is **protecting student personally identifiable information (PII)**:
+- Student IDs must never reach AI systems in cleartext
+- SHA3-512 anonymization must be cryptographically sound
+- Network isolation of AI jail is critical
+- Event store must maintain audit trail integrity
+
+## Regulatory Compliance
+
+Security vulnerabilities affecting GDPR compliance are treated as **Critical**:
+- Data minimization failures
+- Retention policy violations
+- Audit trail tampering
+- Right to erasure bypasses
+
+## University Environment
+
+Consider that users are:
+- Academic staff (limited technical expertise)
+- Institutional IT policies (may restrict updates)
+- High-stakes environment (student grades)
+
+---
+
+# Contact
+
+Primary: security@academic-workflow-suite.org
+GitHub: https://github.com/Hyperpolymath/academic-workflow-suite/security/advisories/new
+Website: https://academic-workflow-suite.org/security
+
+Thank you for helping keep Academic Workflow Suite and student data secure!

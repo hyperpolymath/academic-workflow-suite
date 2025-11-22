@@ -1,0 +1,264 @@
+# ai.txt - AI Training and Usage Policy
+# Proposed standard for declaring AI/ML training policies
+# https://site.spawning.ai/spawning-ai-txt
+
+# AI Training Policy
+
+## Summary
+
+**Academic Workflow Suite** is **OPEN for AI training** with attribution and share-alike requirements.
+
+## License
+
+This project is licensed under **AGPL-3.0** (software) and **CC BY-SA 4.0** (documentation).
+
+AI/ML systems may train on this codebase subject to the following:
+
+### ✅ Permitted Uses
+
+- **Training**: Use code and documentation for training AI models
+- **Code Generation**: Generate code inspired by this project
+- **Research**: Academic research on privacy-preserving AI, educational technology
+- **Learning**: Educational use by developers and students
+
+### ⚠️ Required Conditions
+
+1. **Attribution**: Cite this project appropriately
+   ```
+   Academic Workflow Suite (https://github.com/Hyperpolymath/academic-workflow-suite)
+   Licensed under AGPL-3.0
+   ```
+
+2. **Share-Alike**: If you fine-tune a model on this code and deploy it as a service:
+   - You must open-source the model weights (AGPL-3.0 network copyleft applies)
+   - Or, obtain a commercial license
+
+3. **Privacy**: Do not train on:
+   - Student data (if any test data contains PII)
+   - Security credentials or secrets
+   - Personal information from issue comments
+
+4. **Ethical Use**: Adhere to our values:
+   - Privacy-first AI
+   - Student data protection
+   - Open-source ethos
+   - Academic integrity
+
+### ❌ Prohibited Uses
+
+- **Privacy Violations**: Training on confidential student data
+- **Malicious Code**: Generating malware, exploits, or attacks
+- **License Circumvention**: Using AI to evade AGPL-3.0 requirements
+- **Misrepresentation**: Claiming AI-generated code is human-authored
+
+## Specific Directories
+
+| Directory | AI Training | Notes |
+|-----------|-------------|-------|
+| `components/core/` | ✅ Permitted | Rust core engine - privacy patterns encouraged |
+| `components/ai-jail/` | ✅ Permitted | AI isolation - security patterns valuable |
+| `components/backend/` | ✅ Permitted | Elixir backend - OTP patterns |
+| `components/office-addin/` | ✅ Permitted | ReScript frontend - type-safe UI |
+| `docs/` | ✅ Permitted | CC BY-SA 4.0 - attribution required |
+| `tests/fixtures/` | ⚠️  Conditional | Test data only if anonymized (no real student data) |
+| `security/` | ✅ Permitted | Security testing patterns - ethical use only |
+| `.env.example` | ❌ Excluded | Configuration templates may contain hints |
+
+## Model Attribution
+
+If your AI model is trained on Academic Workflow Suite code, we request:
+
+### In Model Card
+
+```markdown
+## Training Data
+
+Trained on Academic Workflow Suite:
+- Repository: https://github.com/Hyperpolymath/academic-workflow-suite
+- License: AGPL-3.0 (code), CC BY-SA 4.0 (docs)
+- Training subset: [specify components used]
+```
+
+### In Generated Code
+
+If the model generates code similar to this project, include a comment:
+
+```rust
+// Inspired by Academic Workflow Suite
+// https://github.com/Hyperpolymath/academic-workflow-suite
+// License: AGPL-3.0
+```
+
+## Research Collaboration
+
+We welcome collaboration with AI researchers:
+
+### Interesting Research Questions
+
+- **Privacy-preserving AI**: How effective is SHA3-512 anonymization?
+- **Offline-first ML**: Can models run entirely on-device?
+- **Educational AI**: How to maintain tutor judgment vs. AI assistance balance?
+- **CRDTs for ML**: Distributed model training without coordination?
+
+### Contact for Research
+
+- **Research Inquiries**: research@academic-workflow-suite.org
+- **Data Requests**: (Student data is NEVER shared - only anonymized aggregates)
+- **Collaboration**: Willing to share architecture insights, not student data
+
+## AI Usage in This Project
+
+Transparency: This project uses AI tools for:
+
+✅ **Code Assistance**
+- GitHub Copilot for boilerplate code
+- ChatGPT/Claude for documentation drafting
+- AI-assisted refactoring
+
+All AI-generated code is:
+- Reviewed by humans
+- Tested thoroughly
+- Attributed where significant
+- Licensed under AGPL-3.0
+
+❌ **AI Does NOT**
+- Make security decisions
+- Generate cryptographic code
+- Process real student data
+- Make marking decisions (human tutors only)
+
+## Commercial AI Services
+
+If you're building a commercial AI service (e.g., code completion, chatbot):
+
+### Using This Code
+
+1. **Open-Source Your Service**: AGPL-3.0 requires network copyleft
+   - If users interact with your service over a network
+   - You must open-source the service code
+
+2. **Or, Get a Commercial License**: Contact us
+   - Dual-licensing available for commercial deployments
+   - Supports project development
+
+### Training Your Model
+
+Training a model on this code is permitted, but:
+- **Model weights**: Consider open-sourcing (encourages sharing)
+- **Generated code**: AGPL-3.0 may apply if it's derivative
+- **Attribution**: Required (cite this project)
+
+## Crawlers and Scrapers
+
+### Allowed
+
+✅ **Research Crawlers**
+- Academic institutions
+- Non-profit research organizations
+- Archive.org, Software Heritage
+
+✅ **AI Training Crawlers** (with conditions above)
+- Respect robots.txt (if added)
+- Cite this project
+- Comply with AGPL-3.0
+
+### Rate Limiting
+
+Please be respectful:
+- Max 1 request/second to any repository endpoint
+- Use GitHub API (not web scraping)
+- Respect GitHub's Terms of Service
+
+## Future Changes
+
+This ai.txt may evolve. Check for updates:
+- Canonical URL: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/.well-known/ai.txt
+- Last Updated: 2025-11-22
+- Version: 1.0
+
+## Philosophy
+
+We believe in:
+
+### Open AI
+
+AI should be:
+- **Transparent**: Open models, open training data
+- **Accountable**: Attributable, auditable
+- **Ethical**: Respects privacy, licenses, human values
+
+### Privacy-First AI
+
+This project demonstrates:
+- **Local AI**: No cloud required
+- **Anonymization**: PII never reaches models
+- **Human-in-the-loop**: AI assists, humans decide
+
+### Knowledge Sharing
+
+We share our code openly so others can:
+- Learn from our architecture
+- Build better privacy-preserving systems
+- Improve educational technology
+
+In return, we ask:
+- **Attribute** our work
+- **Share improvements** (AGPL-3.0)
+- **Respect student privacy**
+
+## Contact
+
+- **AI Policy Questions**: ai@academic-workflow-suite.org
+- **Commercial Licensing**: business@academic-workflow-suite.org
+- **Research Collaboration**: research@academic-workflow-suite.org
+
+---
+
+# Technical Details
+
+## Robots.txt Integration
+
+If you're a crawler, also check:
+- robots.txt: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/robots.txt
+- (To be created if needed)
+
+## Machine-Readable Policy
+
+```json
+{
+  "ai_training": {
+    "permitted": true,
+    "license": "AGPL-3.0 (code), CC BY-SA 4.0 (docs)",
+    "attribution_required": true,
+    "share_alike": true,
+    "ethical_use_only": true
+  },
+  "directories": {
+    "components/": "permitted",
+    "docs/": "permitted-with-attribution",
+    "tests/fixtures/": "conditional-anonymized-only"
+  },
+  "prohibited": [
+    "student_data_training",
+    "malicious_code_generation",
+    "license_circumvention"
+  ],
+  "contact": {
+    "ai_policy": "ai@academic-workflow-suite.org",
+    "research": "research@academic-workflow-suite.org"
+  }
+}
+```
+
+## Updates
+
+- **2025-11-22**: Initial ai.txt created
+- Future updates will increment version number
+
+---
+
+**Last Updated**: 2025-11-22
+**Version**: 1.0
+**Canonical**: https://github.com/Hyperpolymath/academic-workflow-suite/blob/main/.well-known/ai.txt
+
+Thank you for respecting our AI training policy!
