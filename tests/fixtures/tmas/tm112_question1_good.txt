@@ -1,0 +1,23 @@
+Question 1: Explain the key differences between interpreted and compiled programming languages, providing specific examples and discussing the advantages and disadvantages of each approach. (500 words)
+
+Answer:
+
+There are two main types of programming languages: compiled and interpreted. They work in different ways and each has pros and cons.
+
+Compiled languages like C++ and Java are converted into machine code before they run. A compiler is a special program that reads your source code and translates it into binary code that the computer can understand directly. This happens before you run the program. For example, when you write a C++ program, you have to compile it first, and then you get an executable file like program.exe on Windows. This file contains instructions that the CPU can execute directly.
+
+The good thing about compiled languages is that they are very fast. Because the code is already translated to machine code, the computer doesn't have to do any translation when the program runs. This makes compiled programs much faster than interpreted ones. Also, the compiler can optimize the code to make it even faster. Another advantage is that you can give someone just the executable file without giving them your source code, which is good for protecting intellectual property.
+
+But compiled languages also have disadvantages. One problem is that you have to compile the code every time you make a change, which can be annoying when you're developing. Also, the executable file only works on one type of computer. If you compile a program on Windows, it won't work on Mac or Linux. You have to recompile it for each platform.
+
+Interpreted languages like Python and JavaScript work differently. Instead of being compiled beforehand, they are executed line by line by an interpreter. The interpreter reads each line of code and executes it immediately. For example, when you run a Python program, the Python interpreter goes through your code and executes each instruction as it reads it.
+
+The advantage of interpreted languages is that they are easier to work with during development. You can make changes to your code and see the results immediately without waiting for compilation. Interpreted languages are also usually portable - the same Python code can run on different operating systems without any changes, as long as Python is installed.
+
+The main disadvantage is that interpreted languages are slower than compiled ones. Because the interpreter has to translate the code while the program is running, it adds overhead that slows things down. This can be a problem for programs that need to be very fast, like games or scientific calculations.
+
+Some languages use a combination of both approaches. Java, for instance, compiles to an intermediate form called bytecode, which is then interpreted or compiled just-in-time when the program runs. This gives some of the benefits of both approaches.
+
+In conclusion, compiled languages are faster and better for performance-critical applications, while interpreted languages are easier to develop with and more portable. The choice between them depends on what you're trying to build and what's most important for your project.
+
+[Word count: 476]

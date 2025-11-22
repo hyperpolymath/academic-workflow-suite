@@ -1,0 +1,302 @@
+# GitLab CI Release Pipeline for Academic Workflow Suite
+
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  CARGO_TERM_COLOR: always
+
+stages:
+  - build
+  - test
+  - package
+  - release
+  - publish
+
+# Cache configuration
+.cargo_cache:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .cargo/
+      - target/
+
+# Build jobs
+build:linux:amd64:
+  stage: build
+  image: rust:latest
+  extends: .cargo_cache
+  script:
+    - cargo build --release --target x86_64-unknown-linux-gnu
+    - mkdir -p artifacts
+    - cp target/x86_64-unknown-linux-gnu/release/aws artifacts/aws-linux-amd64
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 1 week
+  only:
+    - tags
+    - main
+
+build:linux:arm64:
+  stage: build
+  image: rust:latest
+  extends: .cargo_cache
+  before_script:
+    - apt-get update && apt-get install -y gcc-aarch64-linux-gnu
+    - rustup target add aarch64-unknown-linux-gnu
+  script:
+    - cargo build --release --target aarch64-unknown-linux-gnu
+    - mkdir -p artifacts
+    - cp target/aarch64-unknown-linux-gnu/release/aws artifacts/aws-linux-arm64
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 1 week
+  only:
+    - tags
+    - main
+
+build:macos:
+  stage: build
+  tags:
+    - macos
+  extends: .cargo_cache
+  script:
+    - cargo build --release
+    - mkdir -p artifacts
+    - cp target/release/aws artifacts/aws-macos
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 1 week
+  only:
+    - tags
+    - main
+
+build:windows:
+  stage: build
+  tags:
+    - windows
+  extends: .cargo_cache
+  script:
+    - cargo build --release
+    - mkdir artifacts
+    - cp target/release/aws.exe artifacts/aws-windows.exe
+  artifacts:
+    paths:
+      - artifacts/
+    expire_in: 1 week
+  only:
+    - tags
+    - main
+
+# Test jobs
+test:linux:
+  stage: test
+  image: rust:latest
+  extends: .cargo_cache
+  script:
+    - cargo test --all
+  only:
+    - tags
+    - main
+    - merge_requests
+
+test:integration:
+  stage: test
+  image: rust:latest
+  extends: .cargo_cache
+  script:
+    - cargo test --all --features integration-tests
+  only:
+    - tags
+    - main
+
+# Package jobs
+package:debian:
+  stage: package
+  image: debian:bookworm
+  dependencies:
+    - build:linux:amd64
+  before_script:
+    - apt-get update && apt-get install -y dpkg-dev build-essential
+  script:
+    - cd release
+    - chmod +x scripts/package.sh
+    - ./scripts/package.sh --deb
+  artifacts:
+    paths:
+      - release/dist/*.deb
+    expire_in: 1 week
+  only:
+    - tags
+
+package:rpm:
+  stage: package
+  image: fedora:latest
+  dependencies:
+    - build:linux:amd64
+  before_script:
+    - dnf install -y rpm-build rpmdevtools
+  script:
+    - cd release
+    - chmod +x scripts/package.sh
+    - ./scripts/package.sh --rpm
+  artifacts:
+    paths:
+      - release/dist/*.rpm
+    expire_in: 1 week
+  only:
+    - tags
+
+package:snap:
+  stage: package
+  image: snapcore/snapcraft:latest
+  dependencies:
+    - build:linux:amd64
+  script:
+    - cd release/snap
+    - snapcraft
+  artifacts:
+    paths:
+      - release/snap/*.snap
+    expire_in: 1 week
+  only:
+    - tags
+
+package:appimage:
+  stage: package
+  image: ubuntu:latest
+  dependencies:
+    - build:linux:amd64
+  before_script:
+    - apt-get update && apt-get install -y wget python3-pip
+    - pip3 install appimage-builder
+  script:
+    - cd release/appimage
+    - appimage-builder --recipe AppImageBuilder.yml
+  artifacts:
+    paths:
+      - release/appimage/*.AppImage
+    expire_in: 1 week
+  only:
+    - tags
+
+# Create archives
+package:archives:
+  stage: package
+  image: alpine:latest
+  dependencies:
+    - build:linux:amd64
+    - build:linux:arm64
+    - build:macos
+    - build:windows
+  before_script:
+    - apk add --no-cache tar gzip zip
+  script:
+    - VERSION=$(cat VERSION)
+    - mkdir -p release/dist
+    # Linux amd64
+    - tar czf release/dist/academic-workflow-suite-${VERSION}-linux-amd64.tar.gz -C artifacts aws-linux-amd64
+    # Linux arm64
+    - tar czf release/dist/academic-workflow-suite-${VERSION}-linux-arm64.tar.gz -C artifacts aws-linux-arm64
+    # macOS
+    - tar czf release/dist/academic-workflow-suite-${VERSION}-macos.tar.gz -C artifacts aws-macos
+    # Windows
+    - cd artifacts && zip ../release/dist/academic-workflow-suite-${VERSION}-windows.zip aws-windows.exe
+  artifacts:
+    paths:
+      - release/dist/*.tar.gz
+      - release/dist/*.zip
+    expire_in: 1 week
+  only:
+    - tags
+
+# Generate checksums
+checksums:
+  stage: package
+  image: alpine:latest
+  dependencies:
+    - package:debian
+    - package:rpm
+    - package:archives
+  before_script:
+    - apk add --no-cache coreutils gnupg
+  script:
+    - cd release/dist
+    - sha256sum * > SHA256SUMS
+    - cat SHA256SUMS
+  artifacts:
+    paths:
+      - release/dist/SHA256SUMS
+    expire_in: 1 week
+  only:
+    - tags
+
+# Create GitLab release
+release:gitlab:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  dependencies:
+    - package:debian
+    - package:rpm
+    - package:archives
+    - checksums
+  script:
+    - echo "Creating GitLab release"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'Release $CI_COMMIT_TAG'
+    description: './CHANGELOG.md'
+    assets:
+      links:
+        - name: 'Debian Package'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/release/dist/academic-workflow-suite_${CI_COMMIT_TAG}_amd64.deb'
+        - name: 'RPM Package'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/release/dist/academic-workflow-suite-${CI_COMMIT_TAG}-1.x86_64.rpm'
+        - name: 'Linux AMD64 Archive'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/release/dist/academic-workflow-suite-${CI_COMMIT_TAG}-linux-amd64.tar.gz'
+        - name: 'Checksums'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/release/dist/SHA256SUMS'
+  only:
+    - tags
+
+# Publish to package registries
+publish:crates:
+  stage: publish
+  image: rust:latest
+  extends: .cargo_cache
+  script:
+    - cargo login $CRATES_IO_TOKEN
+    - cargo publish
+  only:
+    - tags
+  when: manual
+
+publish:docker:
+  stage: publish
+  image: docker:latest
+  services:
+    - docker:dind
+  dependencies:
+    - build:linux:amd64
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - VERSION=$(cat VERSION)
+    - docker build -t $CI_REGISTRY_IMAGE:$VERSION .
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:$VERSION
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - tags
+
+publish:npm:
+  stage: publish
+  image: node:latest
+  script:
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+    - npm publish
+  only:
+    - tags
+  when: manual
+  allow_failure: true

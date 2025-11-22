@@ -1,0 +1,42 @@
+app-id: com.academicworkflow.AWS
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: aws
+
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --filesystem=home
+  - --device=dri
+
+modules:
+  - name: academic-workflow-suite
+    buildsystem: simple
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml --verbose
+      - cargo --offline build --release --verbose
+      - install -Dm755 ./target/release/aws -t /app/bin/
+    sources:
+      - type: archive
+        url: https://github.com/academicworkflow/suite/archive/v{{VERSION}}.tar.gz
+        sha256: {{SHA256}}
+      - cargo-sources.json
+
+  - name: metadata
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 com.academicworkflow.AWS.desktop /app/share/applications/com.academicworkflow.AWS.desktop
+      - install -Dm644 com.academicworkflow.AWS.metainfo.xml /app/share/metainfo/com.academicworkflow.AWS.metainfo.xml
+      - install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/com.academicworkflow.AWS.png
+    sources:
+      - type: file
+        path: com.academicworkflow.AWS.desktop
+      - type: file
+        path: com.academicworkflow.AWS.metainfo.xml
+      - type: file
+        path: icon.png

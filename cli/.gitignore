@@ -1,0 +1,28 @@
+# Rust build artifacts
+target/
+Cargo.lock
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated completions (optional - you may want to commit these)
+# completions/*.bash
+# completions/_*
+# completions/*.fish
+# completions/*.ps1
+
+# Local configuration
+.aws/
+*.local.yaml
+credentials.json
+
+# Logs
+*.log

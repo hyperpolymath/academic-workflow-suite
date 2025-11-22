@@ -1,0 +1,113 @@
+groups:
+  - name: backend_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "High 5xx error rate"
+          description: "5xx error rate is {{ $value | humanize }}% (threshold: 5%)"
+          runbook: "Check backend logs and investigate service health"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="aws-backend"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "High request latency"
+          description: "p95 latency is {{ $value | humanize }}s (threshold: 1s)"
+          runbook: "Investigate slow queries and bottlenecks"
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job="aws-backend"}[5m])) > 3
+        for: 2m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "Critical request latency"
+          description: "p99 latency is {{ $value | humanize }}s (threshold: 3s)"
+          runbook: "Immediate investigation required - check database and AI service"
+
+      - alert: HighRequestRate
+        expr: sum(rate(http_requests_total[5m])) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "Unusually high request rate"
+          description: "Request rate is {{ $value | humanize }} req/s"
+          runbook: "Verify if traffic is legitimate or potential DDoS"
+
+      - alert: Low Availability
+        expr: 100 * (1 - (sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])))) < 99.5
+        for: 5m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "Service availability below SLA"
+          description: "Availability is {{ $value | humanize }}% (SLA: 99.5%)"
+          runbook: "Investigate and resolve errors immediately"
+
+      - alert: TMAProcessingStalled
+        expr: rate(aws_tma_processed_total[10m]) == 0 and aws_tma_queue_depth > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "TMA processing has stalled"
+          description: "No TMAs processed in 10 minutes despite queue depth of {{ $labels.queue_depth }}"
+          runbook: "Check TMA worker status and AI jail connectivity"
+
+      - alert: TMAQueueBacklog
+        expr: aws_tma_queue_depth > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "Large TMA queue backlog"
+          description: "TMA queue depth is {{ $value }}"
+          runbook: "Consider scaling TMA workers or AI jail instances"
+
+      - alert: SlowTMAProcessing
+        expr: avg(aws_tma_marking_duration_seconds) > 120
+        for: 10m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "TMA marking taking too long"
+          description: "Average marking time is {{ $value | humanize }}s (threshold: 120s)"
+          runbook: "Check AI jail performance and model loading times"
+
+      - alert: LowFeedbackQuality
+        expr: avg(aws_feedback_quality_score) < 0.7
+        for: 15m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "Feedback quality declining"
+          description: "Average feedback quality score is {{ $value | humanize }} (threshold: 0.7)"
+          runbook: "Review AI model performance and prompt templates"
+
+      - alert: BackendHTTPConnectionsHigh
+        expr: sum(http_server_connections_active) > 500
+        for: 5m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "High number of active HTTP connections"
+          description: "{{ $value }} active connections (threshold: 500)"
+          runbook: "Check for connection leaks or increase connection pool"

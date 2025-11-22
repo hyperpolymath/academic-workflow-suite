@@ -1,0 +1,136 @@
+question_id: tm112_q1
+module: TM112
+title: "Compiled vs Interpreted Languages"
+total_points: 100
+word_limit: 500
+word_limit_penalty: 5  # Points deducted per 50 words over limit
+
+criteria:
+  - name: "Understanding of Compilation Process"
+    weight: 20
+    description: "Demonstrates clear understanding of how compiled languages work"
+    levels:
+      - score: 20
+        descriptor: "Excellent: Comprehensively explains compilation process, including intermediate steps, machine code generation, and platform-specific executables"
+      - score: 15
+        descriptor: "Good: Clearly explains compilation with some detail about the process"
+      - score: 10
+        descriptor: "Satisfactory: Basic explanation of compilation present but lacks detail"
+      - score: 5
+        descriptor: "Poor: Vague or partially incorrect explanation of compilation"
+      - score: 0
+        descriptor: "Absent: No explanation or completely incorrect"
+
+  - name: "Understanding of Interpretation Process"
+    weight: 20
+    description: "Demonstrates clear understanding of how interpreted languages work"
+    levels:
+      - score: 20
+        descriptor: "Excellent: Comprehensively explains interpretation, runtime execution, and line-by-line processing"
+      - score: 15
+        descriptor: "Good: Clearly explains interpretation with reasonable detail"
+      - score: 10
+        descriptor: "Satisfactory: Basic explanation of interpretation present"
+      - score: 5
+        descriptor: "Poor: Vague or partially incorrect explanation"
+      - score: 0
+        descriptor: "Absent: No explanation or completely incorrect"
+
+  - name: "Examples and Accuracy"
+    weight: 15
+    description: "Provides correct, specific examples of each language type"
+    levels:
+      - score: 15
+        descriptor: "Excellent: Multiple correct examples with accurate categorization (e.g., C/C++/Rust as compiled, Python/JavaScript/Ruby as interpreted)"
+      - score: 10
+        descriptor: "Good: Correct examples provided with accurate categorization"
+      - score: 5
+        descriptor: "Satisfactory: Some examples provided but may include minor errors"
+      - score: 2
+        descriptor: "Poor: Examples present but with significant errors (e.g., Python listed as compiled)"
+      - score: 0
+        descriptor: "Absent: No examples or completely incorrect"
+
+  - name: "Advantages Analysis"
+    weight: 15
+    description: "Discusses advantages of both approaches comprehensively"
+    levels:
+      - score: 15
+        descriptor: "Excellent: Thorough analysis of advantages for both (performance, optimization for compiled; flexibility, portability for interpreted)"
+      - score: 10
+        descriptor: "Good: Clear discussion of main advantages for both types"
+      - score: 7
+        descriptor: "Satisfactory: Some advantages mentioned but incomplete"
+      - score: 3
+        descriptor: "Poor: Limited or superficial discussion of advantages"
+      - score: 0
+        descriptor: "Absent: No discussion of advantages"
+
+  - name: "Disadvantages Analysis"
+    weight: 15
+    description: "Discusses disadvantages of both approaches comprehensively"
+    levels:
+      - score: 15
+        descriptor: "Excellent: Thorough analysis of disadvantages (compilation time, platform dependence vs. performance overhead)"
+      - score: 10
+        descriptor: "Good: Clear discussion of main disadvantages for both types"
+      - score: 7
+        descriptor: "Satisfactory: Some disadvantages mentioned but incomplete"
+      - score: 3
+        descriptor: "Poor: Limited or superficial discussion of disadvantages"
+      - score: 0
+        descriptor: "Absent: No discussion of disadvantages"
+
+  - name: "Technical Depth"
+    weight: 10
+    description: "Demonstrates deeper technical understanding beyond surface-level explanations"
+    levels:
+      - score: 10
+        descriptor: "Excellent: Discusses advanced concepts (JIT compilation, bytecode, optimization techniques, platform independence mechanisms)"
+      - score: 7
+        descriptor: "Good: Shows good technical understanding with some deeper insights"
+      - score: 4
+        descriptor: "Satisfactory: Basic technical understanding demonstrated"
+      - score: 1
+        descriptor: "Poor: Superficial or overly simplistic explanations"
+      - score: 0
+        descriptor: "Absent: No technical depth"
+
+  - name: "Structure and Clarity"
+    weight: 5
+    description: "Answer is well-organized, clear, and easy to follow"
+    levels:
+      - score: 5
+        descriptor: "Excellent: Logical flow, clear paragraphs, professional presentation"
+      - score: 3
+        descriptor: "Good: Generally well-structured with minor organizational issues"
+      - score: 1
+        descriptor: "Poor: Disorganized or difficult to follow"
+      - score: 0
+        descriptor: "Unacceptable: No clear structure"
+
+common_errors:
+  - error: "Incorrectly categorizing languages (e.g., Python as compiled, Java as purely compiled)"
+    penalty: 10
+  - error: "Confusing compilation with interpretation (using terms interchangeably)"
+    penalty: 15
+  - error: "Stating that interpreted languages cannot be fast or that compiled languages are always faster without nuance"
+    penalty: 5
+  - error: "Claiming HTML is a programming language or including it as an example"
+    penalty: 3
+  - error: "Circular definitions (e.g., 'compiled languages are compiled')"
+    penalty: 10
+
+bonus_points:
+  - description: "Discusses hybrid approaches (JIT, bytecode compilation) with examples"
+    points: 5
+  - description: "Mentions specific optimization techniques or discusses trade-offs in modern language design"
+    points: 3
+
+passing_grade: 40
+grade_boundaries:
+  distinction: 85
+  pass_2: 70
+  pass_3: 55
+  pass_4: 40
+  fail: 0

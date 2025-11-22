@@ -1,0 +1,34 @@
+[package]
+name = "aws-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Academic Workflow Suite Team"]
+description = "Core engine for TMA marking automation system"
+license = "MIT"
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+sha3 = "0.10"
+heed = "0.20"  # Modern LMDB wrapper
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1.0"
+thiserror = "1.0"
+regex = "1.10"
+hex = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+tempfile = "3.8"
+tokio-test = "0.4"
+
+[lib]
+name = "aws_core"
+path = "src/lib.rs"
+
+# WASM compatibility considerations
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }

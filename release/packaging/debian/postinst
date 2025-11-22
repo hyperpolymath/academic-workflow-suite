@@ -1,0 +1,28 @@
+#!/bin/bash
+# Post-installation script for academic-workflow-suite
+
+set -e
+
+case "$1" in
+    configure)
+        # Create configuration directory
+        mkdir -p /etc/academic-workflow-suite
+
+        # Set permissions
+        chmod 755 /usr/bin/aws
+
+        # Print welcome message
+        echo "Academic Workflow Suite has been installed successfully!"
+        echo "Run 'aws --help' to get started."
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

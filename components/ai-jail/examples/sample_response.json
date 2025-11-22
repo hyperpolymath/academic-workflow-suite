@@ -1,0 +1,8 @@
+{
+  "status": "success",
+  "feedback": "This is a well-structured answer that addresses all three required ecosystem types.\n\nStrengths:\n- Excellent coverage of marine ecosystems with specific example (Great Barrier Reef coral bleaching) - 3/3 marks\n- Good discussion of terrestrial ecosystems, explaining species migration and food web impacts - 3/3 marks\n- Adequate coverage of freshwater ecosystems with examples of oxygen depletion and altered water levels - 2.5/3 marks\n- Clear explanation of mechanisms including temperature, precipitation, and ocean acidification - 1/1 mark\n\nAreas for improvement:\n- The freshwater section could benefit from a specific example (like a named lake or river system)\n- Could elaborate more on the cascading effects through food webs in the freshwater discussion\n\nOverall: 9.5/10 marks. This demonstrates strong understanding of climate change impacts across diverse ecosystems with appropriate scientific examples.",
+  "confidence": 0.87,
+  "rubric_alignment": 0.92,
+  "tokens_generated": 187,
+  "inference_time_ms": 2341
+}

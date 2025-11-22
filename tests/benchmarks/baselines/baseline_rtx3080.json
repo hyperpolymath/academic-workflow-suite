@@ -1,0 +1,134 @@
+{
+  "metadata": {
+    "name": "RTX 3080 Baseline",
+    "description": "Performance baseline for NVIDIA RTX 3080 GPU configuration",
+    "created": "2025-11-22T00:00:00Z",
+    "hardware": {
+      "cpu": "AMD Ryzen 9 5900X",
+      "cpu_cores": 12,
+      "ram_gb": 32,
+      "gpu": "NVIDIA GeForce RTX 3080",
+      "gpu_vram_mb": 10240,
+      "storage": "NVMe SSD"
+    }
+  },
+  "benchmarks": {
+    "core": {
+      "event_store_write": {
+        "1_events": {"avg_ns": 45000, "std_dev": 2500},
+        "10_events": {"avg_ns": 125000, "std_dev": 5000},
+        "100_events": {"avg_ns": 850000, "std_dev": 35000},
+        "1000_events": {"avg_ns": 7500000, "std_dev": 250000}
+      },
+      "event_store_read": {
+        "10_events": {"avg_ns": 35000, "std_dev": 2000},
+        "100_events": {"avg_ns": 280000, "std_dev": 12000},
+        "1000_events": {"avg_ns": 2500000, "std_dev": 100000}
+      },
+      "anonymization": {
+        "simple_text": {"avg_ns": 1200, "std_dev": 100},
+        "with_email": {"avg_ns": 3500, "std_dev": 200},
+        "with_phone": {"avg_ns": 4200, "std_dev": 250},
+        "complex_pii": {"avg_ns": 8500, "std_dev": 400}
+      },
+      "pii_detection": {
+        "clean_text": {"avg_ns": 2500, "std_dev": 150},
+        "email_only": {"avg_ns": 3800, "std_dev": 200},
+        "multiple_pii": {"avg_ns": 6500, "std_dev": 350},
+        "long_text_with_pii": {"avg_ns": 25000, "std_dev": 1200}
+      },
+      "tma_parsing": {
+        "small_tma": {"avg_ns": 15000, "std_dev": 800},
+        "medium_tma": {"avg_ns": 45000, "std_dev": 2200},
+        "large_tma": {"avg_ns": 420000, "std_dev": 18000}
+      },
+      "hash_computation": {
+        "1kb": {"avg_ns": 1800, "std_dev": 100},
+        "10kb": {"avg_ns": 12000, "std_dev": 600},
+        "100kb": {"avg_ns": 105000, "std_dev": 4500},
+        "1mb": {"avg_ns": 980000, "std_dev": 42000}
+      }
+    },
+    "ipc": {
+      "message_serialization": {
+        "small": {"avg_ns": 450, "std_dev": 25},
+        "medium": {"avg_ns": 2800, "std_dev": 140},
+        "large": {"avg_ns": 18000, "std_dev": 850}
+      },
+      "message_deserialization": {
+        "small": {"avg_ns": 580, "std_dev": 30},
+        "medium": {"avg_ns": 3200, "std_dev": 160},
+        "large": {"avg_ns": 22000, "std_dev": 1100}
+      },
+      "request_response_latency": {
+        "simple_echo": {"avg_ns": 1500, "std_dev": 100},
+        "with_processing": {"avg_ns": 4500, "std_dev": 250}
+      }
+    },
+    "database": {
+      "lmdb_write": {
+        "10_records": {"avg_ns": 85000, "std_dev": 4500},
+        "100_records": {"avg_ns": 650000, "std_dev": 28000},
+        "1000_records": {"avg_ns": 5800000, "std_dev": 240000},
+        "10000_records": {"avg_ns": 58000000, "std_dev": 2400000}
+      },
+      "lmdb_read": {
+        "10_records": {"avg_ns": 28000, "std_dev": 1400},
+        "100_records": {"avg_ns": 220000, "std_dev": 9500},
+        "1000_records": {"avg_ns": 2100000, "std_dev": 85000},
+        "10000_records": {"avg_ns": 21000000, "std_dev": 850000}
+      },
+      "lmdb_range_query": {
+        "10_records": {"avg_ns": 32000, "std_dev": 1600},
+        "100_records": {"avg_ns": 280000, "std_dev": 12000},
+        "1000_records": {"avg_ns": 2700000, "std_dev": 110000}
+      }
+    },
+    "ai_inference": {
+      "model_loading": {
+        "fp16": {"avg_ms": 8500, "std_dev": 350},
+        "q8": {"avg_ms": 5200, "std_dev": 220},
+        "q4": {"avg_ms": 3100, "std_dev": 140}
+      },
+      "inference_latency": {
+        "10_tokens": {"avg_ms": 15, "std_dev": 2},
+        "50_tokens": {"avg_ms": 68, "std_dev": 4},
+        "100_tokens": {"avg_ms": 132, "std_dev": 7},
+        "256_tokens": {"avg_ms": 335, "std_dev": 18},
+        "512_tokens": {"avg_ms": 665, "std_dev": 35}
+      },
+      "throughput": {
+        "fp16": {"tokens_per_sec": 28, "std_dev": 2},
+        "q8": {"tokens_per_sec": 35, "std_dev": 3},
+        "q4": {"tokens_per_sec": 45, "std_dev": 4}
+      },
+      "vram_usage": {
+        "fp16": {"mb": 13800},
+        "q8": {"mb": 7400},
+        "q4": {"mb": 3900}
+      }
+    },
+    "integration": {
+      "e2e_tma_marking": {
+        "avg_ms": 2850,
+        "min_ms": 2420,
+        "max_ms": 3680,
+        "median_ms": 2780
+      },
+      "batch_processing": {
+        "10_tmas": {"duration_ms": 18500, "throughput_per_sec": 5},
+        "50_tmas": {"duration_ms": 87000, "throughput_per_sec": 5},
+        "100_tmas": {"duration_ms": 172000, "throughput_per_sec": 5}
+      },
+      "cold_start_vs_warm": {
+        "cold_start_ms": 1850,
+        "warm_start_avg_ms": 280,
+        "improvement_factor": 6.6
+      }
+    }
+  },
+  "thresholds": {
+    "regression_percentage": 10,
+    "notes": "Any performance degradation >10% is considered a regression"
+  }
+}

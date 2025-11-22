@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Academic Workflow Suite {{VERSION}}</title>
+    <organization>com.academicworkflow</organization>
+    <domains enable_localSystem="true"/>
+    <options customize="never" require-scripts="false" rootVolumeOnly="true" />
+
+    <welcome file="welcome.html" mime-type="text/html" />
+    <license file="LICENSE" mime-type="text/plain" />
+    <conclusion file="conclusion.html" mime-type="text/html" />
+
+    <pkg-ref id="com.academicworkflow.suite">
+        <bundle-version>
+            <bundle id="com.academicworkflow.suite" CFBundleVersion="{{VERSION}}" path="academic-workflow-suite.pkg" />
+        </bundle-version>
+    </pkg-ref>
+
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.academicworkflow.suite"/>
+        </line>
+    </choices-outline>
+
+    <choice id="default"/>
+    <choice id="com.academicworkflow.suite" visible="false">
+        <pkg-ref id="com.academicworkflow.suite"/>
+    </choice>
+</installer-gui-script>

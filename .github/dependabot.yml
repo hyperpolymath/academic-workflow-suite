@@ -1,0 +1,112 @@
+# Dependabot configuration for Academic Workflow Suite
+# Automated dependency updates for security and maintenance
+
+version: 2
+
+updates:
+  # Rust dependencies (Cargo)
+  - package-ecosystem: "cargo"
+    directory: "/components/core"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  - package-ecosystem: "cargo"
+    directory: "/components/ai-jail"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "security-critical"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Elixir dependencies (Mix)
+  - package-ecosystem: "mix"
+    directory: "/components/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "elixir"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  # Node.js dependencies (npm)
+  - package-ecosystem: "npm"
+    directory: "/components/office-addin"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automated"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "ci-cd"
+      - "automated"
+    commit-message:
+      prefix: "chore(ci)"
+
+  # Docker (if Dockerfiles exist)
+  - package-ecosystem: "docker"
+    directory: "/components/ai-jail"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "security-critical"
+      - "automated"
+    commit-message:
+      prefix: "chore(docker)"

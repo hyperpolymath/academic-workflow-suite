@@ -1,0 +1,25 @@
+Question 1: Explain the key differences between interpreted and compiled programming languages, providing specific examples and discussing the advantages and disadvantages of each approach. (500 words)
+
+Answer:
+
+Compiled and interpreted languages are different.
+
+Compiled languages are faster because they compile. Languages like C and python are compiled languages. When you compile a language it turns into 1s and 0s that the computer reads. This is good because computers understand binary code. The compiler does this and makes the program work.
+
+Interpreted languages are slower. They use an interpreter which interprets the code. This means the code doesn't get compiled it just gets interpreted instead. JavaScript is an interpreted language and so is C++. The interpreter looks at the code and runs it.
+
+Compiled languages are better for making fast programs. If you want a fast program you should use a compiled language because its already compiled so it doesn't have to compile when it runs. This saves time and makes it faster.
+
+Interpreted languages are better for beginners because you don't have to compile them. You just write the code and run it. This is easier than compiled languages where you have to compile first.
+
+One advantage of compiled languages is speed. They run very fast because of the compilation. Another advantage is that they are compiled. The disadvantage is that you have to compile them which takes time.
+
+Interpreted languages advantage is that there easy to use. You don't need to compile. The disadvantage is that they are slow because the interpreter has to interpret everything.
+
+Some examples of compiled languages are: C, Java, C++, and Assembly. Some examples of interpreted languages are: Python, JavaScript, Ruby, and HTML.
+
+The difference is that one is compiled and one is interpreted. Compiled languages get compiled by a compiler into machine code. Interpreted languages get interpreted by an interpreter and don't get compiled.
+
+In conclusion, compiled languages and interpreted languages are different because one compiles and one interprets. Compiled languages are faster and interpreted languages are easier. You should choose the right one for your program.
+
+[Word count: 312]

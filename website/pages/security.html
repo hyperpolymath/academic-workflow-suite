@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Security and privacy details for Academic Workflow Suite - Learn about our privacy-first approach, data protection, and compliance.">
+    <title>Security & Privacy - Academic Workflow Suite</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                        <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2"/>
+                        <path d="M10 12h12M10 16h12M10 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">Academic Workflow Suite</span>
+                </a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/pages/features.html">Features</a></li>
+                <li><a href="/pages/documentation.html">Docs</a></li>
+                <li><a href="/pages/installation.html">Install</a></li>
+                <li><a href="/pages/security.html" class="active">Security</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/pages/about.html">About</a></li>
+                <li><a href="/pages/download.html" class="btn btn-primary">Download</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <circle cx="10" cy="10" r="4" fill="currentColor"/>
+                    <path d="M10 2v2M10 16v2M18 10h-2M4 10H2M15.66 4.34l-1.42 1.42M5.76 14.24l-1.42 1.42M15.66 15.66l-1.42-1.42M5.76 5.76L4.34 4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" fill="currentColor"/>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <section class="page-hero security-hero">
+            <div class="container">
+                <div class="security-badge">
+                    <svg width="60" height="60" viewBox="0 0 60 60">
+                        <path d="M30 5L10 15v15c0 12.5 8.7 24.2 20 27 11.3-2.8 20-14.5 20-27V15L30 5z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M25 30l5 5 10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <h1 class="page-title">Security & Privacy First</h1>
+                <p class="page-subtitle">
+                    Your data, your control. We built Academic Workflow Suite with privacy and security as core principles.
+                </p>
+            </div>
+        </section>
+
+        <div class="container content-wrapper">
+            <!-- Privacy Guarantees -->
+            <section class="security-section">
+                <h2 id="guarantees">Our Privacy Guarantees</h2>
+
+                <div class="guarantees-grid">
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M15 24l6 6 12-12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3>100% Local Processing</h3>
+                        <p>
+                            All student data processing happens on your local machine. No information is sent to external
+                            servers without your explicit consent.
+                        </p>
+                    </div>
+
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <rect x="14" y="18" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M20 18v-4a4 4 0 018 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3>Encrypted Storage</h3>
+                        <p>
+                            All data at rest is encrypted using AES-256 encryption with your personal passphrase.
+                            Only you have access to your data.
+                        </p>
+                    </div>
+
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <path d="M8 12h32M8 24h32M8 36h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3>Complete Audit Trail</h3>
+                        <p>
+                            Every action is logged with tamper-proof audit trails. Full transparency into who accessed
+                            what data and when.
+                        </p>
+                    </div>
+
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M24 16v8l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3>Zero Telemetry</h3>
+                        <p>
+                            We don't collect usage analytics, crash reports, or any telemetry without your explicit
+                            opt-in consent. Your usage patterns stay private.
+                        </p>
+                    </div>
+
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <rect x="12" y="12" width="24" height="24" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M20 20h8M20 28h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3>Open Source</h3>
+                        <p>
+                            Complete source code transparency. Security experts and the community can audit our code
+                            at any time. No hidden backdoors.
+                        </p>
+                    </div>
+
+                    <div class="guarantee-card">
+                        <div class="guarantee-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48">
+                                <path d="M12 24h24M24 12v24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3>Offline Capable</h3>
+                        <p>
+                            All core features work completely offline. No internet connection required means no data
+                            can leak over the network.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Isolation -->
+            <section class="security-section">
+                <h2 id="ai-isolation">AI Isolation Technology</h2>
+                <p>
+                    Our unique AI isolation system provides an additional layer of privacy protection when using
+                    AI-assisted feedback generation.
+                </p>
+
+                <div class="isolation-diagram">
+                    <div class="isolation-step">
+                        <div class="step-num">1</div>
+                        <h3>Anonymization</h3>
+                        <p>Student names, IDs, and other PII are automatically stripped from submissions before AI processing.</p>
+                    </div>
+                    <div class="isolation-arrow">→</div>
+                    <div class="isolation-step">
+                        <div class="step-num">2</div>
+                        <h3>Sandboxed Processing</h3>
+                        <p>AI model runs in an isolated environment with no network access or disk write permissions.</p>
+                    </div>
+                    <div class="isolation-arrow">→</div>
+                    <div class="isolation-step">
+                        <div class="step-num">3</div>
+                        <h3>Re-identification</h3>
+                        <p>Generated feedback is safely re-associated with student information after processing.</p>
+                    </div>
+                </div>
+
+                <h3>Isolation Modes</h3>
+                <div class="modes-grid">
+                    <div class="mode-card">
+                        <h4>Standard Mode</h4>
+                        <p>Local AI processing with basic privacy protections. Suitable for most use cases.</p>
+                    </div>
+                    <div class="mode-card mode-recommended">
+                        <span class="badge">Recommended</span>
+                        <h4>Isolation Mode</h4>
+                        <p>Full PII stripping and sandboxed AI processing. Best for sensitive assignments.</p>
+                    </div>
+                    <div class="mode-card">
+                        <h4>Manual Mode</h4>
+                        <p>AI disabled. All feedback written manually. Maximum privacy and control.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GDPR Compliance -->
+            <section class="security-section">
+                <h2 id="gdpr">GDPR & Compliance</h2>
+                <p>
+                    Academic Workflow Suite is designed to help educational institutions meet their
+                    data protection obligations under GDPR and other privacy regulations.
+                </p>
+
+                <h3>GDPR Compliance Features</h3>
+                <div class="compliance-grid">
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Data Minimization</h4>
+                            <p>Only essential data is collected and processed. No excessive data gathering.</p>
+                        </div>
+                    </div>
+
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Right to Access</h4>
+                            <p>Export all data in standard formats (JSON, CSV) for data subject access requests.</p>
+                        </div>
+                    </div>
+
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Right to Erasure</h4>
+                            <p>Securely delete student data with cryptographic wiping. Unrecoverable deletion.</p>
+                        </div>
+                    </div>
+
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Data Portability</h4>
+                            <p>Export data in machine-readable formats for transfer to other systems.</p>
+                        </div>
+                    </div>
+
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Processing Records</h4>
+                            <p>Comprehensive audit logs documenting all data processing activities.</p>
+                        </div>
+                    </div>
+
+                    <div class="compliance-item">
+                        <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <div>
+                            <h4>Privacy by Design</h4>
+                            <p>Privacy and security built into the architecture from day one.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>Need a Data Processing Agreement?</h4>
+                    <p>
+                        Since all processing happens locally on your machine, Academic Workflow Suite acts as your tool,
+                        not a data processor. However, we can provide documentation to help with your institution's
+                        compliance requirements. <a href="/pages/about.html#contact">Contact us</a> for assistance.
+                    </p>
+                </div>
+            </section>
+
+            <!-- University Approval -->
+            <section class="security-section">
+                <h2 id="approval">University Approval Process</h2>
+                <p>
+                    Getting approval from your institution's IT security or data protection office?
+                    Here's what they need to know.
+                </p>
+
+                <h3>Security Documentation Package</h3>
+                <p>We provide comprehensive documentation for institutional review:</p>
+                <ul class="doc-list">
+                    <li>
+                        <strong>Architecture Overview:</strong> Technical documentation of system architecture,
+                        data flows, and security controls.
+                    </li>
+                    <li>
+                        <strong>Security Assessment:</strong> Independent third-party security audit reports
+                        and penetration testing results.
+                    </li>
+                    <li>
+                        <strong>Privacy Impact Assessment:</strong> Detailed DPIA template pre-filled for
+                        Academic Workflow Suite.
+                    </li>
+                    <li>
+                        <strong>Compliance Mapping:</strong> How AWS meets GDPR, FERPA, COPPA, and other
+                        relevant regulations.
+                    </li>
+                    <li>
+                        <strong>Source Code Access:</strong> Full source code available for security review
+                        via GitHub.
+                    </li>
+                </ul>
+
+                <h3>Common Questions from IT Security</h3>
+                <div class="faq-security">
+                    <div class="faq-item">
+                        <h4>Does it store student data in the cloud?</h4>
+                        <p>
+                            No. All student data is stored locally on the educator's machine with AES-256 encryption.
+                            Optional cloud sync (for backup) uses end-to-end encryption.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h4>What network connections does it make?</h4>
+                        <p>
+                            Only when explicitly configured: (1) LMS API connections for import/export, (2) Optional
+                            cloud sync for backups, (3) Optional software update checks. All connections use TLS 1.3.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h4>Can we deploy it on managed devices?</h4>
+                        <p>
+                            Yes. We provide enterprise installers (MSI, PKG, DEB, RPM) that support silent installation,
+                            centralized configuration, and IT management tools.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h4>How are security updates handled?</h4>
+                        <p>
+                            Automatic security updates can be enabled (opt-in). For managed environments, updates can
+                            be controlled through your standard software deployment pipeline.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h4>What about AI model security?</h4>
+                        <p>
+                            AI models run locally with no internet access. They cannot exfiltrate data. Models are
+                            cryptographically signed and verified on installation.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="cta-box">
+                    <h4>Need Help with Institutional Approval?</h4>
+                    <p>
+                        We're happy to provide additional documentation, answer technical questions from your IT team,
+                        or participate in security reviews.
+                    </p>
+                    <a href="/pages/about.html#contact" class="btn btn-primary">Contact Us</a>
+                </div>
+            </section>
+
+            <!-- Trust Indicators -->
+            <section class="security-section">
+                <h2 id="trust">Trust & Transparency</h2>
+
+                <div class="trust-grid">
+                    <div class="trust-card">
+                        <h3>Open Source</h3>
+                        <p>Complete source code available on GitHub under MIT license.</p>
+                        <a href="https://github.com/academic-workflow-suite" class="btn btn-outline btn-sm">
+                            View Source
+                        </a>
+                    </div>
+
+                    <div class="trust-card">
+                        <h3>Security Audits</h3>
+                        <p>Regular third-party security assessments and penetration testing.</p>
+                        <a href="/security-audit-2025.pdf" class="btn btn-outline btn-sm">
+                            Latest Report
+                        </a>
+                    </div>
+
+                    <div class="trust-card">
+                        <h3>Bug Bounty</h3>
+                        <p>Responsible disclosure program with rewards for security researchers.</p>
+                        <a href="/security-policy.html" class="btn btn-outline btn-sm">
+                            Report Vulnerability
+                        </a>
+                    </div>
+
+                    <div class="trust-card">
+                        <h3>Community Reviewed</h3>
+                        <p>Thousands of developers and security experts review our code.</p>
+                        <a href="https://github.com/academic-workflow-suite/security" class="btn btn-outline btn-sm">
+                            Security Policy
+                        </a>
+                    </div>
+                </div>
+
+                <h3>Universities Using Academic Workflow Suite</h3>
+                <p>
+                    Trusted by IT security teams at leading institutions worldwide:
+                </p>
+                <div class="university-logos">
+                    <div class="uni-logo">[University Logo 1]</div>
+                    <div class="uni-logo">[University Logo 2]</div>
+                    <div class="uni-logo">[University Logo 3]</div>
+                    <div class="uni-logo">[University Logo 4]</div>
+                    <div class="uni-logo">[University Logo 5]</div>
+                </div>
+            </section>
+
+            <!-- Security Best Practices -->
+            <section class="security-section">
+                <h2 id="best-practices">Security Best Practices</h2>
+                <p>Recommendations for using Academic Workflow Suite securely:</p>
+
+                <div class="practices-grid">
+                    <div class="practice-card">
+                        <h3>Use Strong Passphrases</h3>
+                        <ul>
+                            <li>Minimum 16 characters</li>
+                            <li>Use a password manager</li>
+                            <li>Don't reuse passphrases</li>
+                            <li>Enable two-factor authentication for cloud sync</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card">
+                        <h3>Regular Backups</h3>
+                        <ul>
+                            <li>Enable automated backup to encrypted cloud storage</li>
+                            <li>Test restoration periodically</li>
+                            <li>Keep backups for data retention compliance</li>
+                            <li>Use <code>aws backup create</code> command</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card">
+                        <h3>Software Updates</h3>
+                        <ul>
+                            <li>Enable automatic security updates</li>
+                            <li>Review changelog before major updates</li>
+                            <li>Keep operating system up to date</li>
+                            <li>Monitor security advisories</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card">
+                        <h3>Access Control</h3>
+                        <ul>
+                            <li>Use OS-level user accounts for multi-user systems</li>
+                            <li>Lock your computer when away</li>
+                            <li>Don't share your encryption passphrase</li>
+                            <li>Enable disk encryption on your device</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Report Security Issues -->
+            <section class="security-section">
+                <h2 id="report">Report Security Issues</h2>
+                <p>
+                    Found a security vulnerability? We take security seriously and appreciate responsible disclosure.
+                </p>
+
+                <div class="report-box">
+                    <h3>Responsible Disclosure Process</h3>
+                    <ol>
+                        <li>Email security details to <a href="mailto:security@academic-workflow.org">security@academic-workflow.org</a></li>
+                        <li>Do not disclose publicly until we've issued a fix</li>
+                        <li>We'll acknowledge your report within 48 hours</li>
+                        <li>We'll provide updates on fix progress</li>
+                        <li>We'll credit you in our security advisory (if desired)</li>
+                    </ol>
+
+                    <p>
+                        <strong>PGP Key:</strong> <a href="/pgp-key.txt">Download our PGP public key</a> for encrypted communication.
+                    </p>
+
+                    <p>
+                        Qualifying vulnerabilities may be eligible for rewards through our bug bounty program.
+                        See our <a href="/security-policy.html">security policy</a> for details.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="footer-heading">Academic Workflow Suite</h3>
+                    <p class="footer-description">Open source tools for modern academic workflows.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="/pages/features.html">Features</a></li>
+                        <li><a href="/pages/download.html">Download</a></li>
+                        <li><a href="/pages/documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/pages/security.html">Security</a></li>
+                        <li><a href="/pages/about.html">About</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 Academic Workflow Suite. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

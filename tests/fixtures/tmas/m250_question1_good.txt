@@ -1,0 +1,48 @@
+Question 1: Write a Python function that implements the binary search algorithm. Explain its time complexity and why it is more efficient than linear search for sorted lists. Include test cases. (400 words + code)
+
+Answer:
+
+Binary search is an algorithm used to find elements in a sorted list efficiently. Here's my implementation:
+
+```python
+def binary_search(arr, target):
+    left = 0
+    right = len(arr) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1
+
+# Tests
+print(binary_search([1, 2, 3, 4, 5], 3))  # Should return 2
+print(binary_search([1, 2, 3, 4, 5], 6))  # Should return -1
+print(binary_search([10, 20, 30, 40, 50], 10))  # Should return 0
+print(binary_search([10, 20, 30, 40, 50], 50))  # Should return 4
+print(binary_search([], 5))  # Should return -1
+```
+
+The function works by keeping track of the left and right boundaries of the search area. In each iteration, it calculates the middle position and checks if that's the target. If the middle value is less than the target, we know the target must be in the right half, so we move the left boundary. If it's greater, we move the right boundary. We keep doing this until we find the target or run out of elements to check.
+
+**Time Complexity:**
+
+Binary search has a time complexity of O(log n). This means that as the list gets bigger, the number of operations grows logarithmically rather than linearly. For example, if you double the size of the list, you only need one more comparison.
+
+Linear search has O(n) complexity, meaning it might have to check every single element in the worst case. If the list has 1000 elements, linear search could need 1000 checks, but binary search only needs about 10.
+
+**Why Binary Search is More Efficient:**
+
+Binary search is faster because it eliminates half of the remaining elements with each comparison. If you're looking for a number in a sorted list of 1000 items, you don't have to check all 1000. You check the middle, and immediately know whether to look in the first 500 or the last 500. Then you check the middle of that half, and so on.
+
+The catch is that the list must be sorted first. If you have an unsorted list, you'd have to sort it before using binary search, which takes time. But if you're going to search the same list many times, it's worth sorting it once and then using binary search for all your searches.
+
+Think of it like looking up a word in a dictionary. You don't start at 'A' and read through every word. You open somewhere in the middle, see if you're too far or not far enough, and adjust. That's basically what binary search does.
+
+[Word count: 392]

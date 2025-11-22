@@ -1,0 +1,187 @@
+scenario: "Happy Path - Complete Marking Flow"
+description: "Tests the complete workflow from TMA submission through AI grading to feedback generation"
+version: "1.0"
+test_type: "integration"
+priority: "high"
+
+setup:
+  database:
+    - load_fixture: "students.json"
+    - load_fixture: "modules.yaml"
+    - load_fixture: "assignment_schedules.yaml"
+  files:
+    - upload: "tm112_question1_excellent.txt"
+      as_user: "S001234"
+
+steps:
+  - name: "Submit TMA"
+    action: "submit_tma"
+    parameters:
+      student_id: "S001234"
+      module: "TM112"
+      assignment: "TMA01"
+      question: 1
+      file: "tm112_question1_excellent.txt"
+    expected_result:
+      status: "success"
+      submission_id: "!exists"
+      message: "TMA submitted successfully"
+    assertions:
+      - field: "status"
+        operator: "equals"
+        value: "submitted"
+      - field: "word_count"
+        operator: "between"
+        value: [450, 550]
+
+  - name: "Load Rubric"
+    action: "load_rubric"
+    parameters:
+      module: "TM112"
+      question: 1
+    expected_result:
+      status: "success"
+      rubric_loaded: true
+    assertions:
+      - field: "rubric.total_points"
+        operator: "equals"
+        value: 100
+      - field: "rubric.criteria"
+        operator: "length_gt"
+        value: 0
+
+  - name: "Initiate AI Grading"
+    action: "grade_with_ai"
+    parameters:
+      submission_id: "!from_step[0].submission_id"
+      rubric_id: "!from_step[1].rubric_id"
+    expected_result:
+      status: "processing"
+      job_id: "!exists"
+    assertions:
+      - field: "status"
+        operator: "in"
+        value: ["processing", "queued"]
+
+  - name: "Wait for AI Grading"
+    action: "wait_for_completion"
+    parameters:
+      job_id: "!from_step[2].job_id"
+      timeout_seconds: 60
+      poll_interval: 2
+    expected_result:
+      status: "completed"
+    assertions:
+      - field: "status"
+        operator: "equals"
+        value: "completed"
+
+  - name: "Retrieve Grading Results"
+    action: "get_grading_results"
+    parameters:
+      submission_id: "!from_step[0].submission_id"
+    expected_result:
+      status: "success"
+      grade: "!exists"
+    assertions:
+      - field: "grade"
+        operator: "between"
+        value: [85, 100]
+      - field: "grade_level"
+        operator: "equals"
+        value: "distinction"
+      - field: "criteria_scores"
+        operator: "length_equals"
+        value: 7
+
+  - name: "Generate Feedback"
+    action: "generate_feedback"
+    parameters:
+      submission_id: "!from_step[0].submission_id"
+      grading_id: "!from_step[4].grading_id"
+    expected_result:
+      status: "success"
+      feedback_generated: true
+    assertions:
+      - field: "feedback.strengths"
+        operator: "length_gt"
+        value: 0
+      - field: "feedback.improvements"
+        operator: "exists"
+      - field: "feedback.comments"
+        operator: "not_empty"
+
+  - name: "Publish Results to Student"
+    action: "publish_results"
+    parameters:
+      submission_id: "!from_step[0].submission_id"
+    expected_result:
+      status: "success"
+      published: true
+    assertions:
+      - field: "notification_sent"
+        operator: "equals"
+        value: true
+      - field: "results_visible_to_student"
+        operator: "equals"
+        value: true
+
+  - name: "Student Views Results"
+    action: "get_student_results"
+    parameters:
+      student_id: "S001234"
+      submission_id: "!from_step[0].submission_id"
+    as_user: "S001234"
+    expected_result:
+      status: "success"
+      grade_visible: true
+    assertions:
+      - field: "grade"
+        operator: "exists"
+      - field: "feedback"
+        operator: "exists"
+      - field: "rubric_breakdown"
+        operator: "exists"
+
+cleanup:
+  - delete_submissions
+  - clear_test_data
+  - reset_database
+
+validation:
+  data_integrity:
+    - check: "submission_exists_in_db"
+      parameters:
+        submission_id: "!from_step[0].submission_id"
+    - check: "grade_matches_feedback"
+      parameters:
+        submission_id: "!from_step[0].submission_id"
+
+  security:
+    - check: "student_can_only_view_own_results"
+      parameters:
+        student_id: "S001234"
+        other_student_id: "S002156"
+    - check: "submission_properly_anonymized"
+      parameters:
+        submission_id: "!from_step[0].submission_id"
+
+  performance:
+    - metric: "total_time"
+      operator: "less_than"
+      value: 60000  # 60 seconds in milliseconds
+    - metric: "ai_grading_time"
+      operator: "less_than"
+      value: 30000  # 30 seconds
+
+success_criteria:
+  - all_steps_pass: true
+  - no_errors: true
+  - validations_pass: true
+  - grade_within_expected_range: [85, 100]
+
+tags:
+  - "happy-path"
+  - "end-to-end"
+  - "ai-grading"
+  - "core-functionality"

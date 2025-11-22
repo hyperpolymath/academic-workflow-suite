@@ -1,0 +1,148 @@
+# Dockerfile for Academic Workflow Suite - AI Jail (Isolated AI Inference)
+# MAXIMUM SECURITY - No network, read-only filesystem, minimal privileges
+
+ARG RUST_VERSION=1.75
+
+# ============================================================================
+# Stage 1: Base - Common dependencies
+# ============================================================================
+FROM rust:${RUST_VERSION}-slim-bookworm AS base
+
+LABEL maintainer="Academic Workflow Suite Team"
+LABEL description="AI Jail - Isolated AI inference container with maximum security"
+
+# Install system dependencies for AI inference
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ============================================================================
+# Stage 2: Dependencies - Build dependencies separately
+# ============================================================================
+FROM base AS dependencies
+
+# Copy dependency manifests
+COPY components/ai-jail/Cargo.toml components/ai-jail/Cargo.lock ./
+
+# Create dummy source to build dependencies
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# ============================================================================
+# Stage 3: Builder - Build the AI jail application
+# ============================================================================
+FROM dependencies AS builder
+
+# Copy source code
+COPY components/ai-jail/src ./src/
+COPY components/ai-jail/tests ./tests/
+COPY components/shared /shared
+
+# Build with optimizations and hardening
+ENV RUSTFLAGS="-C target-cpu=native -C opt-level=3 -C link-arg=-Wl,-z,relro,-z,now"
+
+RUN cargo build --release --bin ai-jail
+
+# Strip debug symbols
+RUN strip /app/target/release/ai-jail
+
+# ============================================================================
+# Stage 4: Development - For development (relaxed security)
+# ============================================================================
+FROM base AS development
+
+# Install development tools
+RUN cargo install cargo-watch
+
+WORKDIR /app
+
+# Copy source for development
+COPY components/ai-jail .
+COPY components/shared /shared
+
+# Development command
+CMD ["cargo", "run"]
+
+# ============================================================================
+# Stage 5: Test - For running tests
+# ============================================================================
+FROM base AS test
+
+WORKDIR /app
+
+# Install test dependencies
+RUN cargo install cargo-tarpaulin
+
+# Copy source
+COPY components/ai-jail .
+COPY components/shared /shared
+
+# Run tests by default
+CMD ["cargo", "test", "--all-features"]
+
+# ============================================================================
+# Stage 6: Production - MAXIMUM SECURITY runtime image
+# ============================================================================
+FROM debian:bookworm-slim AS production
+
+# Install ONLY essential runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* /var/tmp/*
+
+# Create non-root user with minimal permissions
+RUN groupadd -r -g 1001 aijail && \
+    useradd -r -u 1001 -g aijail -s /sbin/nologin \
+    -c "AI Jail User" aijail
+
+# Create minimal directory structure
+RUN mkdir -p /models /run && \
+    chown -R aijail:aijail /run && \
+    chmod 700 /run
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder --chown=aijail:aijail /app/target/release/ai-jail /app/ai-jail
+
+# Make binary executable
+RUN chmod 500 /app/ai-jail
+
+# Switch to non-root user
+USER aijail
+
+# SECURITY LABELS
+LABEL security.isolation="maximum" \
+      security.network="none" \
+      security.filesystem="read-only" \
+      security.user="non-root"
+
+# NO EXPOSED PORTS - communication via Unix socket only
+# NO HEALTHCHECK - minimal attack surface
+
+# Run the AI jail
+CMD ["/app/ai-jail"]
+
+# ============================================================================
+# Security Notes:
+# ============================================================================
+# This container is designed to run with:
+# - No network access (--network=none or internal network)
+# - Read-only root filesystem (--read-only)
+# - Minimal capabilities (--cap-drop=ALL)
+# - Seccomp profile (--security-opt seccomp=ai-jail.json)
+# - AppArmor profile (--security-opt apparmor=aws-ai-jail)
+# - PID limits (--pids-limit=100)
+# - Memory limits (--memory=4g)
+# - CPU limits (--cpus=2)
+# - No new privileges (--security-opt no-new-privileges:true)
+# ============================================================================

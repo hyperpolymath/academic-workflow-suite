@@ -1,0 +1,23 @@
+Question 1: Explain the key differences between interpreted and compiled programming languages, providing specific examples and discussing the advantages and disadvantages of each approach. (500 words)
+
+Answer:
+
+Programming languages can be broadly categorized into two execution models: compiled and interpreted languages. Understanding the fundamental differences between these approaches is crucial for selecting the appropriate tool for a given programming task.
+
+Compiled languages, such as C, C++, and Rust, undergo a complete translation process before execution. The source code is processed by a compiler, which converts the entire program into machine code (binary instructions) that can be directly executed by the computer's processor. This compilation step produces an executable file that is platform-specific and optimized for the target hardware. For example, a C program compiled on a Windows machine will produce a .exe file containing native x86 or x64 instructions.
+
+The primary advantage of compiled languages is performance. Since the translation to machine code occurs before runtime, the resulting programs execute significantly faster than their interpreted counterparts. The compiler can also perform extensive optimizations, such as loop unrolling, dead code elimination, and register allocation, which further enhance execution speed. Additionally, compiled programs can run independently without requiring the original compiler or source code, making distribution straightforward.
+
+However, compiled languages have notable disadvantages. The compilation process adds an extra step to the development cycle, which can slow down iterative development and debugging. Each time a change is made, the entire program (or at least the modified portions) must be recompiled. Furthermore, compiled executables are platform-dependent, meaning a program compiled for Windows cannot run on Linux without recompilation, potentially requiring code modifications to accommodate platform-specific features.
+
+Interpreted languages, such as Python, JavaScript, and Ruby, take a different approach. Instead of pre-compiling to machine code, an interpreter reads and executes the source code line-by-line or statement-by-statement at runtime. The interpreter acts as an intermediary, translating each instruction to machine code just before it is needed. For instance, when a Python script is run, the Python interpreter reads each line, converts it to bytecode, and then executes it.
+
+The main advantage of interpreted languages is flexibility and ease of development. Changes to the code take effect immediately without a compilation step, enabling rapid prototyping and interactive development. Interpreted languages are also generally platform-independent—the same Python script can run on Windows, macOS, or Linux without modification, as long as the appropriate interpreter is installed. This portability is particularly valuable in heterogeneous computing environments.
+
+The disadvantage of interpreted languages is reduced performance. The runtime translation overhead means interpreted programs typically execute more slowly than compiled equivalents. Additionally, some errors that would be caught at compile time in compiled languages may only surface during execution in interpreted languages, potentially leading to runtime failures in production.
+
+It is worth noting that modern language implementations often blur these distinctions. Java, for example, uses a hybrid approach: source code is compiled to bytecode, which is then interpreted or just-in-time (JIT) compiled to machine code at runtime. This combines some advantages of both approaches, offering reasonable portability while maintaining acceptable performance.
+
+In conclusion, the choice between compiled and interpreted languages depends on the specific requirements of the project, including performance needs, development speed, platform considerations, and deployment constraints.
+
+[Word count: 497]

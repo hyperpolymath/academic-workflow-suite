@@ -1,0 +1,238 @@
+# Common log patterns for parsing and analysis
+# These patterns can be used in Loki queries and alerts
+
+patterns:
+  # Error patterns
+  errors:
+    - name: generic_error
+      regex: '\b(error|exception|fatal|critical)\b'
+      severity: error
+      description: 'Generic error pattern'
+
+    - name: stack_trace
+      regex: '^\s+at\s+[\w\.\$]+\([\w\.:]+\)'
+      severity: error
+      description: 'Stack trace line'
+
+    - name: rust_panic
+      regex: 'thread .* panicked at'
+      severity: critical
+      description: 'Rust panic'
+
+    - name: python_exception
+      regex: 'Traceback \(most recent call last\)'
+      severity: error
+      description: 'Python exception'
+
+  # Security patterns
+  security:
+    - name: auth_failure
+      regex: 'authentication failed|invalid credentials|login failed'
+      severity: warning
+      description: 'Authentication failure'
+
+    - name: sql_injection
+      regex: '(UNION\s+SELECT|DROP\s+TABLE|;\s*DROP|--\s*$|\/\*|\*\/)'
+      severity: critical
+      description: 'Potential SQL injection attempt'
+
+    - name: xss_attempt
+      regex: '(<script|javascript:|onerror=|onload=)'
+      severity: critical
+      description: 'Potential XSS attempt'
+
+    - name: path_traversal
+      regex: '(\.\./|\.\.\\|%2e%2e)'
+      severity: critical
+      description: 'Potential path traversal attempt'
+
+    - name: command_injection
+      regex: '(;|\||&|\$\(|\`).*?(rm|wget|curl|nc|bash|sh)'
+      severity: critical
+      description: 'Potential command injection'
+
+  # Performance patterns
+  performance:
+    - name: slow_query
+      regex: 'query took (\d+)ms'
+      severity: warning
+      threshold: 1000
+      description: 'Slow database query'
+
+    - name: high_latency
+      regex: 'request completed in (\d+)ms'
+      severity: warning
+      threshold: 2000
+      description: 'High request latency'
+
+    - name: timeout
+      regex: '(timeout|timed out)'
+      severity: warning
+      description: 'Operation timeout'
+
+  # Database patterns
+  database:
+    - name: connection_error
+      regex: 'could not connect to database|connection refused'
+      severity: critical
+      description: 'Database connection error'
+
+    - name: deadlock
+      regex: 'deadlock detected'
+      severity: warning
+      description: 'Database deadlock'
+
+    - name: constraint_violation
+      regex: 'violates (foreign key|unique) constraint'
+      severity: warning
+      description: 'Database constraint violation'
+
+  # AI/ML patterns
+  ai_ml:
+    - name: model_load_failure
+      regex: 'failed to load model|model not found'
+      severity: critical
+      description: 'AI model loading failure'
+
+    - name: inference_error
+      regex: 'inference (failed|error)'
+      severity: error
+      description: 'AI inference error'
+
+    - name: gpu_oom
+      regex: 'CUDA out of memory|GPU memory error'
+      severity: critical
+      description: 'GPU out of memory'
+
+    - name: slow_inference
+      regex: 'inference took (\d+)ms'
+      severity: warning
+      threshold: 10000
+      description: 'Slow AI inference'
+
+  # Business logic patterns
+  business:
+    - name: tma_processing_failed
+      regex: 'TMA processing failed'
+      severity: error
+      description: 'TMA processing failure'
+
+    - name: feedback_generation_failed
+      regex: 'failed to generate feedback'
+      severity: error
+      description: 'Feedback generation failure'
+
+    - name: batch_processing_error
+      regex: 'batch processing failed'
+      severity: error
+      description: 'Batch processing error'
+
+  # Container patterns
+  container:
+    - name: oom_killed
+      regex: 'OOMKilled|Out of memory'
+      severity: critical
+      description: 'Container killed due to OOM'
+
+    - name: container_restart
+      regex: 'container .* restarted'
+      severity: warning
+      description: 'Container restart'
+
+    - name: escape_attempt
+      regex: '(/proc/self|/sys/fs/cgroup|CAP_SYS_ADMIN)'
+      severity: critical
+      description: 'Potential container escape attempt'
+
+  # Network patterns
+  network:
+    - name: connection_refused
+      regex: 'connection refused|no route to host'
+      severity: error
+      description: 'Network connection error'
+
+    - name: dns_failure
+      regex: 'could not resolve|DNS lookup failed'
+      severity: error
+      description: 'DNS resolution failure'
+
+    - name: tls_error
+      regex: 'TLS handshake failed|certificate (expired|invalid)'
+      severity: error
+      description: 'TLS/SSL error'
+
+# Alert rules based on log patterns
+alert_rules:
+  - name: high_error_rate
+    pattern: errors.generic_error
+    threshold:
+      count: 10
+      window: 5m
+    severity: warning
+    description: 'High error rate detected in logs'
+
+  - name: critical_security_event
+    pattern: security.*
+    threshold:
+      count: 1
+      window: 1m
+    severity: critical
+    description: 'Critical security event detected'
+
+  - name: database_issues
+    pattern: database.*
+    threshold:
+      count: 5
+      window: 5m
+    severity: warning
+    description: 'Multiple database issues detected'
+
+  - name: ai_failures
+    pattern: ai_ml.*
+    threshold:
+      count: 3
+      window: 5m
+    severity: error
+    description: 'AI/ML failures detected'
+
+# Common queries for log analysis
+common_queries:
+  # Find all errors in the last hour
+  all_errors: |
+    {job=~".+"} |~ "(?i)(error|exception|fatal|critical)"
+
+  # Find security events
+  security_events: |
+    {job="security"} or {job="audit"}
+
+  # Find slow queries
+  slow_queries: |
+    {job="postgres"} |~ "duration: [0-9]{4,} ms"
+
+  # Find authentication failures
+  auth_failures: |
+    {job=~".+"} |~ "(?i)(authentication failed|invalid credentials|login failed)"
+
+  # Find AI inference errors
+  ai_errors: |
+    {job="ai-jail"} |~ "(?i)(inference failed|model.*error|CUDA)"
+
+  # Find container issues
+  container_issues: |
+    {job="docker"} |~ "(?i)(OOMKilled|restart|exit|crash)"
+
+  # Find high latency requests
+  high_latency: |
+    {job="backend"} | json | duration_ms > 2000
+
+  # Find PII detection events
+  pii_events: |
+    {job="security"} | json | event_type="pii_detected"
+
+  # Find rate limit violations
+  rate_limit: |
+    {job="backend"} |~ "rate limit exceeded"
+
+  # Find database deadlocks
+  deadlocks: |
+    {job="postgres"} |~ "deadlock detected"

@@ -1,0 +1,305 @@
+scenario: "Batch Marking Operations"
+description: "Tests batch processing of multiple TMA submissions efficiently"
+version: "1.0"
+test_type: "integration"
+priority: "medium"
+
+setup:
+  database:
+    - load_fixture: "students.json"
+    - load_fixture: "modules.yaml"
+    - load_fixture: "student_submissions.json"
+  files:
+    - upload_batch: "fixtures/tmas/*.txt"
+
+configuration:
+  batch_size: 10
+  concurrent_workers: 3
+  timeout_per_submission: 30
+  total_timeout: 600
+
+test_cases:
+  - name: "Batch Grade Multiple Submissions"
+    description: "Process multiple TMAs in batch mode"
+    steps:
+      - name: "Prepare Batch"
+        action: "create_batch"
+        parameters:
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          submission_ids:
+            - "SUB-2024-001"
+            - "SUB-2024-002"
+            - "SUB-2024-003"
+        expected_result:
+          batch_id: "!exists"
+          total_submissions: 3
+
+      - name: "Start Batch Grading"
+        action: "grade_batch"
+        parameters:
+          batch_id: "!from_previous.batch_id"
+          concurrent: 3
+        expected_result:
+          status: "processing"
+          jobs_queued: 3
+
+      - name: "Monitor Batch Progress"
+        action: "get_batch_status"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+          poll_interval: 5
+          timeout: 120
+        expected_result:
+          status: "completed"
+          successful: 3
+          failed: 0
+
+      - name: "Verify All Results"
+        action: "get_batch_results"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+        assertions:
+          - field: "results"
+            operator: "length_equals"
+            value: 3
+          - field: "results[0].grade"
+            operator: "exists"
+          - field: "results[1].grade"
+            operator: "exists"
+          - field: "results[2].grade"
+            operator: "exists"
+
+  - name: "Large Batch Processing"
+    description: "Test scalability with 100 submissions"
+    steps:
+      - name: "Generate 100 Test Submissions"
+        action: "generate_submissions"
+        parameters:
+          count: 100
+          module: "TM112"
+          quality_distribution:
+            excellent: 20
+            good: 40
+            satisfactory: 30
+            poor: 10
+
+      - name: "Create Large Batch"
+        action: "create_batch"
+        parameters:
+          submission_ids: "!from_previous.submission_ids"
+        expected_result:
+          batch_id: "!exists"
+          total_submissions: 100
+
+      - name: "Process with Chunking"
+        action: "grade_batch"
+        parameters:
+          batch_id: "!from_previous.batch_id"
+          chunk_size: 10
+          concurrent_chunks: 3
+        expected_result:
+          status: "processing"
+
+      - name: "Wait for Completion"
+        action: "wait_for_batch"
+        parameters:
+          batch_id: "!from_step[1].batch_id"
+          timeout: 600
+        expected_result:
+          status: "completed"
+          successful: 100
+
+      - name: "Verify Performance Metrics"
+        action: "get_batch_metrics"
+        parameters:
+          batch_id: "!from_step[1].batch_id"
+        assertions:
+          - field: "average_processing_time"
+            operator: "less_than"
+            value: 30000  # 30 seconds per submission
+          - field: "total_time"
+            operator: "less_than"
+            value: 600000  # 10 minutes total
+          - field: "throughput"
+            operator: "greater_than"
+            value: 10  # submissions per minute
+
+  - name: "Batch with Mixed Quality"
+    description: "Process batch with varying submission quality"
+    steps:
+      - name: "Create Mixed Batch"
+        action: "create_batch"
+        parameters:
+          submissions:
+            - file: "tm112_question1_excellent.txt"
+              student_id: "S001234"
+            - file: "tm112_question1_good.txt"
+              student_id: "S002156"
+            - file: "tm112_question1_poor.txt"
+              student_id: "S003421"
+
+      - name: "Grade Mixed Batch"
+        action: "grade_batch"
+        parameters:
+          batch_id: "!from_previous.batch_id"
+
+      - name: "Verify Grade Distribution"
+        action: "analyze_batch_results"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+        assertions:
+          - field: "grades[0]"
+            operator: "greater_than"
+            value: 85
+          - field: "grades[1]"
+            operator: "between"
+            value: [65, 75]
+          - field: "grades[2]"
+            operator: "less_than"
+            value: 40
+
+  - name: "Batch Error Handling"
+    description: "Handle errors in batch without failing entire batch"
+    steps:
+      - name: "Create Batch with Problem Submission"
+        action: "create_batch"
+        parameters:
+          submissions:
+            - file: "tm112_question1_good.txt"
+            - file: "corrupted_file.txt"
+            - file: "tm112_question1_excellent.txt"
+
+      - name: "Process Batch"
+        action: "grade_batch"
+        parameters:
+          batch_id: "!from_previous.batch_id"
+          continue_on_error: true
+
+      - name: "Verify Partial Success"
+        action: "get_batch_results"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+        assertions:
+          - field: "successful"
+            operator: "equals"
+            value: 2
+          - field: "failed"
+            operator: "equals"
+            value: 1
+          - field: "errors[0].submission_index"
+            operator: "equals"
+            value: 1
+
+  - name: "Batch Priority Queueing"
+    description: "Test priority handling in batch processing"
+    steps:
+      - name: "Create Low Priority Batch"
+        action: "create_batch"
+        parameters:
+          submissions: "!generate[20]"
+          priority: "low"
+
+      - name: "Create High Priority Batch"
+        action: "create_batch"
+        parameters:
+          submissions: "!generate[5]"
+          priority: "high"
+
+      - name: "Start Both Batches"
+        action: "start_batches"
+        parameters:
+          batch_ids:
+            - "!from_step[0].batch_id"
+            - "!from_step[1].batch_id"
+
+      - name: "Verify High Priority Processed First"
+        action: "check_processing_order"
+        assertions:
+          - field: "high_priority_completion_time"
+            operator: "less_than"
+            value: "!low_priority_start_time"
+
+  - name: "Batch Resume After Interruption"
+    description: "Resume batch processing after system interruption"
+    steps:
+      - name: "Start Large Batch"
+        action: "create_batch"
+        parameters:
+          submissions: "!generate[50]"
+
+      - name: "Begin Processing"
+        action: "grade_batch"
+        parameters:
+          batch_id: "!from_previous.batch_id"
+
+      - name: "Simulate System Interruption"
+        action: "simulate_interruption"
+        parameters:
+          after_processed: 20
+          batch_id: "!from_step[0].batch_id"
+
+      - name: "Resume Processing"
+        action: "resume_batch"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+        expected_result:
+          resumed_from: 20
+          remaining: 30
+
+      - name: "Verify Complete Results"
+        action: "get_batch_results"
+        parameters:
+          batch_id: "!from_step[0].batch_id"
+        assertions:
+          - field: "total_processed"
+            operator: "equals"
+            value: 50
+          - field: "no_duplicates"
+            operator: "equals"
+            value: true
+
+performance_requirements:
+  small_batch:
+    size: 10
+    max_time: 60000  # 1 minute
+    max_per_submission: 6000  # 6 seconds
+
+  medium_batch:
+    size: 50
+    max_time: 300000  # 5 minutes
+    max_per_submission: 6000
+
+  large_batch:
+    size: 100
+    max_time: 600000  # 10 minutes
+    max_per_submission: 6000
+
+validation:
+  correctness:
+    - all_submissions_processed: true
+    - grades_accurate: true
+    - no_duplicates: true
+
+  performance:
+    - meets_throughput_requirements: true
+    - efficient_resource_usage: true
+    - proper_parallelization: true
+
+  reliability:
+    - handles_errors_gracefully: true
+    - resumes_after_interruption: true
+    - maintains_data_integrity: true
+
+success_criteria:
+  - all_batches_complete_successfully: true
+  - performance_requirements_met: true
+  - error_handling_works: true
+  - results_accurate: true
+
+tags:
+  - "batch-processing"
+  - "scalability"
+  - "performance"
+  - "reliability"

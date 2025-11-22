@@ -1,0 +1,120 @@
+groups:
+  - name: recording_rules
+    interval: 30s
+    rules:
+      # HTTP request aggregations
+      - record: job:http_requests_total:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (job)
+
+      - record: job:http_request_duration_seconds:p95
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+
+      - record: job:http_request_duration_seconds:p99
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+
+      - record: job:http_errors_5xx:rate5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+
+      - record: job:http_errors_4xx:rate5m
+        expr: sum(rate(http_requests_total{status=~"4.."}[5m])) by (job)
+
+      # Service availability
+      - record: job:availability:5m
+        expr: 100 * (1 - (sum(rate(http_requests_total{status=~"5.."}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job)))
+
+      # TMA processing metrics
+      - record: tma:processed_per_hour
+        expr: sum(rate(aws_tma_processed_total[1h])) * 3600
+
+      - record: tma:processing_duration:p95
+        expr: histogram_quantile(0.95, sum(rate(aws_tma_marking_duration_seconds_bucket[5m])) by (le))
+
+      - record: tma:processing_duration:p99
+        expr: histogram_quantile(0.99, sum(rate(aws_tma_marking_duration_seconds_bucket[5m])) by (le))
+
+      - record: tma:feedback_quality:avg
+        expr: avg(aws_feedback_quality_score)
+
+      # AI performance metrics
+      - record: ai:inference_duration:p95
+        expr: histogram_quantile(0.95, sum(rate(aws_ai_inference_duration_seconds_bucket[5m])) by (le))
+
+      - record: ai:inference_duration:p99
+        expr: histogram_quantile(0.99, sum(rate(aws_ai_inference_duration_seconds_bucket[5m])) by (le))
+
+      - record: ai:tokens_per_second
+        expr: sum(rate(aws_ai_tokens_generated_total[5m]))
+
+      - record: ai:gpu_memory_usage_percent
+        expr: (aws_gpu_memory_used_bytes / aws_gpu_memory_total_bytes) * 100
+
+      - record: ai:inference_failure_rate
+        expr: sum(rate(aws_ai_inference_total{status="failed"}[5m])) / sum(rate(aws_ai_inference_total[5m])) * 100
+
+      # Database metrics
+      - record: db:connections_usage_percent
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100
+
+      - record: db:cache_hit_ratio
+        expr: 100 * (rate(pg_stat_database_blks_hit[5m]) / (rate(pg_stat_database_blks_hit[5m]) + rate(pg_stat_database_blks_read[5m])))
+
+      - record: db:transaction_rate
+        expr: sum(rate(pg_stat_database_xact_commit[5m]))
+
+      - record: db:rollback_rate
+        expr: sum(rate(pg_stat_database_xact_rollback[5m]))
+
+      - record: db:rollback_ratio
+        expr: sum(rate(pg_stat_database_xact_rollback[5m])) / sum(rate(pg_stat_database_xact_commit[5m])) * 100
+
+      - record: db:event_store_growth_rate
+        expr: rate(aws_event_store_total_events[1h])
+
+      # System resource metrics
+      - record: node:cpu_usage_percent
+        expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])))
+
+      - record: node:memory_usage_percent
+        expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
+
+      - record: node:disk_usage_percent
+        expr: 100 * (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}))
+
+      - record: node:network_receive_bytes:rate5m
+        expr: sum(rate(node_network_receive_bytes_total[5m])) by (instance)
+
+      - record: node:network_transmit_bytes:rate5m
+        expr: sum(rate(node_network_transmit_bytes_total[5m])) by (instance)
+
+      # Security metrics
+      - record: security:auth_failures_per_minute
+        expr: sum(rate(aws_auth_failed_total[5m])) * 60
+
+      - record: security:pii_detections_per_hour
+        expr: sum(rate(aws_pii_detected_total[1h])) * 3600
+
+      - record: security:container_escape_attempts_total
+        expr: sum(increase(aws_container_escape_attempts_total[1h]))
+
+      - record: security:failed_auth_by_ip
+        expr: sum(rate(aws_auth_failed_total[5m])) by (ip)
+
+      # Business metrics
+      - record: business:active_users:5m
+        expr: aws_active_users
+
+      - record: business:tmas_processed_today
+        expr: sum(increase(aws_tma_processed_total[24h]))
+
+      - record: business:api_requests_per_user
+        expr: sum(rate(http_requests_total[5m])) / aws_active_users
+
+      # Performance SLIs (Service Level Indicators)
+      - record: sli:availability:5m
+        expr: 100 * (sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m])))
+
+      - record: sli:latency_p95:5m
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+
+      - record: sli:error_rate:5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100

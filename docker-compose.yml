@@ -1,0 +1,430 @@
+version: '3.8'
+
+# Academic Workflow Suite - Main Docker Compose Configuration
+# This file defines the complete containerized environment for AWS
+
+networks:
+  aws-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+  ai-jail-network:
+    driver: bridge
+    internal: true  # No external network access for AI jail
+    ipam:
+      config:
+        - subnet: 172.29.0.0/16
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  lmdb-data:
+    driver: local
+  ai-models:
+    driver: local
+
+services:
+  # PostgreSQL Database (for backend service)
+  postgres:
+    image: postgres:16-alpine
+    container_name: aws-postgres
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: academic_workflow
+      POSTGRES_USER: aws_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme123}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/configs/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./docker/configs/postgres/setup-replication.sql:/docker-entrypoint-initdb.d/02-replication.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aws_user -d academic_workflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis (for caching and pub/sub)
+  redis:
+    image: redis:7-alpine
+    container_name: aws-redis
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis-data:/data
+      - ./docker/configs/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Adminer (Database UI)
+  adminer:
+    image: adminer:latest
+    container_name: aws-adminer
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: pepa-linha
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Core Engine (Rust)
+  core:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.core
+      args:
+        RUST_VERSION: 1.75
+    image: aws-core:latest
+    container_name: aws-core
+    restart: unless-stopped
+    networks:
+      - aws-network
+      - ai-jail-network
+    ports:
+      - "8080:8080"
+    environment:
+      RUST_LOG: info
+      AWS_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      LMDB_PATH: /data/lmdb
+      AI_JAIL_SOCKET: /run/ai-jail.sock
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - lmdb-data:/data/lmdb
+      - ai-jail-socket:/run
+      - ./config:/app/config:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      ai-jail:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # Backend Service (Elixir/Phoenix)
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.backend
+      args:
+        ELIXIR_VERSION: 1.15
+        ERLANG_VERSION: 26
+    image: aws-backend:latest
+    container_name: aws-backend
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "4000:4000"
+    environment:
+      MIX_ENV: prod
+      PHX_HOST: backend
+      PHX_SERVER: "true"
+      PORT: 4000
+      DATABASE_URL: postgresql://aws_user:${POSTGRES_PASSWORD:-changeme123}@postgres:5432/academic_workflow
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-generate-a-secret-key-base-with-mix-phx-gen-secret}
+    volumes:
+      - ./config:/app/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # AI Jail (Isolated Container)
+  ai-jail:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.ai-jail
+      args:
+        RUST_VERSION: 1.75
+    image: aws-ai-jail:latest
+    container_name: aws-ai-jail
+    restart: unless-stopped
+    networks:
+      - ai-jail-network
+    environment:
+      RUST_LOG: info
+      AI_JAIL_MODE: "true"
+      SOCKET_PATH: /run/ai-jail.sock
+      MODEL_PATH: /models
+    volumes:
+      - ai-models:/models:ro
+      - ai-jail-socket:/run
+    # Security settings - critical for AI isolation
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=./docker/configs/seccomp/ai-jail.json
+    read_only: true
+    tmpfs:
+      - /tmp:size=1G,mode=1777,noexec,nosuid,nodev
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Nginx Reverse Proxy
+  nginx:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.nginx
+    image: aws-nginx:latest
+    container_name: aws-nginx
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/configs/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/configs/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/configs/nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      core:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Prometheus (Monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aws-prometheus
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./docker/configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/configs/prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - core
+      - backend
+      - nginx
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Grafana (Dashboards)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aws-grafana
+    restart: unless-stopped
+    networks:
+      - aws-network
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: redis-datasource
+      GF_SERVER_ROOT_URL: http://localhost:3000
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/configs/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Shared volume for AI jail socket communication
+volumes:
+  ai-jail-socket:
+    driver: local

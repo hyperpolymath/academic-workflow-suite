@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/academic-workflow-suite/academic-workflow-suite/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Documentation
+    url: https://github.com/academic-workflow-suite/academic-workflow-suite/wiki
+    about: Check our documentation for guides and API references
+  - name: Support Resources
+    url: https://github.com/academic-workflow-suite/academic-workflow-suite/blob/main/.github/SUPPORT.md
+    about: Find additional support resources and community channels

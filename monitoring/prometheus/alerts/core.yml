@@ -1,0 +1,113 @@
+groups:
+  - name: core_service_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on {{ $labels.instance }} has been down for more than 1 minute."
+          runbook: "Check service logs and restart if necessary"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 90% (current: {{ $value | humanize }}%)"
+          runbook: "Investigate memory-intensive processes and consider scaling"
+
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 95% (current: {{ $value | humanize }}%)"
+          runbook: "Immediate action required - scale up or kill processes"
+
+      - alert: HighCPUUsage
+        expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80% for 10 minutes (current: {{ $value | humanize }}%)"
+          runbook: "Check CPU-intensive processes and consider scaling"
+
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Disk space low on {{ $labels.instance }}"
+          description: "Disk usage is above 80% (current: {{ $value | humanize }}%)"
+          runbook: "Clean up old logs, temporary files, or expand disk"
+
+      - alert: DiskSpaceCritical
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Disk usage is above 90% (current: {{ $value | humanize }}%)"
+          runbook: "Immediate cleanup required to prevent system failure"
+
+      - alert: HighNetworkErrors
+        expr: rate(node_network_receive_errs_total[5m]) > 10 or rate(node_network_transmit_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: network
+        annotations:
+          summary: "High network errors on {{ $labels.instance }}"
+          description: "Network interface {{ $labels.device }} is experiencing errors ({{ $value | humanize }} errors/sec)"
+          runbook: "Check network connectivity and hardware"
+
+      - alert: ContainerRestarting
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          component: kubernetes
+        annotations:
+          summary: "Container {{ $labels.container }} is restarting"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is restarting frequently"
+          runbook: "Check container logs for crash reasons"
+
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0.1
+        for: 10m
+        labels:
+          severity: critical
+          component: kubernetes
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes"
+          runbook: "Investigate pod logs and events immediately"
+
+      - alert: SystemLoadHigh
+        expr: node_load15 > (count(node_cpu_seconds_total{mode="idle"}) without (cpu, mode)) * 1.5
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High system load on {{ $labels.instance }}"
+          description: "15-minute load average is {{ $value | humanize }}"
+          runbook: "Check for resource-intensive processes"

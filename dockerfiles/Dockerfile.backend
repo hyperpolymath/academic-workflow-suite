@@ -1,0 +1,167 @@
+# Dockerfile for Academic Workflow Suite - Backend Service (Elixir/Phoenix)
+# Multi-stage build for optimized production image
+
+ARG ELIXIR_VERSION=1.15
+ARG ERLANG_VERSION=26
+
+# ============================================================================
+# Stage 1: Base - Common dependencies
+# ============================================================================
+FROM hexpm/elixir:${ELIXIR_VERSION}-erlang-${ERLANG_VERSION}-debian-bookworm-20231009-slim AS base
+
+LABEL maintainer="Academic Workflow Suite Team"
+LABEL description="Backend Service - Elixir/Phoenix API for rubric repository"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    curl \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install hex and rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+WORKDIR /app
+
+# Set environment variables
+ENV MIX_ENV=prod
+
+# ============================================================================
+# Stage 2: Dependencies - Install dependencies separately for caching
+# ============================================================================
+FROM base AS dependencies
+
+# Copy dependency manifests
+COPY components/backend/mix.exs components/backend/mix.lock ./
+
+# Install dependencies
+RUN mix deps.get --only prod && \
+    mix deps.compile
+
+# ============================================================================
+# Stage 3: Builder - Build the application
+# ============================================================================
+FROM dependencies AS builder
+
+# Copy source code
+COPY components/backend/lib ./lib/
+COPY components/backend/priv ./priv/
+COPY components/backend/config ./config/
+COPY components/shared /shared
+
+# Compile the application
+RUN mix compile
+
+# Compile assets (if any)
+RUN if [ -d "assets" ]; then \
+        mix assets.deploy; \
+    fi
+
+# Build release
+RUN mix release
+
+# ============================================================================
+# Stage 4: Development - For development with hot reload
+# ============================================================================
+FROM base AS development
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y \
+    inotify-tools \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set development environment
+ENV MIX_ENV=dev
+
+WORKDIR /app
+
+# Copy entire source for development
+COPY components/backend .
+
+# Install all dependencies (including dev)
+RUN mix deps.get && \
+    mix deps.compile
+
+# Expose ports
+EXPOSE 4000 4001
+
+# Development command (overridden by compose)
+CMD ["mix", "phx.server"]
+
+# ============================================================================
+# Stage 5: Test - For running tests
+# ============================================================================
+FROM base AS test
+
+# Set test environment
+ENV MIX_ENV=test
+
+WORKDIR /app
+
+# Install test tools
+RUN mix archive.install --force hex ex_unit_notifier
+
+# Copy source
+COPY components/backend .
+COPY components/shared /shared
+
+# Install dependencies
+RUN mix deps.get && \
+    mix deps.compile
+
+# Run tests by default
+CMD ["mix", "test", "--trace"]
+
+# ============================================================================
+# Stage 6: Production - Minimal runtime image
+# ============================================================================
+FROM debian:bookworm-slim AS production
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    libncurses6 \
+    locales \
+    postgresql-client \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+# Create non-root user
+RUN groupadd -r aws && useradd -r -g aws aws
+
+# Create application directories
+RUN mkdir -p /app /app/config && \
+    chown -R aws:aws /app
+
+WORKDIR /app
+
+# Copy release from builder
+COPY --from=builder --chown=aws:aws /app/_build/prod/rel/backend ./
+
+# Copy configuration
+COPY --chown=aws:aws config/backend.yaml /app/config/default.yaml
+
+USER aws
+
+# Expose Phoenix port
+EXPOSE 4000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:4000/api/health || exit 1
+
+# Run the application
+CMD ["/app/bin/backend", "start"]

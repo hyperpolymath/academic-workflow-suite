@@ -1,0 +1,107 @@
+# Multi-stage build for AI Jail container
+# This Containerfile creates a minimal, network-isolated container
+# for running AI inference using the Candle ML framework.
+
+# ============================================================================
+# Stage 1: Builder
+# ============================================================================
+FROM docker.io/library/rust:1.75-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /build
+
+# Copy dependency manifests
+COPY Cargo.toml ./
+
+# Create dummy source to cache dependencies
+RUN mkdir -p src && \
+    echo "fn main() {}" > src/main.rs && \
+    echo "pub fn dummy() {}" > src/model.rs && \
+    echo "pub fn dummy() {}" > src/inference.rs && \
+    echo "pub fn dummy() {}" > src/protocol.rs
+
+# Build dependencies (this layer will be cached)
+RUN cargo build --release && \
+    rm -rf src target/release/ai-jail* target/release/deps/ai_jail*
+
+# Copy actual source code
+COPY src ./src
+
+# Build the actual binary
+RUN cargo build --release --bin ai-jail && \
+    strip target/release/ai-jail
+
+# ============================================================================
+# Stage 2: Runtime
+# ============================================================================
+FROM docker.io/library/debian:bookworm-slim
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN useradd -m -u 1000 -s /bin/bash aijail
+
+# Create necessary directories
+RUN mkdir -p /models /app && \
+    chown -R aijail:aijail /app
+
+# Copy binary from builder
+COPY --from=builder /build/target/release/ai-jail /app/ai-jail
+RUN chmod +x /app/ai-jail
+
+# Set up environment
+ENV MODEL_PATH=/models/mistral-7b/model.safetensors
+ENV TOKENIZER_PATH=/models/mistral-7b/tokenizer.json
+ENV QUANTIZATION=q4
+ENV RUST_LOG=info
+ENV RUST_BACKTRACE=1
+
+# Switch to non-root user
+USER aijail
+WORKDIR /app
+
+# Health check (verify binary exists and is executable)
+HEALTHCHECK NONE
+
+# Metadata
+LABEL org.opencontainers.image.title="AI Jail"
+LABEL org.opencontainers.image.description="Network-isolated AI inference container for academic grading"
+LABEL org.opencontainers.image.vendor="Academic Workflow Suite"
+LABEL org.opencontainers.image.version="0.1.0"
+
+# Entry point
+ENTRYPOINT ["/app/ai-jail"]
+
+# ============================================================================
+# Build and run instructions:
+# ============================================================================
+# Build:
+#   podman build -t ai-jail:latest -f Containerfile .
+#
+# Run (without network):
+#   podman run --rm -i \
+#     --network=none \
+#     --security-opt=no-new-privileges \
+#     --cap-drop=ALL \
+#     -v /path/to/models:/models:ro \
+#     ai-jail:latest
+#
+# Run with GPU (future):
+#   podman run --rm -i \
+#     --network=none \
+#     --device=nvidia.com/gpu=all \
+#     --security-opt=no-new-privileges \
+#     --cap-drop=ALL \
+#     -v /path/to/models:/models:ro \
+#     ai-jail:latest

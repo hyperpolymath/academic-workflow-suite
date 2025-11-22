@@ -1,0 +1,45 @@
+name: academic-workflow-suite
+version: '{{VERSION}}'
+summary: Streamline and automate academic workflows
+description: |
+  The Academic Workflow Suite provides comprehensive tools and utilities
+  for researchers, students, and academics to manage their work more efficiently.
+
+  Features include:
+  - Research paper organization and management
+  - Citation and bibliography tools
+  - Collaboration utilities
+  - Data analysis helpers
+  - Integration with academic databases
+
+grade: stable
+confinement: strict
+base: core22
+
+apps:
+  aws:
+    command: bin/aws
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+
+parts:
+  academic-workflow-suite:
+    plugin: rust
+    source: .
+    build-packages:
+      - pkg-config
+      - libssl-dev
+    stage-packages:
+      - libssl3
+    override-build: |
+      cargo build --release
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp target/release/aws $SNAPCRAFT_PART_INSTALL/bin/
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf

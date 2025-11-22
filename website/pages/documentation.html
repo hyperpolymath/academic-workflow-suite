@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete documentation for Academic Workflow Suite - API reference, tutorials, guides, and FAQs.">
+    <title>Documentation - Academic Workflow Suite</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                        <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2"/>
+                        <path d="M10 12h12M10 16h12M10 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">Academic Workflow Suite</span>
+                </a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/pages/features.html">Features</a></li>
+                <li><a href="/pages/documentation.html" class="active">Docs</a></li>
+                <li><a href="/pages/installation.html">Install</a></li>
+                <li><a href="/pages/security.html">Security</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/pages/about.html">About</a></li>
+                <li><a href="/pages/download.html" class="btn btn-primary">Download</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <circle cx="10" cy="10" r="4" fill="currentColor"/>
+                    <path d="M10 2v2M10 16v2M18 10h-2M4 10H2M15.66 4.34l-1.42 1.42M5.76 14.24l-1.42 1.42M15.66 15.66l-1.42-1.42M5.76 5.76L4.34 4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" fill="currentColor"/>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <section class="page-hero">
+            <div class="container">
+                <h1 class="page-title">Documentation</h1>
+                <p class="page-subtitle">Everything you need to master Academic Workflow Suite.</p>
+                <div class="search-box">
+                    <input type="search" placeholder="Search documentation..." aria-label="Search documentation">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 12l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="container docs-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="docs-sidebar">
+                <nav aria-label="Documentation navigation">
+                    <h3>Getting Started</h3>
+                    <ul>
+                        <li><a href="#quick-start">Quick Start Guide</a></li>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="#configuration">Configuration</a></li>
+                        <li><a href="#first-assignment">Your First Assignment</a></li>
+                    </ul>
+
+                    <h3>User Guides</h3>
+                    <ul>
+                        <li><a href="#marking-assignments">Marking Assignments</a></li>
+                        <li><a href="#creating-rubrics">Creating Rubrics</a></li>
+                        <li><a href="#batch-processing">Batch Processing</a></li>
+                        <li><a href="#lms-integration">LMS Integration</a></li>
+                        <li><a href="#export-feedback">Exporting Feedback</a></li>
+                    </ul>
+
+                    <h3>Advanced Topics</h3>
+                    <ul>
+                        <li><a href="#ai-customization">AI Model Customization</a></li>
+                        <li><a href="#scripting">Scripting & Automation</a></li>
+                        <li><a href="#plugins">Plugin Development</a></li>
+                        <li><a href="#data-migration">Data Migration</a></li>
+                    </ul>
+
+                    <h3>API Reference</h3>
+                    <ul>
+                        <li><a href="/api/swagger-ui/">Interactive API Docs</a></li>
+                        <li><a href="#rest-api">REST API</a></li>
+                        <li><a href="#cli-reference">CLI Reference</a></li>
+                        <li><a href="#python-sdk">Python SDK</a></li>
+                    </ul>
+
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        <li><a href="#best-practices">Best Practices</a></li>
+                        <li><a href="#changelog">Changelog</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Documentation Content -->
+            <div class="docs-content">
+                <!-- Quick Start -->
+                <section id="quick-start" class="doc-section">
+                    <h2>Quick Start Guide</h2>
+                    <p>Get started with Academic Workflow Suite in 5 minutes.</p>
+
+                    <h3>Installation</h3>
+                    <div class="code-block">
+                        <pre><code># macOS/Linux
+curl -sSL https://install.academic-workflow.org | bash
+
+# Verify installation
+aws --version</code></pre>
+                    </div>
+
+                    <h3>Basic Usage</h3>
+                    <div class="code-block">
+                        <pre><code># Create a new project
+aws init my-course
+
+# Import assignments from CSV
+aws import assignments.csv
+
+# Generate feedback for an assignment
+aws mark --assignment "Essay 1" --student "john.doe@example.com"
+
+# Export feedback
+aws export --format pdf --output feedback/</code></pre>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Next Steps:</strong> Check out the <a href="#first-assignment">Your First Assignment</a>
+                        tutorial for a detailed walkthrough.
+                    </div>
+                </section>
+
+                <!-- Marking Assignments -->
+                <section id="marking-assignments" class="doc-section">
+                    <h2>Marking Assignments</h2>
+                    <p>Learn how to efficiently mark student work with AI assistance.</p>
+
+                    <h3>Single Assignment Marking</h3>
+                    <ol>
+                        <li>Open the assignment in the dashboard</li>
+                        <li>Select the student submission to mark</li>
+                        <li>Choose or create a rubric</li>
+                        <li>Click "Generate Feedback" to get AI suggestions</li>
+                        <li>Review and edit the feedback as needed</li>
+                        <li>Assign final grade and save</li>
+                    </ol>
+
+                    <h3>Using Rubrics</h3>
+                    <p>Rubrics ensure consistent grading across all submissions:</p>
+                    <div class="code-block">
+                        <pre><code># Create a rubric from template
+aws rubric create --template essay --name "Analysis Essay"
+
+# Load rubric for marking
+aws mark --assignment "Essay 1" --rubric "Analysis Essay"</code></pre>
+                    </div>
+
+                    <h3>Keyboard Shortcuts</h3>
+                    <table class="shortcut-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Shortcut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Generate feedback</td>
+                                <td><kbd>Ctrl</kbd> + <kbd>G</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Save and next</td>
+                                <td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Toggle AI suggestions</td>
+                                <td><kbd>Ctrl</kbd> + <kbd>A</kbd></td>
+                            </tr>
+                            <tr>
+                                <td>Preview feedback</td>
+                                <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Batch Processing -->
+                <section id="batch-processing" class="doc-section">
+                    <h2>Batch Processing</h2>
+                    <p>Process multiple assignments simultaneously for maximum efficiency.</p>
+
+                    <h3>Basic Batch Operation</h3>
+                    <div class="code-block">
+                        <pre><code># Mark all ungraded submissions for an assignment
+aws batch-mark --assignment "Lab Report 3" --rubric "lab-rubric"
+
+# Process with custom worker count
+aws batch-mark --assignment "Essay 2" --workers 4
+
+# Review mode (don't publish)
+aws batch-mark --assignment "Final" --review-only</code></pre>
+                    </div>
+
+                    <h3>Advanced Batch Configuration</h3>
+                    <div class="code-block">
+                        <pre><code># Configuration file: batch-config.yaml
+assignment: "Midterm Essay"
+rubric: "essay-rubric"
+workers: 4
+ai_model: "advanced"
+review_threshold: 0.85  # Auto-publish if confidence > 85%
+quality_checks:
+  - consistency
+  - tone
+  - completeness</code></pre>
+                    </div>
+
+                    <h3>Monitoring Progress</h3>
+                    <p>Track batch processing in real-time:</p>
+                    <ul>
+                        <li>Dashboard shows live progress bar</li>
+                        <li>Estimated completion time updates dynamically</li>
+                        <li>Pause/resume capability for long batches</li>
+                        <li>Email notification on completion (optional)</li>
+                    </ul>
+                </section>
+
+                <!-- LMS Integration -->
+                <section id="lms-integration" class="doc-section">
+                    <h2>LMS Integration</h2>
+                    <p>Connect with your Learning Management System for seamless workflow.</p>
+
+                    <h3>Supported Platforms</h3>
+                    <ul>
+                        <li>Open University (OU)</li>
+                        <li>Moodle</li>
+                        <li>Canvas</li>
+                        <li>Blackboard Learn</li>
+                        <li>Google Classroom</li>
+                    </ul>
+
+                    <h3>Setup Example: Moodle</h3>
+                    <div class="code-block">
+                        <pre><code># Configure Moodle integration
+aws config set lms.type moodle
+aws config set lms.url https://moodle.university.edu
+aws config set lms.token YOUR_API_TOKEN
+
+# Test connection
+aws lms test
+
+# Import assignments
+aws lms import --course "COMP101"
+
+# Sync grades back to Moodle
+aws lms sync --assignment "Quiz 1"</code></pre>
+                    </div>
+                </section>
+
+                <!-- CLI Reference -->
+                <section id="cli-reference" class="doc-section">
+                    <h2>CLI Reference</h2>
+                    <p>Complete command-line interface documentation.</p>
+
+                    <h3>Global Options</h3>
+                    <div class="code-block">
+                        <pre><code>aws [command] [options]
+
+Global Options:
+  --help, -h          Show help
+  --version, -v       Show version
+  --config FILE       Use custom config file
+  --verbose           Enable verbose logging
+  --quiet             Suppress non-error output</code></pre>
+                    </div>
+
+                    <h3>Commands</h3>
+
+                    <h4><code>aws init</code></h4>
+                    <p>Initialize a new project or course.</p>
+                    <div class="code-block">
+                        <pre><code>aws init [NAME] [OPTIONS]
+
+Options:
+  --template TEMPLATE    Use project template
+  --lms TYPE            Set up LMS integration
+  --no-ai               Disable AI features</code></pre>
+                    </div>
+
+                    <h4><code>aws mark</code></h4>
+                    <p>Mark a single assignment or submission.</p>
+                    <div class="code-block">
+                        <pre><code>aws mark [OPTIONS]
+
+Options:
+  --assignment, -a ID   Assignment ID or name
+  --student, -s EMAIL   Student email or ID
+  --rubric, -r NAME     Rubric to use
+  --no-ai               Skip AI feedback generation</code></pre>
+                    </div>
+
+                    <h4><code>aws batch-mark</code></h4>
+                    <p>Process multiple submissions in batch.</p>
+                    <div class="code-block">
+                        <pre><code>aws batch-mark [OPTIONS]
+
+Options:
+  --assignment, -a ID   Assignment to process
+  --rubric, -r NAME     Rubric to use
+  --workers, -w NUM     Number of parallel workers
+  --review-only         Generate but don't publish</code></pre>
+                    </div>
+
+                    <p><a href="/api/swagger-ui/">View complete API reference →</a></p>
+                </section>
+
+                <!-- FAQ -->
+                <section id="faq" class="doc-section">
+                    <h2>Frequently Asked Questions</h2>
+
+                    <div class="faq-item">
+                        <h3>Is my student data safe?</h3>
+                        <p>
+                            Yes. All processing happens locally on your machine. No student data is sent to external
+                            servers unless you explicitly enable cloud features. See our
+                            <a href="/pages/security.html">security documentation</a> for details.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Can I use Academic Workflow Suite offline?</h3>
+                        <p>
+                            Yes! Core marking and feedback features work completely offline. Internet connection is
+                            only needed for LMS synchronization and optional cloud AI models.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>How accurate is the AI feedback?</h3>
+                        <p>
+                            AI-generated feedback serves as a starting point, not a final product. We recommend always
+                            reviewing and personalizing feedback before sharing with students. Users report 85-95%
+                            satisfaction with AI suggestions as a draft.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Can I customize the AI model?</h3>
+                        <p>
+                            Yes. You can fine-tune models with your own feedback examples, adjust tone and style
+                            preferences, and even use custom models. See
+                            <a href="#ai-customization">AI Model Customization</a> for details.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>What file formats are supported?</h3>
+                        <p>
+                            We support PDF, DOCX, TXT, Markdown, HTML, and common code file formats. Assignment imports
+                            support CSV, JSON, and direct LMS integration.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Is there a limit to the number of students?</h3>
+                        <p>
+                            No limits! Academic Workflow Suite scales from small seminars to massive online courses
+                            with thousands of students.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>How do I backup my data?</h3>
+                        <p>
+                            Use <code>aws backup create</code> to create encrypted backups. You can also sync to cloud
+                            storage providers (Dropbox, Google Drive, etc.) for automatic backup.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>Can multiple instructors collaborate?</h3>
+                        <p>
+                            Yes! Enable team mode to share rubrics, templates, and coordinate marking across teaching
+                            teams. Each member maintains their own secure environment.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Best Practices -->
+                <section id="best-practices" class="doc-section">
+                    <h2>Best Practices</h2>
+
+                    <h3>Effective Rubric Design</h3>
+                    <ul>
+                        <li>Use clear, measurable criteria</li>
+                        <li>Include 3-5 performance levels per criterion</li>
+                        <li>Provide specific examples for each level</li>
+                        <li>Weight criteria by importance</li>
+                        <li>Test rubrics on sample work before deployment</li>
+                    </ul>
+
+                    <h3>Optimizing AI Feedback</h3>
+                    <ul>
+                        <li>Always review AI-generated feedback before publishing</li>
+                        <li>Provide examples of your feedback style to train the model</li>
+                        <li>Use the tone adjustment slider to match your teaching voice</li>
+                        <li>Enable "explanation mode" for constructive criticism</li>
+                        <li>Personalize at least one comment per submission</li>
+                    </ul>
+
+                    <h3>Workflow Efficiency</h3>
+                    <ul>
+                        <li>Use keyboard shortcuts for common actions</li>
+                        <li>Process similar assignments in batches</li>
+                        <li>Create templates for recurring assignment types</li>
+                        <li>Schedule batch jobs during off-hours</li>
+                        <li>Use quality sampling for large batches</li>
+                    </ul>
+
+                    <h3>Data Security</h3>
+                    <ul>
+                        <li>Enable encryption for local storage</li>
+                        <li>Use strong, unique passphrases</li>
+                        <li>Regularly backup your data</li>
+                        <li>Review audit logs periodically</li>
+                        <li>Use AI isolation mode for sensitive assignments</li>
+                    </ul>
+                </section>
+
+                <!-- Support -->
+                <section id="support" class="doc-section">
+                    <h2>Getting Help</h2>
+                    <div class="support-grid">
+                        <div class="support-card">
+                            <h3>Community Forum</h3>
+                            <p>Ask questions and share tips with other educators.</p>
+                            <a href="https://github.com/academic-workflow-suite/discussions" class="btn btn-outline">
+                                Visit Forum
+                            </a>
+                        </div>
+                        <div class="support-card">
+                            <h3>GitHub Issues</h3>
+                            <p>Report bugs and request features.</p>
+                            <a href="https://github.com/academic-workflow-suite/issues" class="btn btn-outline">
+                                Report Issue
+                            </a>
+                        </div>
+                        <div class="support-card">
+                            <h3>Tutorials</h3>
+                            <p>Video guides and written tutorials.</p>
+                            <a href="/blog/" class="btn btn-outline">
+                                View Tutorials
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="footer-heading">Academic Workflow Suite</h3>
+                    <p class="footer-description">Open source tools for modern academic workflows.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="/pages/features.html">Features</a></li>
+                        <li><a href="/pages/download.html">Download</a></li>
+                        <li><a href="/pages/documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/pages/security.html">Security</a></li>
+                        <li><a href="/pages/about.html">About</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 Academic Workflow Suite. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

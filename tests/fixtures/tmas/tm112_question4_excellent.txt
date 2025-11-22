@@ -1,0 +1,37 @@
+Question 4: Describe the OSI model's seven layers and explain why a layered approach is beneficial for network communication. (400 words)
+
+Answer:
+
+The Open Systems Interconnection (OSI) model provides a conceptual framework for understanding network communication by dividing the complex process into seven distinct layers, each with specific responsibilities. This standardized model, developed by the International Organization for Standardization (ISO), facilitates interoperability between different network technologies and vendors.
+
+The seven layers, from lowest to highest, are:
+
+**Layer 1 - Physical Layer**: Handles the transmission of raw binary data over physical media (cables, radio waves). It defines voltage levels, cable specifications, and physical connectors. Examples include Ethernet cables and Wi-Fi radio frequencies.
+
+**Layer 2 - Data Link Layer**: Provides node-to-node data transfer and handles error detection/correction from the physical layer. It frames data into packets and manages MAC addresses. Ethernet and Wi-Fi protocols operate here.
+
+**Layer 3 - Network Layer**: Manages logical addressing and routing of data packets across networks. The Internet Protocol (IP) operates at this layer, using IP addresses to route packets from source to destination across multiple networks.
+
+**Layer 4 - Transport Layer**: Ensures reliable data transfer between hosts through error checking, flow control, and segmentation. TCP (reliable, connection-oriented) and UDP (unreliable, connectionless) are key protocols at this layer.
+
+**Layer 5 - Session Layer**: Establishes, maintains, and terminates communication sessions between applications. It handles authentication and reconnection after interruptions.
+
+**Layer 6 - Presentation Layer**: Translates data formats between the application and network, handling encryption, compression, and character encoding. It ensures data sent by one system can be understood by another.
+
+**Layer 7 - Application Layer**: Provides network services directly to user applications. Protocols like HTTP, FTP, SMTP, and DNS operate here, enabling web browsing, file transfer, email, and name resolution.
+
+The layered approach offers significant benefits:
+
+**Modularity**: Each layer has a well-defined function, making the system easier to understand and troubleshoot. Engineers can focus on specific layers without needing complete knowledge of the entire stack.
+
+**Interoperability**: Standardized interfaces between layers allow different vendors' implementations to work together. A network card from one manufacturer can work with an operating system from another.
+
+**Flexibility**: Layers can be updated or replaced independently. For example, transitioning from IPv4 to IPv6 at the network layer doesn't require changes to transport or application layers.
+
+**Troubleshooting**: The layered structure aids in systematic diagnosis. If web browsing fails, technicians can check each layer sequentially—physical connectivity, link status, IP configuration, port availability, and finally application-level issues.
+
+**Development Efficiency**: Developers can build applications using high-level protocols without understanding low-level transmission details, accelerating development and reducing complexity.
+
+While the OSI model is largely conceptual (the TCP/IP model is more commonly implemented), it remains invaluable for teaching, troubleshooting, and discussing network architecture.
+
+[Word count: 412]

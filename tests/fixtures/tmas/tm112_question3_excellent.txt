@@ -1,0 +1,23 @@
+Question 3: Explain how relational databases use primary keys and foreign keys to maintain data integrity and establish relationships between tables. Provide examples. (350 words)
+
+Answer:
+
+Relational databases employ primary keys and foreign keys as fundamental mechanisms for ensuring data integrity and establishing meaningful relationships between tables. These constraints form the backbone of the relational model, enabling databases to maintain consistency and accurately represent real-world relationships.
+
+A primary key is a column (or combination of columns) that uniquely identifies each row in a table. Primary keys must satisfy two essential properties: uniqueness (no two rows can have the same primary key value) and non-nullability (every row must have a primary key value). For example, in a Students table, a StudentID column might serve as the primary key, ensuring each student has a unique identifier. The database management system (DBMS) enforces these constraints automatically, rejecting any attempt to insert duplicate or null primary key values.
+
+Foreign keys establish relationships between tables by referencing the primary key of another table. A foreign key in one table points to a primary key in another table, creating a parent-child relationship. For instance, consider an Enrollments table that tracks which students are enrolled in which courses. This table might have columns: EnrollmentID (primary key), StudentID (foreign key referencing Students table), and CourseID (foreign key referencing Courses table). The foreign key constraint ensures referential integrity—you cannot enroll a student who doesn't exist in the Students table.
+
+These relationships enable several important integrity mechanisms:
+
+1. **Entity Integrity**: Primary keys ensure each entity (row) is uniquely identifiable, preventing duplicate or ambiguous records.
+
+2. **Referential Integrity**: Foreign keys ensure that relationships between tables remain valid. The DBMS prevents "orphaned" records—for example, you cannot delete a student who has existing enrollments unless those enrollments are first deleted or reassigned.
+
+3. **Cascade Operations**: Foreign keys can be configured with cascade rules. ON DELETE CASCADE automatically removes dependent records when the parent is deleted, while ON UPDATE CASCADE propagates key changes throughout related tables.
+
+Consider a practical example: a library database with Books, Authors, and BookAuthors tables. Books has BookID as primary key, Authors has AuthorID as primary key, and BookAuthors (a junction table for the many-to-many relationship) has foreign keys to both, ensuring every book-author association references valid books and authors.
+
+This relational structure provides data consistency, prevents anomalies, and enables powerful query capabilities through JOIN operations, making relational databases robust tools for managing complex, interconnected data.
+
+[Word count: 379]

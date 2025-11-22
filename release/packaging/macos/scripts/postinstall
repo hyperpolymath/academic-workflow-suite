@@ -1,0 +1,22 @@
+#!/bin/bash
+# Post-installation script for macOS
+
+set -e
+
+# Add to PATH in shell profiles
+SHELL_PROFILES=("$HOME/.bash_profile" "$HOME/.zshrc" "$HOME/.profile")
+
+for profile in "${SHELL_PROFILES[@]}"; do
+    if [ -f "$profile" ]; then
+        # Check if already added
+        if ! grep -q "/usr/local/bin" "$profile"; then
+            echo 'export PATH="/usr/local/bin:$PATH"' >> "$profile"
+        fi
+    fi
+done
+
+echo "Academic Workflow Suite has been installed successfully!"
+echo "Run 'aws --help' to get started."
+echo "You may need to restart your terminal or run 'source ~/.bash_profile' (or ~/.zshrc)"
+
+exit 0

@@ -1,0 +1,255 @@
+version: '3.8'
+
+# Academic Workflow Suite - Testing Environment
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.test.yml up
+
+services:
+  # PostgreSQL - Test Database (Isolated)
+  postgres:
+    image: postgres:16-alpine
+    container_name: aws-postgres-test
+    environment:
+      POSTGRES_DB: academic_workflow_test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    volumes:
+      # No persistent volumes for tests - fresh DB each time
+      - ./docker/configs/postgres/init-test.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./tests/fixtures/postgres:/docker-entrypoint-initdb.d/fixtures:ro
+    tmpfs:
+      - /var/lib/postgresql/data:size=512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d academic_workflow_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    logging:
+      driver: "none"  # Disable logging in test
+
+  # Redis - Test Cache (Ephemeral)
+  redis:
+    image: redis:7-alpine
+    container_name: aws-redis-test
+    command: redis-server --save "" --appendonly no
+    tmpfs:
+      - /data:size=256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "none"
+
+  # Core Engine - Test Mode
+  core:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.core
+      target: test
+    image: aws-core:test
+    container_name: aws-core-test
+    environment:
+      RUST_LOG: info
+      RUST_BACKTRACE: full
+      RUST_TEST_THREADS: 4
+      AWS_ENV: test
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      LMDB_PATH: /tmp/lmdb
+      AI_JAIL_SOCKET: /run/ai-jail.sock
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://test_user:test_password@postgres:5432/academic_workflow_test
+    volumes:
+      - ./components/core:/app:ro
+      - ./tests:/tests:ro
+      - ai-jail-socket:/run
+    tmpfs:
+      - /tmp:size=1G
+      - /data:size=512M
+    command: cargo test --all-features --no-fail-fast
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai-jail:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+
+  # Backend Service - Test Mode
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.backend
+      target: test
+    image: aws-backend:test
+    container_name: aws-backend-test
+    environment:
+      MIX_ENV: test
+      PORT: 4000
+      DATABASE_URL: postgresql://test_user:test_password@postgres:5432/academic_workflow_test
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY_BASE: test-secret-key-base-not-for-production-use-only
+    volumes:
+      - ./components/backend:/app:ro
+      - ./tests:/tests:ro
+    tmpfs:
+      - /tmp:size=512M
+    command: mix test --trace
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+
+  # AI Jail - Test Mode (Mock)
+  ai-jail:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.ai-jail
+      target: test
+    image: aws-ai-jail:test
+    container_name: aws-ai-jail-test
+    environment:
+      RUST_LOG: debug
+      AI_JAIL_MODE: "test"
+      SOCKET_PATH: /run/ai-jail.sock
+      MODEL_PATH: /models
+      MOCK_RESPONSES: "true"  # Use mock AI responses
+    volumes:
+      - ./tests/fixtures/ai-models:/models:ro
+      - ai-jail-socket:/run
+    tmpfs:
+      - /tmp:size=512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: false  # Allow writes for test artifacts
+    command: cargo test --all-features
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+
+  # Test Runner (Integration Tests)
+  test-runner:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile.test-runner
+    image: aws-test-runner:latest
+    container_name: aws-test-runner
+    networks:
+      - aws-network
+    environment:
+      TEST_ENV: docker
+      CORE_URL: http://core:8080
+      BACKEND_URL: http://backend:4000
+      POSTGRES_URL: postgresql://test_user:test_password@postgres:5432/academic_workflow_test
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./tests:/tests:ro
+      - ./components:/components:ro
+      - test-results:/test-results
+    command: >
+      sh -c "
+        echo 'Waiting for services...' &&
+        sleep 10 &&
+        echo 'Running integration tests...' &&
+        pytest /tests/integration -v --junit-xml=/test-results/junit.xml --html=/test-results/report.html --self-contained-html &&
+        echo 'Running end-to-end tests...' &&
+        pytest /tests/e2e -v --junit-xml=/test-results/e2e-junit.xml
+      "
+    depends_on:
+      core:
+        condition: service_started
+      backend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  # Coverage Reporter
+  coverage:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile.coverage
+    image: aws-coverage:latest
+    container_name: aws-coverage
+    volumes:
+      - ./components:/components:ro
+      - ./tests:/tests:ro
+      - test-results:/test-results
+      - coverage-reports:/coverage
+    command: >
+      sh -c "
+        echo 'Generating coverage reports...' &&
+        cd /components/core &&
+        cargo tarpaulin --out Xml --out Html --output-dir /coverage/core &&
+        cd /components/backend &&
+        mix coveralls.html --output-dir /coverage/backend &&
+        echo 'Coverage reports generated at /coverage'
+      "
+    depends_on:
+      - core
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "none"
+
+# Test-specific volumes (ephemeral)
+volumes:
+  test-results:
+    driver: local
+  coverage-reports:
+    driver: local
+  ai-jail-socket:
+    driver: local
+
+# No Adminer, Prometheus, Grafana, or Nginx in test environment

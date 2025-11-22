@@ -1,0 +1,149 @@
+modules:
+  - code: TM112
+    title: "Introduction to Computing and Information Technology 2"
+    level: 1
+    credits: 30
+    institution: "Open University"
+    description: "An introduction to programming, databases, networks, and computing fundamentals"
+    presentation_dates:
+      - start: "2024-02-01"
+        end: "2024-10-31"
+        presentation_code: "2024B"
+    topics:
+      - "Programming fundamentals"
+      - "Database systems"
+      - "Computer networks"
+      - "Operating systems"
+      - "Web technologies"
+      - "Ethics in computing"
+    assessment:
+      tmas: 3
+      tma_weight: 50
+      ema_weight: 50
+      passing_grade: 40
+    prerequisites: []
+
+  - code: M250
+    title: "Object-oriented Java Programming"
+    level: 2
+    credits: 30
+    institution: "Open University"
+    description: "Intermediate Java programming focusing on object-oriented principles and data structures"
+    presentation_dates:
+      - start: "2024-02-01"
+        end: "2024-10-31"
+        presentation_code: "2024B"
+    topics:
+      - "Object-oriented design"
+      - "Java programming"
+      - "Data structures"
+      - "Algorithms"
+      - "Testing and debugging"
+      - "Software design patterns"
+    assessment:
+      tmas: 4
+      tma_weight: 40
+      ema_weight: 60
+      passing_grade: 40
+    prerequisites:
+      - "TM112 or equivalent programming experience"
+
+  - code: M269
+    title: "Algorithms, Data Structures and Computability"
+    level: 2
+    credits: 30
+    institution: "Open University"
+    description: "Study of algorithms, data structures, and computational complexity"
+    presentation_dates:
+      - start: "2024-02-01"
+        end: "2024-10-31"
+        presentation_code: "2024B"
+    topics:
+      - "Algorithm design and analysis"
+      - "Data structures (trees, graphs, hash tables)"
+      - "Sorting and searching algorithms"
+      - "Computational complexity"
+      - "Computability theory"
+      - "Algorithm optimization"
+    assessment:
+      tmas: 3
+      tma_weight: 50
+      ema_weight: 50
+      passing_grade: 40
+    prerequisites:
+      - "M250 or equivalent"
+
+  - code: TM351
+    title: "Data Management and Analysis"
+    level: 3
+    credits: 30
+    institution: "Open University"
+    description: "Advanced data management, databases, and data analysis techniques"
+    presentation_dates:
+      - start: "2024-05-01"
+        end: "2025-01-31"
+        presentation_code: "2024J"
+    topics:
+      - "Relational databases"
+      - "NoSQL databases"
+      - "Data analytics"
+      - "Big data technologies"
+      - "Data visualization"
+      - "Machine learning basics"
+    assessment:
+      tmas: 3
+      tma_weight: 60
+      ema_weight: 40
+      passing_grade: 40
+    prerequisites:
+      - "TM112"
+      - "M250 or M269"
+
+  - code: TM470
+    title: "The Computing and IT Project"
+    level: 3
+    credits: 30
+    institution: "Open University"
+    description: "Independent computing project demonstrating research and development skills"
+    presentation_dates:
+      - start: "2024-02-01"
+        end: "2024-10-31"
+        presentation_code: "2024B"
+      - start: "2024-05-01"
+        end: "2025-01-31"
+        presentation_code: "2024J"
+    topics:
+      - "Project management"
+      - "Research methods"
+      - "Software development lifecycle"
+      - "Technical documentation"
+      - "Professional practice"
+    assessment:
+      tmas: 2
+      tma_weight: 30
+      ema_weight: 70
+      passing_grade: 40
+    prerequisites:
+      - "120 credits at Level 2 or higher"
+
+metadata:
+  institution: "The Open University"
+  institution_code: "OU"
+  academic_year: "2024/2025"
+  grading_scale:
+    distinction: 85
+    grade_2: 70
+    grade_3: 55
+    grade_4: 40
+    fail: 0
+  grade_descriptions:
+    distinction: "First class honours (1st)"
+    grade_2: "Upper second class honours (2:1)"
+    grade_3: "Lower second class honours (2:2)"
+    grade_4: "Third class honours (3rd)"
+    fail: "Fail"
+  credit_system: "UK Higher Education Credit Framework"
+  level_framework:
+    level_1: "Certificate/Foundation level (FHEQ Level 4)"
+    level_2: "Diploma/Intermediate level (FHEQ Level 5)"
+    level_3: "Degree/Honours level (FHEQ Level 6)"

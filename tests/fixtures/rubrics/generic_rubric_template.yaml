@@ -1,0 +1,138 @@
+question_id: template
+module: GENERIC
+title: "Generic Question Rubric Template"
+total_points: 100
+word_limit: 500
+word_limit_penalty: 5  # Points deducted per 50 words over limit (set to 0 to disable)
+
+# Instructions for use:
+# 1. Copy this template and rename for your specific question
+# 2. Update question_id, module, title, and word_limit
+# 3. Modify criteria to match your question requirements
+# 4. Ensure weights sum to 100
+# 5. Define common_errors specific to the topic
+# 6. Add bonus_points if applicable
+
+criteria:
+  - name: "Content Understanding"
+    weight: 40
+    description: "Demonstrates understanding of core concepts"
+    levels:
+      - score: 40
+        descriptor: "Excellent: Comprehensive and deep understanding demonstrated"
+      - score: 30
+        descriptor: "Good: Solid understanding with minor gaps"
+      - score: 20
+        descriptor: "Satisfactory: Basic understanding present"
+      - score: 10
+        descriptor: "Poor: Limited or flawed understanding"
+      - score: 0
+        descriptor: "Absent: No understanding demonstrated"
+
+  - name: "Analysis and Critical Thinking"
+    weight: 25
+    description: "Analyzes concepts and shows critical thinking"
+    levels:
+      - score: 25
+        descriptor: "Excellent: Insightful analysis with well-reasoned arguments"
+      - score: 18
+        descriptor: "Good: Sound analysis with some depth"
+      - score: 12
+        descriptor: "Satisfactory: Basic analysis present"
+      - score: 6
+        descriptor: "Poor: Superficial or weak analysis"
+      - score: 0
+        descriptor: "Absent: No analysis"
+
+  - name: "Examples and Evidence"
+    weight: 20
+    description: "Provides relevant examples and supporting evidence"
+    levels:
+      - score: 20
+        descriptor: "Excellent: Multiple relevant, detailed examples"
+      - score: 14
+        descriptor: "Good: Relevant examples provided"
+      - score: 8
+        descriptor: "Satisfactory: Some examples but limited"
+      - score: 3
+        descriptor: "Poor: Weak or irrelevant examples"
+      - score: 0
+        descriptor: "Absent: No examples"
+
+  - name: "Technical Accuracy"
+    weight: 10
+    description: "Information is factually correct"
+    levels:
+      - score: 10
+        descriptor: "No errors or only trivial mistakes"
+      - score: 7
+        descriptor: "Minor errors that don't affect overall quality"
+      - score: 4
+        descriptor: "Some significant errors"
+      - score: 1
+        descriptor: "Major errors throughout"
+      - score: 0
+        descriptor: "Completely incorrect"
+
+  - name: "Structure and Clarity"
+    weight: 5
+    description: "Answer is well-organized and clearly written"
+    levels:
+      - score: 5
+        descriptor: "Excellent: Logical structure, clear writing, good flow"
+      - score: 3
+        descriptor: "Good: Generally well-structured with minor issues"
+      - score: 1
+        descriptor: "Poor: Disorganized or unclear"
+      - score: 0
+        descriptor: "Unacceptable: No clear structure"
+
+# Define errors specific to your question topic
+common_errors:
+  - error: "Specific error pattern 1"
+    penalty: 10
+    critical: false  # Set to true for errors that should result in automatic fail
+  - error: "Specific error pattern 2"
+    penalty: 5
+    critical: false
+  - error: "Critical conceptual error"
+    penalty: 25
+    critical: true
+
+# Optional bonus points for exceptional work
+bonus_points:
+  - description: "Goes beyond requirements with additional insights"
+    points: 5
+  - description: "Exceptionally clear explanations or diagrams"
+    points: 3
+
+# Grade boundaries (adjust as needed)
+passing_grade: 40
+grade_boundaries:
+  distinction: 85    # First class
+  pass_2: 70        # Upper second class (2:1)
+  pass_3: 55        # Lower second class (2:2)
+  pass_4: 40        # Third class
+  fail: 0           # Fail
+
+# Feedback templates for different grade ranges
+feedback_templates:
+  distinction: "Excellent work demonstrating comprehensive understanding and insightful analysis."
+  pass_2: "Good work showing solid understanding with room for deeper analysis."
+  pass_3: "Satisfactory work covering basic concepts but lacking depth in places."
+  pass_4: "Pass achieved but significant improvements needed in understanding and analysis."
+  fail: "Does not meet passing standards. Please review core concepts and seek additional support."
+
+# AI grading parameters (optional)
+ai_grading:
+  use_ai: true
+  model: "claude-sonnet-4.5"
+  confidence_threshold: 0.85  # Only return grade if AI confidence is above this
+  require_human_review: false  # Set to true to always require human verification
+  review_thresholds:
+    - condition: "borderline"  # Within 5 points of grade boundary
+      require_review: true
+    - condition: "low_confidence"  # AI confidence below threshold
+      require_review: true
+    - condition: "critical_error"  # Any critical error detected
+      require_review: true

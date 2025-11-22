@@ -1,0 +1,64 @@
+---
+# YAML Lint Configuration for Academic Workflow Suite
+# Used by CI/CD pipeline to ensure YAML files are properly formatted
+
+extends: default
+
+rules:
+  # Line length - allow longer lines for readability
+  line-length:
+    max: 120
+    level: warning
+
+  # Indentation - 2 spaces
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Comments
+  comments:
+    min-spaces-from-content: 1
+    require-starting-space: true
+
+  # Brackets
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+
+  # Braces
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+  # Document start/end markers
+  document-start:
+    present: false
+
+  # Trailing spaces
+  trailing-spaces: enable
+
+  # Empty lines
+  empty-lines:
+    max: 2
+
+  # Key duplicates
+  key-duplicates: enable
+
+  # Truthy values (allow yes/no/on/off)
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']
+    check-keys: false
+
+  # Quoted strings - be flexible
+  quoted-strings:
+    quote-type: any
+    required: false
+
+ignore: |
+  node_modules/
+  .git/
+  _build/
+  target/
+  dist/
+  coverage/

@@ -1,0 +1,785 @@
+# GitLab CI/CD Pipeline for Academic Workflow Suite
+# 6-stage comprehensive pipeline: Lint, Build, Test, Security, Package, Deploy
+
+variables:
+  CARGO_HOME: "${CI_PROJECT_DIR}/.cargo"
+  RUST_BACKTRACE: "1"
+  MIX_ENV: "test"
+  MIX_HOME: "${CI_PROJECT_DIR}/.mix"
+  HEX_HOME: "${CI_PROJECT_DIR}/.hex"
+  NODE_ENV: "test"
+  CODECOV_TOKEN: "${CODECOV_TOKEN}"
+  DEBIAN_FRONTEND: "noninteractive"
+  # Versioning
+  VERSION: "0.1.0"
+
+# Pipeline configuration
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
+stages:
+  - lint
+  - build
+  - test
+  - security
+  - package
+  - deploy
+
+# ==============================================================================
+# TEMPLATES
+# ==============================================================================
+
+.rust_template: &rust_template
+  image: rust:1.75-slim
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq build-essential pkg-config libssl-dev
+    - rustc --version
+    - cargo --version
+  cache:
+    key:
+      files:
+        - Cargo.lock
+      prefix: rust-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cargo/
+      - target/
+
+.elixir_template: &elixir_template
+  image: elixir:1.15-alpine
+  before_script:
+    - apk add --no-cache build-base git
+    - mix local.hex --force
+    - mix local.rebar --force
+    - elixir --version
+    - mix --version
+  cache:
+    key:
+      files:
+        - mix.lock
+      prefix: elixir-$CI_COMMIT_REF_SLUG
+    paths:
+      - .mix/
+      - .hex/
+      - components/backend/_build/
+      - components/backend/deps/
+
+.node_template: &node_template
+  image: node:20-alpine
+  before_script:
+    - node --version
+    - npm --version
+    - npm ci
+  cache:
+    key:
+      files:
+        - package-lock.json
+      prefix: node-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+      - .npm/
+
+.docker_template: &docker_template
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker info
+
+# ==============================================================================
+# STAGE 1: LINT
+# ==============================================================================
+
+lint:rust:clippy:
+  <<: *rust_template
+  stage: lint
+  script:
+    - echo "Running Rust clippy on core component..."
+    - cd components/core
+    - rustup component add clippy
+    - cargo clippy --all-targets --all-features -- -D warnings
+    - echo "Running Rust clippy on AI jail component..."
+    - cd ../ai-jail
+    - cargo clippy --all-targets --all-features -- -D warnings
+  allow_failure: false
+  rules:
+    - changes:
+        - components/core/**/*.rs
+        - components/ai-jail/**/*.rs
+        - components/core/Cargo.toml
+        - components/ai-jail/Cargo.toml
+
+lint:rust:fmt:
+  <<: *rust_template
+  stage: lint
+  script:
+    - echo "Checking Rust formatting on core component..."
+    - cd components/core
+    - rustup component add rustfmt
+    - cargo fmt --all -- --check
+    - echo "Checking Rust formatting on AI jail component..."
+    - cd ../ai-jail
+    - cargo fmt --all -- --check
+  allow_failure: false
+  rules:
+    - changes:
+        - components/core/**/*.rs
+        - components/ai-jail/**/*.rs
+
+lint:elixir:format:
+  <<: *elixir_template
+  stage: lint
+  script:
+    - echo "Checking Elixir formatting..."
+    - cd components/backend
+    - mix deps.get
+    - mix format --check-formatted
+  allow_failure: false
+  rules:
+    - changes:
+        - components/backend/**/*.ex
+        - components/backend/**/*.exs
+
+lint:elixir:credo:
+  <<: *elixir_template
+  stage: lint
+  script:
+    - echo "Running Credo static analysis..."
+    - cd components/backend
+    - mix deps.get
+    - mix credo --strict
+  allow_failure: true
+  rules:
+    - changes:
+        - components/backend/**/*.ex
+        - components/backend/**/*.exs
+
+lint:rescript:
+  <<: *node_template
+  stage: lint
+  script:
+    - echo "Linting ReScript code..."
+    - cd components/office-addin
+    - npm run lint || echo "No lint script found, skipping..."
+  allow_failure: true
+  rules:
+    - changes:
+        - components/office-addin/**/*.res
+        - components/office-addin/**/*.js
+        - components/office-addin/**/*.ts
+
+lint:shell:
+  image: koalaman/shellcheck-alpine:stable
+  stage: lint
+  script:
+    - echo "Running shellcheck on all shell scripts..."
+    - find . -type f -name "*.sh" -not -path "./.git/*" -not -path "./node_modules/*" | while read -r file; do
+        echo "Checking $file..."
+        shellcheck -x "$file"
+      done
+  allow_failure: false
+  rules:
+    - changes:
+        - "**/*.sh"
+
+lint:yaml:
+  image: alpine:latest
+  stage: lint
+  before_script:
+    - apk add --no-cache yamllint
+  script:
+    - echo "Linting YAML files..."
+    - yamllint -d "{extends: default, rules: {line-length: {max: 120}}}" .gitlab-ci.yml
+    - find . -type f \( -name "*.yml" -o -name "*.yaml" \) -not -path "./.git/*" | xargs yamllint -d "{extends: default, rules: {line-length: {max: 120}}}"
+  allow_failure: true
+
+# ==============================================================================
+# STAGE 2: BUILD
+# ==============================================================================
+
+build:rust:core:
+  <<: *rust_template
+  stage: build
+  needs: ["lint:rust:clippy", "lint:rust:fmt"]
+  script:
+    - echo "Building Rust core component in release mode..."
+    - cd components/core
+    - cargo build --release --verbose
+    - ls -lh target/release/
+  artifacts:
+    name: "rust-core-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - components/core/target/release/academic-workflow-core
+    expire_in: 1 week
+  cache:
+    key:
+      files:
+        - components/core/Cargo.lock
+      prefix: rust-core-build-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cargo/
+      - components/core/target/
+
+build:rust:ai-jail:
+  <<: *rust_template
+  stage: build
+  needs: ["lint:rust:clippy", "lint:rust:fmt"]
+  script:
+    - echo "Building AI jail component in release mode..."
+    - cd components/ai-jail
+    - cargo build --release --verbose
+    - ls -lh target/release/
+  artifacts:
+    name: "rust-ai-jail-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - components/ai-jail/target/release/ai-jail
+    expire_in: 1 week
+  cache:
+    key:
+      files:
+        - components/ai-jail/Cargo.lock
+      prefix: rust-ai-jail-build-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cargo/
+      - components/ai-jail/target/
+
+build:elixir:backend:
+  <<: *elixir_template
+  stage: build
+  needs: ["lint:elixir:format"]
+  variables:
+    MIX_ENV: "prod"
+  script:
+    - echo "Building Elixir backend in production mode..."
+    - cd components/backend
+    - mix deps.get --only prod
+    - mix deps.compile
+    - mix compile --warnings-as-errors
+    - mix release || echo "No release configuration found"
+  artifacts:
+    name: "elixir-backend-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - components/backend/_build/prod/
+    expire_in: 1 week
+  cache:
+    key:
+      files:
+        - components/backend/mix.lock
+      prefix: elixir-backend-build-$CI_COMMIT_REF_SLUG
+    paths:
+      - .mix/
+      - .hex/
+      - components/backend/deps/
+      - components/backend/_build/
+
+build:office-addin:
+  <<: *node_template
+  stage: build
+  needs: ["lint:rescript"]
+  script:
+    - echo "Building Office add-in with webpack (production)..."
+    - cd components/office-addin
+    - npm run build:prod || npm run build || echo "No build script found"
+    - ls -lh dist/ || ls -lh build/ || echo "Build output not found"
+  artifacts:
+    name: "office-addin-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - components/office-addin/dist/
+      - components/office-addin/build/
+    expire_in: 1 week
+
+# ==============================================================================
+# STAGE 3: TEST
+# ==============================================================================
+
+test:rust:core:
+  <<: *rust_template
+  stage: test
+  needs: ["build:rust:core"]
+  script:
+    - echo "Running Rust core unit tests..."
+    - cd components/core
+    - cargo test --all-features --verbose -- --nocapture
+  coverage: '/^\s*lines\.+:\s+(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: components/core/target/nextest/ci/junit.xml
+    expire_in: 30 days
+  allow_failure: false
+
+test:rust:ai-jail:
+  <<: *rust_template
+  stage: test
+  needs: ["build:rust:ai-jail"]
+  script:
+    - echo "Running AI jail unit tests..."
+    - cd components/ai-jail
+    - cargo test --all-features --verbose -- --nocapture
+  coverage: '/^\s*lines\.+:\s+(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: components/ai-jail/target/nextest/ci/junit.xml
+    expire_in: 30 days
+  allow_failure: false
+
+test:elixir:backend:
+  <<: *elixir_template
+  stage: test
+  needs: ["build:elixir:backend"]
+  variables:
+    MIX_ENV: "test"
+  script:
+    - echo "Running Elixir backend tests..."
+    - cd components/backend
+    - mix deps.get --only test
+    - mix test --cover --trace
+  coverage: '/\[TOTAL\]\s+(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: components/backend/_build/test/lib/backend/test-junit-report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: components/backend/cover/cobertura.xml
+    paths:
+      - components/backend/cover/
+    expire_in: 30 days
+
+test:rescript:office-addin:
+  <<: *node_template
+  stage: test
+  needs: ["build:office-addin"]
+  script:
+    - echo "Running ReScript/JavaScript tests..."
+    - cd components/office-addin
+    - npm test || echo "No test script configured"
+  coverage: '/Statements\s+:\s+(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      junit: components/office-addin/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: components/office-addin/coverage/cobertura-coverage.xml
+    expire_in: 30 days
+  allow_failure: true
+
+test:integration:
+  image: ubuntu:22.04
+  stage: test
+  needs:
+    - build:rust:core
+    - build:rust:ai-jail
+    - build:elixir:backend
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq curl build-essential
+  script:
+    - echo "Running integration tests..."
+    - chmod +x scripts/ci/test-integration.sh
+    - ./scripts/ci/test-integration.sh
+  artifacts:
+    reports:
+      junit: tests/integration/results/junit.xml
+    paths:
+      - tests/integration/results/
+    expire_in: 30 days
+  allow_failure: false
+
+test:ai-isolation:
+  <<: *docker_template
+  stage: test
+  needs: ["build:rust:ai-jail"]
+  script:
+    - echo "Testing AI jail isolation (CRITICAL)..."
+    - cd components/ai-jail
+    - |
+      # Build test container
+      docker build -t ai-jail-test -f Dockerfile.test . || exit 1
+
+      # Run isolation tests
+      docker run --rm --cap-drop=ALL --security-opt=no-new-privileges ai-jail-test || exit 1
+
+      # Test resource limits
+      docker run --rm --memory=512m --cpus=1.0 ai-jail-test test-limits || exit 1
+
+      echo "AI isolation tests passed!"
+  allow_failure: false
+
+test:coverage:
+  <<: *rust_template
+  stage: test
+  needs:
+    - test:rust:core
+    - test:rust:ai-jail
+    - test:elixir:backend
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq curl build-essential pkg-config libssl-dev
+    - cargo install cargo-tarpaulin || true
+  script:
+    - echo "Generating code coverage reports..."
+    - cd components/core
+    - cargo tarpaulin --out Xml --output-dir ../../coverage/core --verbose || true
+    - cd ../ai-jail
+    - cargo tarpaulin --out Xml --output-dir ../../coverage/ai-jail --verbose || true
+    - cd ../..
+    - |
+      if [ -n "$CODECOV_TOKEN" ]; then
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
+        chmod +x codecov
+        ./codecov -t $CODECOV_TOKEN -f coverage/core/cobertura.xml -F core
+        ./codecov -t $CODECOV_TOKEN -f coverage/ai-jail/cobertura.xml -F ai-jail
+        echo "Coverage uploaded to Codecov"
+      else
+        echo "CODECOV_TOKEN not set, skipping upload"
+      fi
+  artifacts:
+    paths:
+      - coverage/
+    expire_in: 30 days
+  allow_failure: true
+
+# ==============================================================================
+# STAGE 4: SECURITY
+# ==============================================================================
+
+security:rust:audit:
+  image: rust:1.75-slim
+  stage: security
+  before_script:
+    - cargo install cargo-audit || true
+  script:
+    - echo "Auditing Rust dependencies for vulnerabilities..."
+    - cd components/core
+    - cargo audit || echo "Vulnerabilities found in core"
+    - cd ../ai-jail
+    - cargo audit || echo "Vulnerabilities found in AI jail"
+  allow_failure: true
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+    expire_in: 30 days
+
+security:elixir:audit:
+  <<: *elixir_template
+  stage: security
+  script:
+    - echo "Auditing Elixir dependencies..."
+    - cd components/backend
+    - mix deps.get
+    - mix hex.audit || echo "Vulnerabilities found in Elixir dependencies"
+    - mix deps.audit || true
+  allow_failure: true
+
+security:node:audit:
+  <<: *node_template
+  stage: security
+  script:
+    - echo "Auditing Node.js dependencies..."
+    - cd components/office-addin
+    - npm audit --audit-level=moderate || echo "Vulnerabilities found"
+    - npm audit fix --dry-run || true
+  allow_failure: true
+
+security:sast:semgrep:
+  image: returntocorp/semgrep:latest
+  stage: security
+  script:
+    - echo "Running SAST with Semgrep..."
+    - semgrep --config=auto --config=p/security-audit --config=p/secrets --json --output=gl-sast-report.json . || true
+    - semgrep --config=auto --config=p/security-audit --config=p/secrets . || true
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+    expire_in: 30 days
+  allow_failure: true
+
+security:secret-detection:
+  image: alpine:latest
+  stage: security
+  before_script:
+    - apk add --no-cache git grep
+  script:
+    - echo "Scanning for secrets and sensitive data..."
+    - |
+      # Check for common secret patterns
+      if git grep -E "(password|secret|api_key|private_key|token)\s*=\s*['\"]" -- ':!.gitlab-ci.yml' ':!*.md'; then
+        echo "WARNING: Potential secrets found in code!"
+        exit 1
+      fi
+    - |
+      # Check for hardcoded URLs with credentials
+      if git grep -E "https?://[^:]+:[^@]+@" .; then
+        echo "WARNING: Hardcoded credentials in URLs!"
+        exit 1
+      fi
+    - echo "No obvious secrets detected"
+  allow_failure: true
+
+security:license-compliance:
+  image: licensefinder/license_finder:latest
+  stage: security
+  script:
+    - echo "Checking license compliance..."
+    - cd components/core
+    - cargo license --json > ../../licenses-rust-core.json || true
+    - cd ../backend
+    - mix hex.info --json > ../../licenses-elixir.json || true
+    - cd ../office-addin
+    - npx license-checker --json > ../../licenses-node.json || true
+  artifacts:
+    paths:
+      - licenses-*.json
+    expire_in: 30 days
+  allow_failure: true
+
+security:container-scan:
+  <<: *docker_template
+  stage: security
+  needs: []
+  script:
+    - echo "Scanning container images for vulnerabilities..."
+    - |
+      if command -v trivy &> /dev/null; then
+        trivy image --severity HIGH,CRITICAL ai-jail:latest || true
+      else
+        echo "Trivy not installed, skipping container scan"
+      fi
+  allow_failure: true
+
+# ==============================================================================
+# STAGE 5: PACKAGE
+# ==============================================================================
+
+package:deb:
+  image: ubuntu:22.04
+  stage: package
+  needs:
+    - build:rust:core
+    - build:rust:ai-jail
+    - build:elixir:backend
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq build-essential dpkg-dev fakeroot
+  script:
+    - echo "Creating Debian package..."
+    - chmod +x scripts/ci/package.sh
+    - ./scripts/ci/package.sh deb
+    - ls -lh packages/
+  artifacts:
+    name: "academic-workflow-suite-${VERSION}-${CI_COMMIT_SHORT_SHA}.deb"
+    paths:
+      - packages/*.deb
+      - packages/*.sha256
+    expire_in: 1 month
+  only:
+    - main
+    - tags
+
+package:msi:
+  image: debian:bullseye
+  stage: package
+  needs:
+    - build:rust:core
+    - build:office-addin
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq wine wixl msitools
+  script:
+    - echo "Creating Windows MSI installer..."
+    - chmod +x scripts/ci/package.sh
+    - ./scripts/ci/package.sh msi
+    - ls -lh packages/
+  artifacts:
+    name: "academic-workflow-suite-${VERSION}-${CI_COMMIT_SHORT_SHA}.msi"
+    paths:
+      - packages/*.msi
+      - packages/*.sha256
+    expire_in: 1 month
+  only:
+    - main
+    - tags
+  allow_failure: true
+
+package:container:ai-jail:
+  <<: *docker_template
+  stage: package
+  needs:
+    - build:rust:ai-jail
+    - test:ai-isolation
+  script:
+    - echo "Building Podman/Docker image for AI jail..."
+    - cd components/ai-jail
+    - |
+      docker build \
+        --build-arg VERSION=${VERSION} \
+        --build-arg CI_COMMIT_SHA=${CI_COMMIT_SHORT_SHA} \
+        -t ${CI_REGISTRY_IMAGE}/ai-jail:${VERSION} \
+        -t ${CI_REGISTRY_IMAGE}/ai-jail:latest \
+        .
+    - docker images
+    - |
+      if [ -n "$CI_REGISTRY_USER" ]; then
+        echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+        docker push ${CI_REGISTRY_IMAGE}/ai-jail:${VERSION}
+        docker push ${CI_REGISTRY_IMAGE}/ai-jail:latest
+      fi
+  only:
+    - main
+    - tags
+
+package:office-addin:
+  <<: *node_template
+  stage: package
+  needs:
+    - build:office-addin
+    - test:rescript:office-addin
+  script:
+    - echo "Packaging Office add-in..."
+    - cd components/office-addin
+    - npm pack
+    - mv *.tgz ../../packages/ || mkdir -p ../../packages && mv *.tgz ../../packages/
+  artifacts:
+    name: "office-addin-${VERSION}-${CI_COMMIT_SHORT_SHA}.tgz"
+    paths:
+      - packages/*.tgz
+    expire_in: 1 month
+  only:
+    - main
+    - tags
+
+package:checksums:
+  image: alpine:latest
+  stage: package
+  needs:
+    - package:deb
+    - package:office-addin
+  before_script:
+    - apk add --no-cache coreutils
+  script:
+    - echo "Generating checksums for all packages..."
+    - cd packages
+    - sha256sum * > SHA256SUMS
+    - cat SHA256SUMS
+  artifacts:
+    paths:
+      - packages/SHA256SUMS
+    expire_in: 1 month
+  only:
+    - main
+    - tags
+
+# ==============================================================================
+# STAGE 6: DEPLOY
+# ==============================================================================
+
+deploy:staging:
+  image: alpine:latest
+  stage: deploy
+  needs:
+    - package:deb
+    - package:container:ai-jail
+  before_script:
+    - apk add --no-cache openssh-client curl
+  script:
+    - echo "Deploying to staging environment..."
+    - |
+      if [ -n "$STAGING_SERVER" ]; then
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "$STAGING_SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        # Deploy packages
+        scp -o StrictHostKeyChecking=no packages/*.deb $STAGING_SERVER:/tmp/
+        ssh -o StrictHostKeyChecking=no $STAGING_SERVER "sudo dpkg -i /tmp/*.deb"
+
+        echo "Deployed to staging successfully"
+      else
+        echo "STAGING_SERVER not configured, skipping deployment"
+      fi
+  environment:
+    name: staging
+    url: https://staging.academic-workflow.example.com
+  when: manual
+  only:
+    - main
+
+deploy:production:
+  image: alpine:latest
+  stage: deploy
+  needs:
+    - package:deb
+    - package:msi
+    - package:container:ai-jail
+    - package:office-addin
+  before_script:
+    - apk add --no-cache openssh-client curl
+  script:
+    - echo "Deploying to production environment..."
+    - |
+      if [ -n "$PROD_SERVER" ]; then
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "$PROD_SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+        # Deploy packages
+        scp -o StrictHostKeyChecking=no packages/*.deb $PROD_SERVER:/tmp/
+        ssh -o StrictHostKeyChecking=no $PROD_SERVER "sudo dpkg -i /tmp/*.deb && sudo systemctl restart academic-workflow"
+
+        echo "Deployed to production successfully"
+      else
+        echo "PROD_SERVER not configured, skipping deployment"
+      fi
+  environment:
+    name: production
+    url: https://academic-workflow.example.com
+  when: manual
+  only:
+    - main
+    - tags
+  # Protected environment - only maintainers can deploy
+
+deploy:release:
+  image: alpine:latest
+  stage: deploy
+  needs:
+    - package:deb
+    - package:msi
+    - package:office-addin
+    - package:checksums
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    - echo "Uploading release artifacts to GitLab..."
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        # Create release
+        curl --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
+             --data tag_name="$CI_COMMIT_TAG" \
+             --data name="Release $CI_COMMIT_TAG" \
+             --data description="Automated release for $CI_COMMIT_TAG" \
+             "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
+
+        # Upload artifacts
+        for file in packages/*; do
+          curl --header "PRIVATE-TOKEN: $CI_JOB_TOKEN" \
+               --upload-file "$file" \
+               "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads"
+        done
+
+        echo "Release created successfully"
+      else
+        echo "Not a tag, skipping release creation"
+      fi
+  only:
+    - tags
+  when: manual

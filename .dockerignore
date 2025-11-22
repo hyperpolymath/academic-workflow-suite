@@ -1,0 +1,147 @@
+# Docker ignore file for Academic Workflow Suite
+# Exclude unnecessary files from container builds
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+
+# Documentation
+*.md
+!README.md
+docs/
+CLAUDE.md
+LICENSE
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+target/
+_build/
+build/
+dist/
+out/
+*.o
+*.so
+*.a
+*.lib
+*.exe
+*.dll
+*.dylib
+
+# Rust
+Cargo.lock
+**/.cargo/
+**/target/
+*.rs.bk
+
+# Elixir
+.elixir_ls/
+.mix/
+.hex/
+deps/
+_build/
+*.ez
+*.beam
+/config/*.secret.exs
+.fetch
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.npm/
+.pnp.*
+.yarn/
+*.tgz
+
+# ReScript
+lib/bs/
+.bsb.lock
+.merlin
+
+# Test coverage
+coverage/
+.coverage
+htmlcov/
+*.coveragerc
+*.lcov
+.nyc_output/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# Package artifacts
+packages/
+*.deb
+*.msi
+*.dmg
+*.rpm
+*.pkg
+*.tgz
+*.tar.gz
+*.zip
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Testing
+tests/
+test/
+spec/
+*.test.js
+*.spec.js
+__tests__/
+.pytest_cache/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Development
+.devcontainer/
+.vagrant/
+Vagrantfile
+
+# Scripts (most not needed in container)
+scripts/dev/
+scripts/install/
+scripts/management/
+
+# Keep only necessary scripts for container runtime
+!scripts/ci/

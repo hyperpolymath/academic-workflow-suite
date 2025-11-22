@@ -1,0 +1,55 @@
+{
+  "name": "awap-office-addin",
+  "version": "1.0.0",
+  "description": "Academic Workflow Suite Office Add-in built with ReScript",
+  "main": "dist/addin.js",
+  "scripts": {
+    "clean": "rescript clean",
+    "build": "rescript build && webpack --mode production",
+    "dev": "rescript build -w & webpack --mode development --watch",
+    "test": "jest",
+    "start": "office-addin-dev-server start manifest.xml",
+    "stop": "office-addin-dev-server stop manifest.xml",
+    "validate": "office-addin-manifest validate manifest.xml"
+  },
+  "keywords": [
+    "office-addin",
+    "word",
+    "rescript",
+    "academic"
+  ],
+  "author": "Academic Workflow Suite",
+  "license": "MIT",
+  "dependencies": {
+    "@rescript/core": "^1.2.0",
+    "rescript": "^11.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/preset-react": "^7.23.3",
+    "@types/office-js": "^1.0.376",
+    "@types/office-runtime": "^1.0.35",
+    "babel-loader": "^9.1.3",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.4",
+    "office-addin-dev-certs": "^1.13.2",
+    "office-addin-dev-server": "^1.13.2",
+    "office-addin-manifest": "^1.13.2",
+    "rescript-jest": "^0.10.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "jest": {
+    "testMatch": [
+      "**/tests/**/*_test.bs.js"
+    ],
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
+  }
+}

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Installation guide for Academic Workflow Suite - Get up and running in minutes with our step-by-step instructions.">
+    <title>Installation Guide - Academic Workflow Suite</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                        <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2"/>
+                        <path d="M10 12h12M10 16h12M10 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">Academic Workflow Suite</span>
+                </a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/pages/features.html">Features</a></li>
+                <li><a href="/pages/documentation.html">Docs</a></li>
+                <li><a href="/pages/installation.html" class="active">Install</a></li>
+                <li><a href="/pages/security.html">Security</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/pages/about.html">About</a></li>
+                <li><a href="/pages/download.html" class="btn btn-primary">Download</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <circle cx="10" cy="10" r="4" fill="currentColor"/>
+                    <path d="M10 2v2M10 16v2M18 10h-2M4 10H2M15.66 4.34l-1.42 1.42M5.76 14.24l-1.42 1.42M15.66 15.66l-1.42-1.42M5.76 5.76L4.34 4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" fill="currentColor"/>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <section class="page-hero">
+            <div class="container">
+                <h1 class="page-title">Installation Guide</h1>
+                <p class="page-subtitle">Get up and running with Academic Workflow Suite in minutes.</p>
+            </div>
+        </section>
+
+        <div class="container content-wrapper">
+            <!-- Quick Start -->
+            <section class="install-section">
+                <h2 id="quick-start">Quick Start</h2>
+                <p>The fastest way to install Academic Workflow Suite on your system:</p>
+
+                <div class="install-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" data-tab="macos">macOS</button>
+                        <button class="tab-button" data-tab="linux">Linux</button>
+                        <button class="tab-button" data-tab="windows">Windows</button>
+                    </div>
+
+                    <div class="tab-content active" id="macos">
+                        <div class="code-block">
+                            <pre><code># Using Homebrew (recommended)
+brew install academic-workflow-suite
+
+# Or download the installer
+curl -sSL https://install.academic-workflow.org | bash</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="linux">
+                        <div class="code-block">
+                            <pre><code># Using the install script
+curl -sSL https://install.academic-workflow.org | bash
+
+# Or using package managers:
+# Debian/Ubuntu
+sudo apt install academic-workflow-suite
+
+# Fedora/RHEL
+sudo dnf install academic-workflow-suite
+
+# Arch Linux
+yay -S academic-workflow-suite</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="windows">
+                        <div class="code-block">
+                            <pre><code># Using Windows Package Manager
+winget install AcademicWorkflowSuite
+
+# Or using Chocolatey
+choco install academic-workflow-suite
+
+# Or download the MSI installer from the download page</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Requirements -->
+            <section class="install-section">
+                <h2 id="requirements">System Requirements</h2>
+
+                <div class="requirements-grid">
+                    <div class="requirement-card">
+                        <h3>Minimum Requirements</h3>
+                        <ul>
+                            <li><strong>OS:</strong> macOS 11+, Windows 10+, or Linux (kernel 4.15+)</li>
+                            <li><strong>CPU:</strong> Dual-core processor (x86_64 or ARM64)</li>
+                            <li><strong>RAM:</strong> 4 GB</li>
+                            <li><strong>Storage:</strong> 500 MB available space</li>
+                            <li><strong>Optional:</strong> Internet connection for LMS sync</li>
+                        </ul>
+                    </div>
+
+                    <div class="requirement-card">
+                        <h3>Recommended Requirements</h3>
+                        <ul>
+                            <li><strong>OS:</strong> Latest stable version</li>
+                            <li><strong>CPU:</strong> Quad-core processor or better</li>
+                            <li><strong>RAM:</strong> 8 GB or more</li>
+                            <li><strong>Storage:</strong> 2 GB available space (for AI models)</li>
+                            <li><strong>GPU:</strong> Optional, for faster AI processing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>About AI Models</h4>
+                    <p>
+                        The base installation includes lightweight AI models (~200MB). For enhanced feedback quality,
+                        you can optionally download advanced models (up to 2GB) during or after installation.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Step-by-Step Installation -->
+            <section class="install-section">
+                <h2 id="detailed-install">Detailed Installation Steps</h2>
+
+                <div class="steps-detailed">
+                    <div class="step-detailed">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Download the Installer</h3>
+                            <p>Visit the <a href="/pages/download.html">download page</a> and select the installer for your platform:</p>
+                            <ul>
+                                <li><strong>macOS:</strong> <code>AWS-macOS-v1.0.0.dmg</code> (Apple Silicon or Intel)</li>
+                                <li><strong>Windows:</strong> <code>AWS-Windows-v1.0.0.msi</code></li>
+                                <li><strong>Linux:</strong> <code>AWS-Linux-v1.0.0.AppImage</code> or distribution-specific packages</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-detailed">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Verify the Download (Optional but Recommended)</h3>
+                            <p>Verify the integrity of your download using checksums:</p>
+                            <div class="code-block">
+                                <pre><code># macOS/Linux
+sha256sum AWS-*.dmg
+# Compare with published checksum
+
+# Windows (PowerShell)
+Get-FileHash AWS-*.msi -Algorithm SHA256</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-detailed">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Run the Installer</h3>
+                            <ul>
+                                <li><strong>macOS:</strong> Open the DMG file and drag Academic Workflow Suite to Applications</li>
+                                <li><strong>Windows:</strong> Double-click the MSI file and follow the installation wizard</li>
+                                <li><strong>Linux:</strong> Make the AppImage executable and run it, or use your package manager</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-detailed">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Initial Configuration</h3>
+                            <p>Launch Academic Workflow Suite and complete the setup wizard:</p>
+                            <ol>
+                                <li>Choose your preferred language and region</li>
+                                <li>Configure data storage location (default: <code>~/AcademicWorkflow</code>)</li>
+                                <li>Enable or disable AI features and select models</li>
+                                <li>Set up encryption passphrase (required for data security)</li>
+                                <li>Optionally configure LMS integration</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="step-detailed">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Verify Installation</h3>
+                            <p>Confirm everything is working correctly:</p>
+                            <div class="code-block">
+                                <pre><code># Check version
+aws --version
+
+# Run system check
+aws doctor
+
+# Expected output:
+# ✓ All systems operational
+# ✓ AI models loaded
+# ✓ Storage accessible
+# ✓ No issues detected</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Video Tutorial Placeholder -->
+            <section class="install-section">
+                <h2 id="video-tutorial">Video Tutorial</h2>
+                <div class="video-placeholder">
+                    <div class="video-container">
+                        <div class="video-thumb">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="currentColor" opacity="0.2"/>
+                                <path d="M40 30l30 20-30 20z" fill="currentColor"/>
+                            </svg>
+                            <p>Installation Walkthrough</p>
+                            <span>5 minute video showing the complete installation process</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center">
+                    <em>Video coming soon! Subscribe to our <a href="/blog/">blog</a> for updates.</em>
+                </p>
+            </section>
+
+            <!-- LMS Integration Setup -->
+            <section class="install-section">
+                <h2 id="lms-setup">LMS Integration Setup</h2>
+                <p>Connect Academic Workflow Suite with your Learning Management System:</p>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span>Open University Integration</span>
+                            <svg class="accordion-icon" width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <ol>
+                                <li>Log into your OU account and navigate to Settings</li>
+                                <li>Generate an API token under "Integrations"</li>
+                                <li>In AWS, go to Settings → Integrations → Add LMS</li>
+                                <li>Select "Open University" and paste your API token</li>
+                                <li>Click "Test Connection" to verify</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span>Moodle Integration</span>
+                            <svg class="accordion-icon" width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <ol>
+                                <li>Access your Moodle site as an administrator</li>
+                                <li>Navigate to Site Administration → Plugins → Web Services</li>
+                                <li>Enable web services and create a token for your account</li>
+                                <li>In AWS, select "Moodle" integration and enter your site URL</li>
+                                <li>Paste the token and authorize the connection</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span>Canvas Integration</span>
+                            <svg class="accordion-icon" width="20" height="20" viewBox="0 0 20 20">
+                                <path d="M6 8l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="accordion-content">
+                            <ol>
+                                <li>Log into Canvas and click on Account → Settings</li>
+                                <li>Scroll to "Approved Integrations" and click "+ New Access Token"</li>
+                                <li>Give it a purpose (e.g., "Academic Workflow Suite") and generate</li>
+                                <li>Copy the token (shown only once!)</li>
+                                <li>In AWS, add Canvas integration with your institution's Canvas URL and token</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section class="install-section">
+                <h2 id="troubleshooting">Troubleshooting</h2>
+
+                <div class="troubleshooting-grid">
+                    <div class="trouble-item">
+                        <h3>Installation fails on macOS</h3>
+                        <p><strong>Issue:</strong> "App cannot be opened because it is from an unidentified developer"</p>
+                        <p><strong>Solution:</strong></p>
+                        <ol>
+                            <li>Right-click the app and select "Open"</li>
+                            <li>Click "Open" in the security dialog</li>
+                            <li>Alternatively: System Preferences → Security & Privacy → Allow app</li>
+                        </ol>
+                    </div>
+
+                    <div class="trouble-item">
+                        <h3>AI models not loading</h3>
+                        <p><strong>Issue:</strong> Error message "Failed to load AI models"</p>
+                        <p><strong>Solution:</strong></p>
+                        <ol>
+                            <li>Ensure you have at least 500MB free disk space</li>
+                            <li>Run <code>aws models download</code> to re-download</li>
+                            <li>Check firewall isn't blocking downloads</li>
+                            <li>Try manual model installation from <a href="/pages/download.html">downloads</a></li>
+                        </ol>
+                    </div>
+
+                    <div class="trouble-item">
+                        <h3>LMS connection fails</h3>
+                        <p><strong>Issue:</strong> Cannot connect to Learning Management System</p>
+                        <p><strong>Solution:</strong></p>
+                        <ol>
+                            <li>Verify your API token is still valid</li>
+                            <li>Check the LMS URL is correct (including https://)</li>
+                            <li>Ensure your network allows connections to the LMS</li>
+                            <li>Try regenerating the API token in your LMS</li>
+                        </ol>
+                    </div>
+
+                    <div class="trouble-item">
+                        <h3>Permission errors on Linux</h3>
+                        <p><strong>Issue:</strong> "Permission denied" when running commands</p>
+                        <p><strong>Solution:</strong></p>
+                        <ol>
+                            <li>Make the binary executable: <code>chmod +x academic-workflow-suite</code></li>
+                            <li>Ensure your user has write access to the data directory</li>
+                            <li>Don't run as root unless necessary</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="help-box">
+                    <h3>Still Having Issues?</h3>
+                    <p>We're here to help! Check these resources:</p>
+                    <ul>
+                        <li><a href="/pages/documentation.html">Full Documentation</a></li>
+                        <li><a href="https://github.com/academic-workflow-suite/issues">GitHub Issues</a></li>
+                        <li><a href="https://github.com/academic-workflow-suite/discussions">Community Discussions</a></li>
+                        <li><a href="/pages/about.html#contact">Contact Support</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Next Steps -->
+            <section class="install-section">
+                <h2>Next Steps</h2>
+                <div class="next-steps-grid">
+                    <a href="/pages/documentation.html" class="next-step-card">
+                        <h3>Read the Documentation</h3>
+                        <p>Learn how to use all features effectively</p>
+                    </a>
+                    <a href="/pages/features.html" class="next-step-card">
+                        <h3>Explore Features</h3>
+                        <p>Discover what Academic Workflow Suite can do</p>
+                    </a>
+                    <a href="/blog/" class="next-step-card">
+                        <h3>Read Tutorials</h3>
+                        <p>Follow step-by-step guides and best practices</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="footer-heading">Academic Workflow Suite</h3>
+                    <p class="footer-description">Open source tools for modern academic workflows.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="/pages/features.html">Features</a></li>
+                        <li><a href="/pages/download.html">Download</a></li>
+                        <li><a href="/pages/documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/pages/security.html">Security</a></li>
+                        <li><a href="/pages/about.html">About</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 Academic Workflow Suite. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

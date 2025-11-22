@@ -1,0 +1,157 @@
+groups:
+  - name: database_alerts
+    interval: 30s
+    rules:
+      - alert: PostgresDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been unreachable for more than 1 minute"
+          runbook: "Check PostgreSQL service status and restart if necessary"
+
+      - alert: HighConnectionPoolUsage
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connection pool usage"
+          description: "Connection pool usage is {{ $value | humanize }}% (threshold: 80%)"
+          runbook: "Check for connection leaks or increase max_connections"
+
+      - alert: CriticalConnectionPoolUsage
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Critical database connection pool usage"
+          description: "Connection pool usage is {{ $value | humanize }}% (threshold: 90%)"
+          runbook: "Immediate action - kill idle connections or scale database"
+
+      - alert: SlowQueries
+        expr: rate(pg_stat_statements_mean_exec_time[5m]) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value | humanize }}ms (threshold: 1000ms)"
+          runbook: "Identify and optimize slow queries using pg_stat_statements"
+
+      - alert: LowCacheHitRatio
+        expr: 100 * (rate(pg_stat_database_blks_hit[5m]) / (rate(pg_stat_database_blks_hit[5m]) + rate(pg_stat_database_blks_read[5m]))) < 90
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Low database cache hit ratio"
+          description: "Cache hit ratio is {{ $value | humanize }}% (threshold: 90%)"
+          runbook: "Consider increasing shared_buffers or optimizing queries"
+
+      - alert: HighTransactionRollbackRate
+        expr: sum(rate(pg_stat_database_xact_rollback[5m])) / sum(rate(pg_stat_database_xact_commit[5m])) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High transaction rollback rate"
+          description: "Rollback rate is {{ $value | humanize }}% (threshold: 10%)"
+          runbook: "Investigate application logic and constraint violations"
+
+      - alert: DatabaseDeadlocks
+        expr: increase(pg_stat_database_deadlocks[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database deadlocks detected"
+          description: "{{ $value }} deadlocks in the last 5 minutes"
+          runbook: "Review transaction isolation levels and query patterns"
+
+      - alert: DatabaseConflicts
+        expr: increase(pg_stat_database_conflicts[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database conflicts detected"
+          description: "{{ $value }} conflicts in the last 5 minutes"
+          runbook: "Check for replication lag and long-running queries"
+
+      - alert: EventStoreGrowthHigh
+        expr: rate(aws_event_store_total_events[1h]) > 10000
+        for: 30m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High event store growth rate"
+          description: "Event store growing at {{ $value | humanize }} events/sec"
+          runbook: "Verify event generation is normal and consider archiving old events"
+
+      - alert: LargeEventStoreSize
+        expr: aws_event_store_total_events > 100000000
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Event store is very large"
+          description: "Event store contains {{ $value | humanize }} events"
+          runbook: "Plan event store archival or partitioning"
+
+      - alert: DatabaseSizeLarge
+        expr: pg_database_size_bytes > 100 * 1024 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database size is large"
+          description: "Database size is {{ $value | humanizeBytes }}"
+          runbook: "Plan for storage expansion and data archival"
+
+      - alert: LongRunningTransactions
+        expr: max(pg_stat_activity_max_tx_duration) > 300
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Long-running transactions detected"
+          description: "Transaction running for {{ $value | humanize }}s (threshold: 300s)"
+          runbook: "Identify and terminate or optimize long-running transactions"
+
+      - alert: ReplicationLag
+        expr: pg_replication_lag_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database replication lag detected"
+          description: "Replication lag is {{ $value | humanize }}s (threshold: 60s)"
+          runbook: "Check replica health and network connectivity"
+
+      - alert: TooManyIdleConnections
+        expr: pg_stat_activity_count{state="idle"} > 50
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Too many idle database connections"
+          description: "{{ $value }} idle connections (threshold: 50)"
+          runbook: "Check application connection pooling and set idle_in_transaction_session_timeout"

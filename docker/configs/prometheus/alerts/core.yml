@@ -1,0 +1,60 @@
+# Alerting Rules for Academic Workflow Suite Core Engine
+
+groups:
+  - name: core_alerts
+    interval: 30s
+    rules:
+      # Core service is down
+      - alert: CoreServiceDown
+        expr: up{job="core"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: core
+        annotations:
+          summary: "Core service is down"
+          description: "Core service has been down for more than 1 minute."
+
+      # High memory usage
+      - alert: CoreHighMemoryUsage
+        expr: (process_resident_memory_bytes{job="core"} / 1024 / 1024 / 1024) > 6
+        for: 5m
+        labels:
+          severity: warning
+          component: core
+        annotations:
+          summary: "Core service high memory usage"
+          description: "Core service is using more than 6GB of memory."
+
+      # High CPU usage
+      - alert: CoreHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="core"}[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: core
+        annotations:
+          summary: "Core service high CPU usage"
+          description: "Core service CPU usage is above 80% for 10 minutes."
+
+      # High error rate
+      - alert: CoreHighErrorRate
+        expr: rate(http_requests_total{job="core",status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: core
+        annotations:
+          summary: "Core service high error rate"
+          description: "Core service is experiencing more than 5% error rate."
+
+      # Slow response time
+      - alert: CoreSlowResponseTime
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job="core"}[5m])) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: core
+        annotations:
+          summary: "Core service slow response time"
+          description: "Core service 99th percentile response time is above 5 seconds."

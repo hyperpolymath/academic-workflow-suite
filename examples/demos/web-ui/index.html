@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Workflow Suite - Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Academic Workflow Suite</h1>
+            <p>Automated TMA Marking & Feedback</p>
+        </header>
+
+        <main>
+            <section id="upload-section">
+                <h2>Submit Assignment</h2>
+
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="student-id">Student ID</label>
+                        <input type="text" id="student-id" required placeholder="student001">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rubric">Rubric</label>
+                        <select id="rubric">
+                            <option value="default">Default</option>
+                            <option value="essay">Essay</option>
+                            <option value="lab_report">Lab Report</option>
+                            <option value="research_paper">Research Paper</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file">Assignment File (PDF)</label>
+                        <input type="file" id="file" accept=".pdf" required>
+                        <small>Maximum file size: 10MB</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit for Marking</button>
+                </form>
+            </section>
+
+            <section id="status-section" style="display: none;">
+                <h2>Marking Status</h2>
+                <div class="status-indicator">
+                    <div class="spinner"></div>
+                    <p id="status-text">Uploading assignment...</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </section>
+
+            <section id="results-section" style="display: none;">
+                <h2>Marking Results</h2>
+
+                <div class="results-card">
+                    <div class="score-display">
+                        <h3>Score</h3>
+                        <div class="score" id="score">0</div>
+                        <div class="grade" id="grade">-</div>
+                    </div>
+
+                    <div class="feedback-section">
+                        <h3>Feedback Summary</h3>
+                        <p id="feedback-summary"></p>
+
+                        <h4>Strengths</h4>
+                        <ul id="strengths-list"></ul>
+
+                        <h4>Areas for Improvement</h4>
+                        <ul id="improvements-list"></ul>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="downloadFeedback()">Download Feedback</button>
+                        <button class="btn btn-secondary" onclick="submitAnother()">Submit Another</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Academic Workflow Suite</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

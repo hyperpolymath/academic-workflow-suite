@@ -1,0 +1,466 @@
+version: '3.8'
+
+# Academic Workflow Suite - Production Environment
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  # PostgreSQL - Production Configuration
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: academic_workflow
+      POSTGRES_USER: ${POSTGRES_USER:-aws_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8 --data-checksums"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/configs/postgres/init-prod.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./backups/postgres:/backups
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=512MB
+      -c effective_cache_size=1536MB
+      -c maintenance_work_mem=128MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=2621kB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_workers=4
+      -c max_parallel_maintenance_workers=2
+      -c log_checkpoints=on
+      -c log_connections=on
+      -c log_disconnections=on
+      -c log_lock_waits=on
+      -c log_statement=ddl
+      -c log_temp_files=0
+      -c ssl=on
+      -c ssl_cert_file=/etc/ssl/certs/server.crt
+      -c ssl_key_file=/etc/ssl/private/server.key
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aws_user} -d academic_workflow"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+        compress: "true"
+
+  # Redis - Production Configuration
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required in production}
+      --maxclients 10000
+      --tcp-backlog 511
+      --timeout 300
+      --tcp-keepalive 300
+    volumes:
+      - redis-data:/data
+      - ./backups/redis:/backups
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+        compress: "true"
+
+  # Core Engine - Production Configuration
+  core:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.core
+      target: production
+      args:
+        RUST_VERSION: 1.75
+    image: aws-core:${VERSION:-latest}
+    restart: always
+    environment:
+      RUST_LOG: warn,aws_core=info
+      AWS_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      LMDB_PATH: /data/lmdb
+      AI_JAIL_SOCKET: /run/ai-jail.sock
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      MAX_WORKERS: ${CORE_MAX_WORKERS:-8}
+      REQUEST_TIMEOUT: ${CORE_REQUEST_TIMEOUT:-30}
+    volumes:
+      - lmdb-data:/data/lmdb:rw
+      - ai-jail-socket:/run
+      - ./config/prod:/app/config:ro
+      - ./backups/lmdb:/backups
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8G
+        reservations:
+          cpus: '4.0'
+          memory: 4G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 180s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        order: start-first
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+        compress: "true"
+
+  # Backend Service - Production Configuration
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.backend
+      target: production
+      args:
+        ELIXIR_VERSION: 1.15
+        ERLANG_VERSION: 26
+    image: aws-backend:${VERSION:-latest}
+    restart: always
+    environment:
+      MIX_ENV: prod
+      PHX_HOST: ${BACKEND_HOST:-backend}
+      PHX_SERVER: "true"
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-aws_user}:${POSTGRES_PASSWORD}@postgres:5432/academic_workflow
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?SECRET_KEY_BASE is required in production}
+      POOL_SIZE: ${BACKEND_POOL_SIZE:-20}
+    volumes:
+      - ./config/prod:/app/config:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 180s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        order: start-first
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+        compress: "true"
+
+  # AI Jail - Production Configuration with Maximum Security
+  ai-jail:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.ai-jail
+      target: production
+      args:
+        RUST_VERSION: 1.75
+    image: aws-ai-jail:${VERSION:-latest}
+    restart: always
+    environment:
+      RUST_LOG: warn,ai_jail=info
+      AI_JAIL_MODE: "production"
+      SOCKET_PATH: /run/ai-jail.sock
+      MODEL_PATH: /models
+    volumes:
+      - ai-models:/models:ro
+      - ai-jail-socket:/run
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=./docker/configs/seccomp/ai-jail-prod.json
+      - apparmor=aws-ai-jail
+    read_only: true
+    tmpfs:
+      - /tmp:size=512M,mode=1777,noexec,nosuid,nodev
+    pids_limit: 100
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 180s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+        compress: "true"
+
+  # Nginx - Production Configuration with SSL
+  nginx:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.nginx
+      target: production
+    image: aws-nginx:${VERSION:-latest}
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/configs/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/configs/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/configs/nginx/ssl:/etc/nginx/ssl:ro
+      - ./components/office-addin/dist:/usr/share/nginx/html/addin:ro
+      - nginx-cache:/var/cache/nginx
+      - nginx-logs:/var/log/nginx
+      - letsencrypt:/etc/letsencrypt:ro
+    environment:
+      NGINX_WORKER_PROCESSES: auto
+      NGINX_WORKER_CONNECTIONS: 4096
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+        compress: "true"
+
+  # Prometheus - Production Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=90d'
+      - '--storage.tsdb.retention.size=50GB'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    volumes:
+      - ./docker/configs/prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/configs/prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus-data:/prometheus
+      - ./backups/prometheus:/backups
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+
+  # Grafana - Production Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required in production}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: redis-datasource
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-https://grafana.example.com}
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SNAPSHOTS_EXTERNAL_ENABLED: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/configs/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./backups/grafana:/backups
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+        compress: "true"
+
+  # Backup Service
+  backup:
+    build:
+      context: ./docker/backup
+      dockerfile: Dockerfile
+    image: aws-backup:latest
+    restart: "no"
+    environment:
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+      S3_BUCKET: ${BACKUP_S3_BUCKET}
+      S3_ACCESS_KEY: ${BACKUP_S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${BACKUP_S3_SECRET_KEY}
+    volumes:
+      - postgres-data:/data/postgres:ro
+      - redis-data:/data/redis:ro
+      - lmdb-data:/data/lmdb:ro
+      - ./backups:/backups:rw
+    depends_on:
+      - postgres
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Production-specific volumes with backup labels
+volumes:
+  nginx-cache:
+    driver: local
+  nginx-logs:
+    driver: local
+  letsencrypt:
+    driver: local
+
+# Remove Adminer in production (security)
+# Adminer should only be used in development

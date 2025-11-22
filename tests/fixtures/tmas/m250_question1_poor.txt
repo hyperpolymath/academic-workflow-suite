@@ -1,0 +1,36 @@
+Question 1: Write a Python function that implements the binary search algorithm. Explain its time complexity and why it is more efficient than linear search for sorted lists. Include test cases. (400 words + code)
+
+Answer:
+
+Here is a binary search:
+
+```python
+def search(list, num):
+    for i in range(len(list)):
+        if list[i] == num:
+            return i
+    return -1
+
+print(search([1,2,3,4,5], 3))
+```
+
+This function searches through a list to find a number. It goes through each element and checks if it matches. If it does, it returns the position. If it doesn't find it, it returns -1.
+
+Binary search is when you search for something in a binary way. It's more efficient than linear search because it's faster. Linear search looks at every element but binary search doesn't.
+
+The time complexity is O(n) which means it depends on how many elements there are. The more elements, the longer it takes. Binary search is O(log n) which is better than O(n) because log is smaller.
+
+Binary search works by dividing the list in half. You look at the middle element and see if that's what you want. If its not, you look at the other half. This is faster than looking at everything.
+
+You have to sort the list first before you can do binary search. If the list is not sorted it won't work. Linear search works on any list sorted or not.
+
+Tests:
+- search([1,2,3], 2) finds 2
+- search([1,2,3], 4) doesn't find 4
+- search([], 1) empty list
+
+Binary search is good for big lists because it's fast. It doesn't have to check every element. It only checks some of them by dividing in half each time. This makes it efficient.
+
+In conclusion binary search is better than linear search for sorted lists because its faster and more efficient.
+
+[Word count: 267]

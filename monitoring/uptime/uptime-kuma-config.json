@@ -1,0 +1,257 @@
+{
+  "version": "1.23.0",
+  "exportDate": "2025-11-22",
+  "monitors": [
+    {
+      "name": "Backend API",
+      "type": "http",
+      "url": "${BACKEND_URL}/health",
+      "method": "GET",
+      "interval": 60,
+      "timeout": 10,
+      "retries": 3,
+      "maxRetries": 3,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["backend", "api", "critical"],
+      "notifications": ["email", "slack", "pagerduty"],
+      "description": "Main backend API health endpoint"
+    },
+    {
+      "name": "Backend API - Detailed Health",
+      "type": "http",
+      "url": "${BACKEND_URL}/health/detailed",
+      "method": "GET",
+      "interval": 120,
+      "timeout": 15,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["backend", "api"],
+      "notifications": ["email", "slack"],
+      "description": "Detailed backend health check including database, cache, and dependencies"
+    },
+    {
+      "name": "AI Jail Service",
+      "type": "http",
+      "url": "${AI_JAIL_URL}/health",
+      "method": "GET",
+      "interval": 60,
+      "timeout": 10,
+      "retries": 3,
+      "maxRetries": 3,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["ai-jail", "critical"],
+      "notifications": ["email", "slack", "pagerduty"],
+      "description": "AI Jail service health endpoint"
+    },
+    {
+      "name": "AI Model Status",
+      "type": "http",
+      "url": "${AI_JAIL_URL}/health/model",
+      "method": "GET",
+      "interval": 120,
+      "timeout": 15,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "expectedKeyword": "model_loaded",
+      "tags": ["ai-jail", "model"],
+      "notifications": ["email", "slack"],
+      "description": "AI model loading status"
+    },
+    {
+      "name": "PostgreSQL Database",
+      "type": "postgres",
+      "hostname": "${POSTGRES_HOST}",
+      "port": "${POSTGRES_PORT}",
+      "database": "${POSTGRES_DB}",
+      "username": "${POSTGRES_USER}",
+      "password": "${POSTGRES_PASSWORD}",
+      "interval": 60,
+      "timeout": 10,
+      "retries": 3,
+      "maxRetries": 3,
+      "active": true,
+      "tags": ["database", "postgres", "critical"],
+      "notifications": ["email", "slack", "pagerduty"],
+      "description": "PostgreSQL database connectivity"
+    },
+    {
+      "name": "Prometheus",
+      "type": "http",
+      "url": "${PROMETHEUS_URL}/-/healthy",
+      "method": "GET",
+      "interval": 120,
+      "timeout": 10,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["monitoring", "prometheus"],
+      "notifications": ["email", "slack"],
+      "description": "Prometheus monitoring service"
+    },
+    {
+      "name": "Grafana",
+      "type": "http",
+      "url": "${GRAFANA_URL}/api/health",
+      "method": "GET",
+      "interval": 120,
+      "timeout": 10,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["monitoring", "grafana"],
+      "notifications": ["email", "slack"],
+      "description": "Grafana dashboards service"
+    },
+    {
+      "name": "Alertmanager",
+      "type": "http",
+      "url": "${ALERTMANAGER_URL}/-/healthy",
+      "method": "GET",
+      "interval": 120,
+      "timeout": 10,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["monitoring", "alertmanager"],
+      "notifications": ["email", "slack"],
+      "description": "Alertmanager service"
+    },
+    {
+      "name": "Loki Logs",
+      "type": "http",
+      "url": "${LOKI_URL}/ready",
+      "method": "GET",
+      "interval": 180,
+      "timeout": 10,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "expectedStatus": "200",
+      "tags": ["monitoring", "logging", "loki"],
+      "notifications": ["email"],
+      "description": "Loki log aggregation service"
+    },
+    {
+      "name": "SSL Certificate",
+      "type": "ssl-cert",
+      "url": "${BACKEND_URL}",
+      "interval": 86400,
+      "timeout": 30,
+      "retries": 1,
+      "maxRetries": 1,
+      "active": true,
+      "daysRemaining": 30,
+      "tags": ["security", "ssl"],
+      "notifications": ["email", "slack"],
+      "description": "SSL certificate expiration monitoring"
+    },
+    {
+      "name": "DNS Resolution",
+      "type": "dns",
+      "hostname": "${DOMAIN}",
+      "resolverServer": "8.8.8.8",
+      "interval": 300,
+      "timeout": 10,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "tags": ["network", "dns"],
+      "notifications": ["email"],
+      "description": "DNS resolution check"
+    },
+    {
+      "name": "Docker Host",
+      "type": "docker",
+      "dockerHost": "unix:///var/run/docker.sock",
+      "interval": 120,
+      "timeout": 15,
+      "retries": 2,
+      "maxRetries": 2,
+      "active": true,
+      "tags": ["infrastructure", "docker"],
+      "notifications": ["email", "slack"],
+      "description": "Docker daemon health"
+    }
+  ],
+  "notifications": [
+    {
+      "name": "Email Notifications",
+      "type": "email",
+      "smtpHost": "smtp.gmail.com",
+      "smtpPort": 587,
+      "smtpSecure": "tls",
+      "smtpUsername": "alerts@academic-workflow-suite.com",
+      "smtpPassword": "${SMTP_PASSWORD}",
+      "emailFrom": "alerts@academic-workflow-suite.com",
+      "emailTo": "ops@academic-workflow-suite.com",
+      "active": true
+    },
+    {
+      "name": "Slack Alerts",
+      "type": "slack",
+      "webhookUrl": "${SLACK_WEBHOOK_URL}",
+      "channel": "#uptime-alerts",
+      "username": "Uptime Kuma",
+      "iconEmoji": ":bell:",
+      "active": true
+    },
+    {
+      "name": "PagerDuty",
+      "type": "pagerduty",
+      "integrationKey": "${PAGERDUTY_INTEGRATION_KEY}",
+      "active": true
+    },
+    {
+      "name": "Discord",
+      "type": "discord",
+      "webhookUrl": "${DISCORD_WEBHOOK_URL}",
+      "username": "Uptime Monitor",
+      "active": false
+    }
+  ],
+  "statusPages": [
+    {
+      "name": "AWS Status Page",
+      "slug": "aws-status",
+      "title": "Academic Workflow Suite Status",
+      "description": "Real-time status and uptime monitoring for Academic Workflow Suite services",
+      "theme": "auto",
+      "published": true,
+      "showTags": true,
+      "domainNameList": ["status.academic-workflow-suite.com"],
+      "customCSS": "",
+      "footerText": "Academic Workflow Suite",
+      "showPoweredBy": false,
+      "publicGroupList": [
+        {
+          "name": "Core Services",
+          "monitorList": ["Backend API", "AI Jail Service", "PostgreSQL Database"]
+        },
+        {
+          "name": "Monitoring Stack",
+          "monitorList": ["Prometheus", "Grafana", "Alertmanager", "Loki Logs"]
+        }
+      ]
+    }
+  ],
+  "maintenanceWindows": [],
+  "settings": {
+    "checkInterval": 60,
+    "retryInterval": 60,
+    "resendInterval": 0,
+    "tlsCertificateDaysRemaining": 30,
+    "keepDataPeriodDays": 180,
+    "serverTimezone": "UTC",
+    "entryPage": "dashboard",
+    "primaryBaseURL": "https://uptime.academic-workflow-suite.com"
+  }
+}

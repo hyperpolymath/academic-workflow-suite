@@ -1,0 +1,135 @@
+question_id: m250_q1
+module: M250
+title: "Binary Search Implementation and Analysis"
+total_points: 100
+word_limit: 400
+word_limit_penalty: 5
+
+criteria:
+  - name: "Code Implementation - Correctness"
+    weight: 35
+    description: "Binary search function works correctly"
+    levels:
+      - score: 35
+        descriptor: "Excellent: Correct binary search implementation with proper handling of all cases"
+      - score: 25
+        descriptor: "Good: Mostly correct with minor issues that don't affect core functionality"
+      - score: 15
+        descriptor: "Satisfactory: Basic binary search logic present but with some errors"
+      - score: 8
+        descriptor: "Poor: Attempted binary search but significant errors"
+      - score: 0
+        descriptor: "Absent: No binary search implementation or completely wrong algorithm (e.g., linear search)"
+
+  - name: "Code Implementation - Quality"
+    weight: 15
+    description: "Code quality, style, and best practices"
+    levels:
+      - score: 15
+        descriptor: "Excellent: Clean code with proper variable names, comments, docstrings, and error handling"
+      - score: 10
+        descriptor: "Good: Good code quality with minor style issues"
+      - score: 6
+        descriptor: "Satisfactory: Functional code but poor style or naming"
+      - score: 2
+        descriptor: "Poor: Difficult to read or understand"
+      - score: 0
+        descriptor: "Unacceptable: Extremely poor code quality"
+
+  - name: "Test Cases"
+    weight: 15
+    description: "Comprehensive and meaningful test cases provided"
+    levels:
+      - score: 15
+        descriptor: "Excellent: Multiple comprehensive tests covering edge cases (empty list, single element, not found, boundaries, etc.)"
+      - score: 10
+        descriptor: "Good: Several tests covering common scenarios"
+      - score: 6
+        descriptor: "Satisfactory: Basic tests present but incomplete coverage"
+      - score: 2
+        descriptor: "Poor: Minimal or inadequate tests"
+      - score: 0
+        descriptor: "Absent: No tests provided"
+
+  - name: "Time Complexity Explanation"
+    weight: 20
+    description: "Correctly explains O(log n) complexity of binary search"
+    levels:
+      - score: 20
+        descriptor: "Excellent: Clear explanation of O(log n) with reasoning about halving search space, comparison with O(n)"
+      - score: 14
+        descriptor: "Good: Correct complexity stated with reasonable explanation"
+      - score: 8
+        descriptor: "Satisfactory: Complexity mentioned but explanation lacks depth"
+      - score: 3
+        descriptor: "Poor: Incorrect complexity or very weak explanation"
+      - score: 0
+        descriptor: "Absent: No complexity discussion"
+
+  - name: "Efficiency Comparison"
+    weight: 10
+    description: "Explains why binary search is more efficient than linear search"
+    levels:
+      - score: 10
+        descriptor: "Excellent: Clear comparison with concrete examples showing difference (e.g., 1000 elements: 10 vs 1000 comparisons)"
+      - score: 7
+        descriptor: "Good: Solid comparison with some quantitative reasoning"
+      - score: 4
+        descriptor: "Satisfactory: Basic comparison made"
+      - score: 1
+        descriptor: "Poor: Superficial or incorrect comparison"
+      - score: 0
+        descriptor: "Absent: No comparison"
+
+  - name: "Prerequisites and Limitations"
+    weight: 3
+    description: "Discusses that list must be sorted and when binary search is appropriate"
+    levels:
+      - score: 3
+        descriptor: "Clearly states sorted requirement and discusses trade-offs"
+      - score: 2
+        descriptor: "Mentions sorted requirement"
+      - score: 0
+        descriptor: "Doesn't mention sorted requirement"
+
+  - name: "Clarity and Presentation"
+    weight: 2
+    description: "Answer is well-organized and clearly communicated"
+    levels:
+      - score: 2
+        descriptor: "Excellent presentation"
+      - score: 1
+        descriptor: "Adequate presentation"
+      - score: 0
+        descriptor: "Poor presentation"
+
+common_errors:
+  - error: "Implements linear search instead of binary search"
+    penalty: 35
+    critical: true
+  - error: "Doesn't handle case when target is not found"
+    penalty: 10
+  - error: "Incorrect complexity analysis (e.g., claiming O(n) or O(1))"
+    penalty: 15
+  - error: "No mention that list must be sorted"
+    penalty: 5
+  - error: "Off-by-one errors in implementation"
+    penalty: 8
+  - error: "Infinite loop possibility due to incorrect boundary updates"
+    penalty: 12
+
+bonus_points:
+  - description: "Discusses overflow-safe midpoint calculation"
+    points: 2
+  - description: "Provides recursive implementation in addition to iterative"
+    points: 3
+  - description: "Discusses practical applications or when to use each algorithm"
+    points: 2
+
+passing_grade: 40
+grade_boundaries:
+  distinction: 85
+  pass_2: 70
+  pass_3: 55
+  pass_4: 40
+  fail: 0

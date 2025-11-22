@@ -1,0 +1,98 @@
+Question 2: Explain the difference between stacks and queues as abstract data types. Implement both in Python and provide examples of real-world applications for each. (350 words + code)
+
+Answer:
+
+Stacks and queues are fundamental abstract data types (ADTs) that differ primarily in their access patterns and ordering principles.
+
+**Stacks** follow Last-In-First-Out (LIFO) ordering. The most recently added element is the first to be removed, analogous to a stack of plates where you can only add or remove from the top. Key operations are push (add element) and pop (remove most recent element).
+
+**Queues** follow First-In-First-Out (FIFO) ordering. Elements are removed in the same order they were added, like customers in a checkout line. Key operations are enqueue (add to rear) and dequeue (remove from front).
+
+```python
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        """Add item to top of stack"""
+        self.items.append(item)
+
+    def pop(self):
+        """Remove and return top item"""
+        if not self.is_empty():
+            return self.items.pop()
+        raise IndexError("Pop from empty stack")
+
+    def peek(self):
+        """Return top item without removing"""
+        if not self.is_empty():
+            return self.items[-1]
+        return None
+
+    def is_empty(self):
+        return len(self.items) == 0
+
+    def size(self):
+        return len(self.items)
+
+
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def enqueue(self, item):
+        """Add item to rear of queue"""
+        self.items.insert(0, item)
+
+    def dequeue(self):
+        """Remove and return front item"""
+        if not self.is_empty():
+            return self.items.pop()
+        raise IndexError("Dequeue from empty queue")
+
+    def front(self):
+        """Return front item without removing"""
+        if not self.is_empty():
+            return self.items[-1]
+        return None
+
+    def is_empty(self):
+        return len(self.items) == 0
+
+    def size(self):
+        return len(self.items)
+
+
+# Example usage
+stack = Stack()
+stack.push(1)
+stack.push(2)
+stack.push(3)
+print(stack.pop())  # 3 (LIFO)
+print(stack.pop())  # 2
+
+queue = Queue()
+queue.enqueue('A')
+queue.enqueue('B')
+queue.enqueue('C')
+print(queue.dequeue())  # 'A' (FIFO)
+print(queue.dequeue())  # 'B'
+```
+
+**Real-World Applications:**
+
+**Stack Applications:**
+1. **Function Call Stack**: Programming languages use stacks to manage function calls. When a function is called, its context is pushed onto the call stack; when it returns, the context is popped.
+2. **Undo Functionality**: Text editors use stacks to implement undo/redo. Each action is pushed onto a stack; undoing pops the most recent action.
+3. **Expression Evaluation**: Compilers use stacks to evaluate mathematical expressions and check balanced parentheses.
+4. **Browser History**: The back button uses a stack to navigate to previously visited pages in reverse order.
+
+**Queue Applications:**
+1. **Task Scheduling**: Operating systems use queues to manage processes waiting for CPU time, ensuring fair first-come-first-served execution.
+2. **Print Spooling**: Print jobs are queued and processed in the order received.
+3. **Breadth-First Search**: Graph traversal algorithms use queues to explore nodes level by level.
+4. **Customer Service**: Call centers use queues to manage incoming calls, serving customers in arrival order.
+
+The choice between stacks and queues depends on whether LIFO or FIFO ordering is appropriate for the specific problem domain.
+
+[Word count: 368]

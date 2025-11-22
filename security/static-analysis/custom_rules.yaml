@@ -1,0 +1,94 @@
+# Custom Semgrep Security Rules for Academic Workflow Suite
+
+rules:
+  - id: hardcoded-student-id
+    pattern: |
+      student_id = "$NUMBER"
+    message: "Hardcoded student ID detected. Use hashed IDs instead."
+    severity: ERROR
+    languages: [python, javascript, rust]
+
+  - id: plain-text-logging
+    patterns:
+      - pattern: |
+          log.info("Student ID: $ID")
+      - pattern-not: |
+          log.info("Student ID: sha256:...")
+    message: "Plain-text student ID in logs. Always hash before logging."
+    severity: ERROR
+    languages: [python, javascript, rust]
+
+  - id: missing-input-validation
+    pattern: |
+      def $FUNC($PARAM):
+        ...
+        execute_query($PARAM)
+    message: "Missing input validation before database query. SQL injection risk."
+    severity: WARNING
+    languages: [python]
+
+  - id: network-call-in-sandbox
+    patterns:
+      - pattern-either:
+          - pattern: requests.get(...)
+          - pattern: requests.post(...)
+          - pattern: urllib.request.urlopen(...)
+          - pattern: http.client.HTTPConnection(...)
+    message: "Network call detected. Container should have network disabled."
+    severity: ERROR
+    languages: [python]
+
+  - id: unsafe-deserialization
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: yaml.load(...)
+          - pattern: eval(...)
+          - pattern: exec(...)
+    message: "Unsafe deserialization/execution. Use safe alternatives."
+    severity: ERROR
+    languages: [python]
+
+  - id: missing-authentication
+    pattern: |
+      @app.route(...)
+      def $FUNC(...):
+        ...
+    pattern-not: |
+      @app.route(...)
+      @requires_auth
+      def $FUNC(...):
+        ...
+    message: "Endpoint missing authentication decorator."
+    severity: WARNING
+    languages: [python]
+
+  - id: weak-random
+    patterns:
+      - pattern-either:
+          - pattern: random.random()
+          - pattern: random.randint(...)
+    message: "Using weak random number generator. Use secrets module for security."
+    severity: WARNING
+    languages: [python]
+
+  - id: sql-injection-risk
+    pattern: |
+      $CURSOR.execute(f"... {$VAR} ...")
+    message: "SQL injection risk. Use parameterized queries."
+    severity: ERROR
+    languages: [python]
+
+  - id: xss-risk
+    pattern: |
+      return f"<html>... {$USER_INPUT} ...</html>"
+    message: "XSS risk. Escape user input before rendering in HTML."
+    severity: ERROR
+    languages: [python]
+
+  - id: path-traversal-risk
+    pattern: |
+      open($USER_INPUT, ...)
+    message: "Path traversal risk. Validate and sanitize file paths."
+    severity: ERROR
+    languages: [python]

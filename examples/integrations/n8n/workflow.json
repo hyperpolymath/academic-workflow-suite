@@ -1,0 +1,348 @@
+{
+  "name": "Academic Workflow Suite - TMA Marking",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submission",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "submission-webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "name": "Download File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.AWAP_API_URL }}/api/v1/tma/upload",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "student_id",
+                "value": "={{ $json.student_id }}"
+              },
+              {
+                "name": "rubric",
+                "value": "={{ $json.rubric || 'default' }}"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Upload TMA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.AWAP_API_URL }}/api/v1/tma/{{ $json.tma_id }}/mark",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "rubric",
+              "value": "={{ $('Webhook').item.json.rubric || 'default' }}"
+            },
+            {
+              "name": "auto_feedback",
+              "value": true
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "name": "Submit for Marking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "minutes"
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.AWAP_API_URL }}/api/v1/jobs/{{ $('Submit for Marking').item.json.job_id }}",
+        "options": {}
+      },
+      "name": "Check Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "name": "If Completed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.AWAP_API_URL }}/api/v1/tma/{{ $('Upload TMA').item.json.tma_id }}/results",
+        "options": {}
+      },
+      "name": "Get Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "feedback@university.example",
+        "toEmail": "={{ $('Webhook').item.json.student_email }}",
+        "subject": "Your Assignment Feedback - Score: {{ $json.score }}",
+        "emailType": "html",
+        "message": "=<h2>Assignment Feedback</h2>\n<p><strong>Score:</strong> {{ $json.score }}/100</p>\n<p><strong>Grade:</strong> {{ $json.grade }}</p>\n<h3>Summary</h3>\n<p>{{ $json.feedback.summary }}</p>\n<h3>Strengths</h3>\n<ul>\n{{ $json.feedback.strengths.map(s => `<li>${s}</li>`).join('\\n') }}\n</ul>\n<h3>Areas for Improvement</h3>\n<ul>\n{{ $json.feedback.areas_for_improvement.map(a => `<li>${a}</li>`).join('\\n') }}\n</ul>"
+      },
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1850, 200],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.spreadsheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Grades",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Student ID": "={{ $('Webhook').item.json.student_id }}",
+            "Score": "={{ $json.score }}",
+            "Grade": "={{ $json.grade }}",
+            "Marked At": "={{ $json.marked_at }}"
+          }
+        },
+        "options": {}
+      },
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [2050, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"score\": $json.score, \"grade\": $json.grade } }}"
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2250, 200]
+    },
+    {
+      "parameters": {
+        "unit": "seconds",
+        "amount": 30
+      },
+      "name": "Wait and Retry",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Upload TMA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload TMA": {
+      "main": [
+        [
+          {
+            "node": "Submit for Marking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit for Marking": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "If Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Completed": {
+      "main": [
+        [
+          {
+            "node": "Get Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait and Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Results": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait and Retry": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {},
+  "meta": {
+    "instanceId": "awap-instance"
+  }
+}

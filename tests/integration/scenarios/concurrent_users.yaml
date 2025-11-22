@@ -1,0 +1,346 @@
+scenario: "Concurrent Multi-User Operations"
+description: "Tests system behavior under concurrent access by multiple users"
+version: "1.0"
+test_type: "integration"
+priority: "high"
+
+setup:
+  database:
+    - load_fixture: "students.json"
+    - load_fixture: "modules.yaml"
+  users:
+    - count: 10
+      role: "student"
+    - count: 2
+      role: "tutor"
+    - count: 1
+      role: "admin"
+
+test_cases:
+  - name: "Concurrent Student Submissions"
+    description: "Multiple students submitting simultaneously"
+    concurrency: 10
+    steps:
+      - name: "Simultaneous Submissions"
+        action: "parallel_execute"
+        threads: 10
+        each_thread:
+          - action: "submit_tma"
+            parameters:
+              student_id: "!thread_student_id"
+              module: "TM112"
+              assignment: "TMA01"
+              question: 1
+              file: "!random_tma_file"
+        expected_result:
+          all_successful: true
+          total_submissions: 10
+
+      - name: "Verify All Submissions Recorded"
+        action: "query_submissions"
+        parameters:
+          module: "TM112"
+          assignment: "TMA01"
+        assertions:
+          - field: "count"
+            operator: "equals"
+            value: 10
+          - field: "unique_students"
+            operator: "equals"
+            value: 10
+
+  - name: "Concurrent Grading Operations"
+    description: "Multiple tutors grading different submissions simultaneously"
+    concurrency: 5
+    steps:
+      - name: "Setup Submissions"
+        action: "create_submissions"
+        parameters:
+          count: 5
+          module: "TM112"
+
+      - name: "Parallel Grading"
+        action: "parallel_execute"
+        threads: 5
+        each_thread:
+          - action: "grade_with_ai"
+            parameters:
+              submission_id: "!thread_submission_id"
+              tutor_id: "!thread_tutor_id"
+
+      - name: "Verify No Conflicts"
+        action: "check_grading_integrity"
+        assertions:
+          - field: "duplicate_grades"
+            operator: "equals"
+            value: 0
+          - field: "all_graded"
+            operator: "equals"
+            value: true
+
+  - name: "Read-Write Concurrency"
+    description: "Students reading while system is processing grades"
+    steps:
+      - name: "Start Batch Grading"
+        action: "grade_batch"
+        parameters:
+          submission_ids: "!all_pending_submissions"
+          async: true
+
+      - name: "Concurrent Student Queries"
+        action: "parallel_execute"
+        threads: 10
+        duration: 30  # seconds
+        each_thread:
+          - action: "get_student_results"
+            parameters:
+              student_id: "!thread_student_id"
+          - wait: 3
+
+      - name: "Verify Data Consistency"
+        action: "check_consistency"
+        assertions:
+          - field: "no_partial_reads"
+            operator: "equals"
+            value: true
+          - field: "all_transactions_atomic"
+            operator: "equals"
+            value: true
+
+  - name: "Database Lock Contention"
+    description: "Test database locking under heavy concurrent access"
+    concurrency: 20
+    steps:
+      - name: "Concurrent Updates"
+        action: "parallel_execute"
+        threads: 20
+        iterations: 10
+        each_thread:
+          - action: "update_submission_status"
+            parameters:
+              submission_id: "!shared_submission_id"
+              new_status: "!random_status"
+              timestamp: "!current_time"
+
+      - name: "Verify Final State"
+        action: "get_submission"
+        parameters:
+          submission_id: "!shared_submission_id"
+        assertions:
+          - field: "update_count"
+            operator: "equals"
+            value: 200  # 20 threads × 10 iterations
+          - field: "no_lost_updates"
+            operator: "equals"
+            value: true
+
+  - name: "API Rate Limiting"
+    description: "Verify rate limiting works correctly under load"
+    steps:
+      - name: "Rapid API Calls"
+        action: "parallel_execute"
+        threads: 5
+        each_thread:
+          - action: "loop"
+            iterations: 100
+            commands:
+              - action: "api_call"
+                endpoint: "/api/submissions"
+                method: "GET"
+
+      - name: "Verify Rate Limiting Applied"
+        action: "check_rate_limits"
+        assertions:
+          - field: "rate_limit_exceeded_count"
+            operator: "greater_than"
+            value: 0
+          - field: "http_429_responses"
+            operator: "greater_than"
+            value: 0
+          - field: "system_remained_stable"
+            operator: "equals"
+            value: true
+
+  - name: "Session Management Under Load"
+    description: "Test session handling with many concurrent users"
+    concurrency: 50
+    steps:
+      - name: "Concurrent Logins"
+        action: "parallel_execute"
+        threads: 50
+        each_thread:
+          - action: "login"
+            parameters:
+              user_id: "!thread_user_id"
+              password: "!thread_password"
+
+      - name: "Verify All Sessions Created"
+        action: "check_active_sessions"
+        assertions:
+          - field: "active_sessions"
+            operator: "equals"
+            value: 50
+
+      - name: "Concurrent Operations"
+        action: "parallel_execute"
+        threads: 50
+        duration: 60
+        each_thread:
+          - action: "random_authenticated_operation"
+            parameters:
+              session_id: "!thread_session_id"
+
+      - name: "Verify Session Isolation"
+        action: "verify_sessions"
+        assertions:
+          - field: "no_session_bleed"
+            operator: "equals"
+            value: true
+          - field: "all_operations_authenticated"
+            operator: "equals"
+            value: true
+
+  - name: "Cache Coherency"
+    description: "Verify cache remains coherent under concurrent access"
+    steps:
+      - name: "Prime Cache"
+        action: "cache_warm_up"
+        parameters:
+          entities: ["students", "modules", "rubrics"]
+
+      - name: "Concurrent Reads and Writes"
+        action: "parallel_execute"
+        threads: 10
+        duration: 30
+        thread_groups:
+          - threads: 7
+            action: "read_cached_data"
+            parameters:
+              entity: "!random_entity"
+          - threads: 3
+            action: "update_entity"
+            parameters:
+              entity: "!random_entity"
+              invalidate_cache: true
+
+      - name: "Verify Cache Consistency"
+        action: "check_cache_coherency"
+        assertions:
+          - field: "stale_reads"
+            operator: "equals"
+            value: 0
+          - field: "cache_hit_rate"
+            operator: "greater_than"
+            value: 0.7
+
+  - name: "Deadlock Detection and Recovery"
+    description: "Test system handles potential deadlocks"
+    steps:
+      - name: "Create Deadlock Scenario"
+        action: "parallel_execute"
+        threads: 2
+        each_thread:
+          - action: "cross_lock_operations"
+            parameters:
+              thread_id: "!thread_id"
+              resources: ["resource_a", "resource_b"]
+              lock_order: "!alternating"
+
+      - name: "Verify Deadlock Handled"
+        action: "check_deadlock_recovery"
+        assertions:
+          - field: "deadlock_detected"
+            operator: "equals"
+            value: true
+          - field: "transactions_rolled_back"
+            operator: "greater_than"
+            value: 0
+          - field: "system_recovered"
+            operator: "equals"
+            value: true
+
+  - name: "Resource Exhaustion Prevention"
+    description: "System handles resource exhaustion gracefully"
+    steps:
+      - name: "Spawn Many Concurrent Requests"
+        action: "parallel_execute"
+        threads: 100
+        each_thread:
+          - action: "submit_and_grade_tma"
+            parameters:
+              student_id: "!thread_student_id"
+
+      - name: "Verify Graceful Degradation"
+        action: "check_system_health"
+        assertions:
+          - field: "system_remained_responsive"
+            operator: "equals"
+            value: true
+          - field: "connection_pool_not_exhausted"
+            operator: "equals"
+            value: true
+          - field: "proper_queuing_applied"
+            operator: "equals"
+            value: true
+
+load_testing:
+  ramp_up:
+    start_users: 1
+    end_users: 50
+    duration: 60  # seconds
+    step: 5
+
+  sustained_load:
+    concurrent_users: 50
+    duration: 300  # 5 minutes
+    operations_per_second: 100
+
+  spike_test:
+    baseline_users: 10
+    spike_to: 100
+    spike_duration: 30
+    recovery_time: 60
+
+performance_metrics:
+  response_time:
+    p50: 200  # 50th percentile in ms
+    p95: 1000  # 95th percentile in ms
+    p99: 2000  # 99th percentile in ms
+
+  throughput:
+    min_requests_per_second: 50
+    min_successful_rate: 0.99
+
+  resource_usage:
+    max_cpu_percent: 80
+    max_memory_percent: 85
+    max_db_connections: 90
+
+validation:
+  correctness:
+    - no_race_conditions: true
+    - data_consistency_maintained: true
+    - transactions_atomic: true
+
+  performance:
+    - response_times_acceptable: true
+    - throughput_requirements_met: true
+    - no_resource_exhaustion: true
+
+  reliability:
+    - no_deadlocks: true
+    - graceful_degradation: true
+    - proper_error_handling: true
+
+success_criteria:
+  - all_concurrent_operations_successful: true
+  - no_data_corruption: true
+  - performance_requirements_met: true
+  - system_stable_under_load: true
+
+tags:
+  - "concurrency"
+  - "load-testing"
+  - "scalability"
+  - "performance"
+  - "reliability"

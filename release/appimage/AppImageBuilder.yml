@@ -1,0 +1,60 @@
+version: 1
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: com.academicworkflow.AWS
+    name: Academic Workflow Suite
+    icon: aws
+    version: "{{VERSION}}"
+    exec: usr/bin/aws
+    exec_args: $@
+
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C'
+
+    include:
+      - libc6
+      - libssl3
+      - libgcc-s1
+      - libstdc++6
+
+  files:
+    include:
+      - /usr/bin/aws
+      - /usr/share/doc/academic-workflow-suite
+
+    exclude:
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+      - usr/share/doc/*/TODO.*
+
+  runtime:
+    env:
+      PATH: '${APPDIR}/usr/bin:${PATH}'
+      LD_LIBRARY_PATH: '${APPDIR}/usr/lib:${LD_LIBRARY_PATH}'
+
+  test:
+    fedora:
+      image: appimagecrafters/tests-env:fedora-30
+      command: ./AppRun --version
+      use_host_x: true
+    debian:
+      image: appimagecrafters/tests-env:debian-stable
+      command: ./AppRun --version
+      use_host_x: true
+    ubuntu:
+      image: appimagecrafters/tests-env:ubuntu-xenial
+      command: ./AppRun --version
+      use_host_x: true
+
+AppImage:
+  update-information: 'gh-releases-zsync|academicworkflow|suite|latest|academic-workflow-suite-*-x86_64.AppImage.zsync'
+  sign-key: None
+  arch: x86_64

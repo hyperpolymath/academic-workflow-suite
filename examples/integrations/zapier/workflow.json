@@ -1,0 +1,235 @@
+{
+  "name": "Academic Workflow Suite - Zapier Integration",
+  "description": "Automated TMA marking workflow using Zapier",
+  "version": "1.0.0",
+  "triggers": [
+    {
+      "name": "New Submission",
+      "type": "webhook",
+      "description": "Triggered when a new assignment is submitted",
+      "fields": [
+        {
+          "key": "student_id",
+          "label": "Student ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "assignment_id",
+          "label": "Assignment ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "file_url",
+          "label": "Submission File URL",
+          "type": "string",
+          "required": true,
+          "helpText": "URL to the submitted PDF file"
+        },
+        {
+          "key": "rubric",
+          "label": "Rubric",
+          "type": "string",
+          "default": "default"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "name": "Mark TMA",
+      "description": "Submit a TMA for automated marking",
+      "operation": {
+        "type": "create",
+        "perform": {
+          "method": "POST",
+          "url": "{{bundle.authData.api_url}}/api/v1/tma/upload",
+          "body": {
+            "student_id": "{{bundle.inputData.student_id}}",
+            "rubric": "{{bundle.inputData.rubric}}",
+            "file": {
+              "url": "{{bundle.inputData.file_url}}"
+            }
+          },
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {{bundle.authData.api_key}}"
+          }
+        },
+        "sample": {
+          "tma_id": "tma_123456",
+          "student_id": "student001",
+          "status": "uploaded",
+          "created_at": "2024-01-15T10:30:00Z"
+        }
+      }
+    },
+    {
+      "name": "Get Marking Results",
+      "description": "Retrieve marking results for a TMA",
+      "operation": {
+        "type": "read",
+        "perform": {
+          "method": "GET",
+          "url": "{{bundle.authData.api_url}}/api/v1/tma/{{bundle.inputData.tma_id}}/results",
+          "headers": {
+            "Authorization": "Bearer {{bundle.authData.api_key}}"
+          }
+        },
+        "sample": {
+          "tma_id": "tma_123456",
+          "student_id": "student001",
+          "score": 85,
+          "grade": "B+",
+          "feedback": {
+            "summary": "Good work overall",
+            "strengths": [
+              "Clear thesis",
+              "Good examples"
+            ],
+            "areas_for_improvement": [
+              "Citations need work",
+              "Expand conclusion"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Send Feedback Email",
+      "description": "Send marking results via email",
+      "operation": {
+        "type": "create",
+        "perform": {
+          "method": "POST",
+          "url": "https://api.sendgrid.com/v3/mail/send",
+          "body": {
+            "personalizations": [
+              {
+                "to": [
+                  {
+                    "email": "{{bundle.inputData.student_email}}"
+                  }
+                ],
+                "subject": "Your Assignment Feedback - Score: {{bundle.inputData.score}}"
+              }
+            ],
+            "from": {
+              "email": "feedback@university.example"
+            },
+            "content": [
+              {
+                "type": "text/html",
+                "value": "<h2>Assignment Feedback</h2><p><strong>Score:</strong> {{bundle.inputData.score}}/100</p><p><strong>Grade:</strong> {{bundle.inputData.grade}}</p><h3>Summary</h3><p>{{bundle.inputData.feedback.summary}}</p>"
+              }
+            ]
+          },
+          "headers": {
+            "Authorization": "Bearer {{bundle.authData.sendgrid_api_key}}",
+            "Content-Type": "application/json"
+          }
+        }
+      }
+    }
+  ],
+  "authentication": {
+    "type": "custom",
+    "fields": [
+      {
+        "key": "api_url",
+        "label": "API URL",
+        "type": "string",
+        "required": true,
+        "default": "http://localhost:8080",
+        "helpText": "Base URL of your Academic Workflow API"
+      },
+      {
+        "key": "api_key",
+        "label": "API Key",
+        "type": "string",
+        "required": false,
+        "helpText": "Your AWAP API key (if required)"
+      }
+    ],
+    "test": {
+      "url": "{{bundle.authData.api_url}}/api/v1/health"
+    }
+  },
+  "workflows": [
+    {
+      "name": "Complete Marking Workflow",
+      "description": "Full workflow from submission to feedback delivery",
+      "steps": [
+        {
+          "id": "trigger",
+          "type": "trigger",
+          "app": "webhook",
+          "event": "New Submission"
+        },
+        {
+          "id": "download_file",
+          "type": "action",
+          "app": "files",
+          "action": "Download File",
+          "input": {
+            "url": "{{trigger.file_url}}"
+          }
+        },
+        {
+          "id": "mark_tma",
+          "type": "action",
+          "app": "awap",
+          "action": "Mark TMA",
+          "input": {
+            "student_id": "{{trigger.student_id}}",
+            "rubric": "{{trigger.rubric}}",
+            "file_url": "{{trigger.file_url}}"
+          }
+        },
+        {
+          "id": "wait",
+          "type": "delay",
+          "delay": "5 minutes"
+        },
+        {
+          "id": "get_results",
+          "type": "action",
+          "app": "awap",
+          "action": "Get Marking Results",
+          "input": {
+            "tma_id": "{{mark_tma.tma_id}}"
+          }
+        },
+        {
+          "id": "send_email",
+          "type": "action",
+          "app": "email",
+          "action": "Send Feedback Email",
+          "input": {
+            "student_email": "{{trigger.student_email}}",
+            "score": "{{get_results.score}}",
+            "grade": "{{get_results.grade}}",
+            "feedback": "{{get_results.feedback}}"
+          }
+        },
+        {
+          "id": "update_spreadsheet",
+          "type": "action",
+          "app": "google_sheets",
+          "action": "Add Row",
+          "input": {
+            "spreadsheet_id": "{{trigger.spreadsheet_id}}",
+            "worksheet": "Grades",
+            "values": {
+              "Student ID": "{{trigger.student_id}}",
+              "Score": "{{get_results.score}}",
+              "Grade": "{{get_results.grade}}",
+              "Marked At": "{{get_results.marked_at}}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

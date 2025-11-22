@@ -1,0 +1,41 @@
+{
+  "name": "awap-office-addin",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "tests",
+      "type": "dev"
+    }
+  ],
+  "package-specs": {
+    "module": "es6",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+    "@rescript/core"
+  ],
+  "bs-dev-dependencies": [],
+  "warnings": {
+    "error": "+101"
+  },
+  "namespace": true,
+  "refmt": 3,
+  "jsx": {
+    "version": 4,
+    "mode": "classic"
+  },
+  "ppx-flags": [],
+  "gentypeconfig": {
+    "language": "typescript",
+    "shims": {},
+    "debug": {
+      "all": false,
+      "basic": false
+    }
+  }
+}

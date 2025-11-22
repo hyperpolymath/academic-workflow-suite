@@ -1,0 +1,912 @@
+{
+  "batch_id": "BENCH-BATCH-100",
+  "description": "100 TMA submissions for scalability benchmarking",
+  "total_submissions": 100,
+  "submissions": [
+    {
+      "submission_id": "BENCH-001",
+      "student_id": "S100001",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 303,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-002",
+      "student_id": "S100002",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 474,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-003",
+      "student_id": "S100003",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 504,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-004",
+      "student_id": "S100004",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 444,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-005",
+      "student_id": "S100005",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 4,
+      "word_count": 533,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-006",
+      "student_id": "S100006",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 455,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-007",
+      "student_id": "S100007",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 343,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-008",
+      "student_id": "S100008",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 286,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-009",
+      "student_id": "S100009",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 494,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-010",
+      "student_id": "S100010",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 368,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-011",
+      "student_id": "S100011",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 460,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-012",
+      "student_id": "S100012",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 458,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-013",
+      "student_id": "S100013",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 310,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-014",
+      "student_id": "S100014",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 3,
+      "word_count": 461,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-015",
+      "student_id": "S100015",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 1,
+      "word_count": 465,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-016",
+      "student_id": "S100016",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 321,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-017",
+      "student_id": "S100017",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 498,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-018",
+      "student_id": "S100018",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 421,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-019",
+      "student_id": "S100019",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 351,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-020",
+      "student_id": "S100020",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 345,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-021",
+      "student_id": "S100021",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 350,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-022",
+      "student_id": "S100022",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 411,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-023",
+      "student_id": "S100023",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 4,
+      "word_count": 454,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-024",
+      "student_id": "S100024",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 397,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-025",
+      "student_id": "S100025",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 314,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-026",
+      "student_id": "S100026",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 354,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-027",
+      "student_id": "S100027",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 439,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-028",
+      "student_id": "S100028",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 1,
+      "word_count": 301,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-029",
+      "student_id": "S100029",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 3,
+      "word_count": 368,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-030",
+      "student_id": "S100030",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 505,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-031",
+      "student_id": "S100031",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 267,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-032",
+      "student_id": "S100032",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 276,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-033",
+      "student_id": "S100033",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 497,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-034",
+      "student_id": "S100034",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 282,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-035",
+      "student_id": "S100035",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 278,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-036",
+      "student_id": "S100036",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 4,
+      "word_count": 310,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-037",
+      "student_id": "S100037",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 397,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-038",
+      "student_id": "S100038",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 370,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-039",
+      "student_id": "S100039",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 354,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-040",
+      "student_id": "S100040",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 3,
+      "word_count": 351,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-041",
+      "student_id": "S100041",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 446,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-042",
+      "student_id": "S100042",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 423,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-043",
+      "student_id": "S100043",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 408,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-044",
+      "student_id": "S100044",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 384,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-045",
+      "student_id": "S100045",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 465,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-046",
+      "student_id": "S100046",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 523,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-047",
+      "student_id": "S100047",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 352,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-048",
+      "student_id": "S100048",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 4,
+      "word_count": 345,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-049",
+      "student_id": "S100049",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 1,
+      "word_count": 306,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-050",
+      "student_id": "S100050",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 543,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-051",
+      "student_id": "S100051",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 518,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-052",
+      "student_id": "S100052",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 509,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-053",
+      "student_id": "S100053",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 370,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-054",
+      "student_id": "S100054",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 311,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-055",
+      "student_id": "S100055",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 407,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-056",
+      "student_id": "S100056",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 3,
+      "word_count": 429,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-057",
+      "student_id": "S100057",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 4,
+      "word_count": 473,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-058",
+      "student_id": "S100058",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 487,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-059",
+      "student_id": "S100059",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 307,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-060",
+      "student_id": "S100060",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 511,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-061",
+      "student_id": "S100061",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 515,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-062",
+      "student_id": "S100062",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 466,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-063",
+      "student_id": "S100063",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 345,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-064",
+      "student_id": "S100064",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 460,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-065",
+      "student_id": "S100065",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 3,
+      "word_count": 420,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-066",
+      "student_id": "S100066",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 3,
+      "word_count": 430,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-067",
+      "student_id": "S100067",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 476,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-068",
+      "student_id": "S100068",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 372,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-069",
+      "student_id": "S100069",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 413,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-070",
+      "student_id": "S100070",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 347,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-071",
+      "student_id": "S100071",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 5,
+      "word_count": 390,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-072",
+      "student_id": "S100072",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 1,
+      "word_count": 520,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-073",
+      "student_id": "S100073",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 234,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-074",
+      "student_id": "S100074",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 319,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-075",
+      "student_id": "S100075",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 3,
+      "word_count": 423,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-076",
+      "student_id": "S100076",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 412,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-077",
+      "student_id": "S100077",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 305,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-078",
+      "student_id": "S100078",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 4,
+      "word_count": 333,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-079",
+      "student_id": "S100079",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 434,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-080",
+      "student_id": "S100080",
+      "module": "TM112",
+      "assignment": "TMA03",
+      "question": 1,
+      "word_count": 538,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-081",
+      "student_id": "S100081",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 374,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-082",
+      "student_id": "S100082",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 3,
+      "word_count": 489,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-083",
+      "student_id": "S100083",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 3,
+      "word_count": 411,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-084",
+      "student_id": "S100084",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 352,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-085",
+      "student_id": "S100085",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 260,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-086",
+      "student_id": "S100086",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 2,
+      "word_count": 544,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-087",
+      "student_id": "S100087",
+      "module": "M269",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 480,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-088",
+      "student_id": "S100088",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 4,
+      "word_count": 360,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-089",
+      "student_id": "S100089",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 409,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-090",
+      "student_id": "S100090",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 3,
+      "word_count": 415,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-091",
+      "student_id": "S100091",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 3,
+      "word_count": 351,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-092",
+      "student_id": "S100092",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 229,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-093",
+      "student_id": "S100093",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 267,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-094",
+      "student_id": "S100094",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 473,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-095",
+      "student_id": "S100095",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 229,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-096",
+      "student_id": "S100096",
+      "module": "M250",
+      "assignment": "TMA01",
+      "question": 5,
+      "word_count": 470,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-097",
+      "student_id": "S100097",
+      "module": "M269",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 337,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-098",
+      "student_id": "S100098",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 388,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-099",
+      "student_id": "S100099",
+      "module": "M269",
+      "assignment": "TMA02",
+      "question": 5,
+      "word_count": 395,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-100",
+      "student_id": "S100100",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 3,
+      "word_count": 432,
+      "quality": "good"
+    }
+  ],
+  "expected_performance": {
+    "max_processing_time_ms": 600000,
+    "max_per_submission_ms": 6000,
+    "expected_throughput_per_min": 20
+  }
+}

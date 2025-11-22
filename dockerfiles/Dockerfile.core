@@ -1,0 +1,137 @@
+# Dockerfile for Academic Workflow Suite - Core Engine (Rust)
+# Multi-stage build for optimized production image
+
+ARG RUST_VERSION=1.75
+
+# ============================================================================
+# Stage 1: Base - Common dependencies
+# ============================================================================
+FROM rust:${RUST_VERSION}-slim-bookworm AS base
+
+LABEL maintainer="Academic Workflow Suite Team"
+LABEL description="Core Engine - Rust REST API with LMDB event store"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    liblmdb-dev \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ============================================================================
+# Stage 2: Dependencies - Build dependencies separately for caching
+# ============================================================================
+FROM base AS dependencies
+
+# Copy dependency manifests
+COPY components/core/Cargo.toml components/core/Cargo.lock ./
+
+# Create dummy source to build dependencies
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# ============================================================================
+# Stage 3: Builder - Build the application
+# ============================================================================
+FROM dependencies AS builder
+
+# Copy source code
+COPY components/core/src ./src/
+COPY components/core/benches ./benches/
+COPY components/core/tests ./tests/
+COPY components/shared /shared
+
+# Build the application
+RUN cargo build --release --bin aws-core
+
+# Strip debug symbols
+RUN strip /app/target/release/aws-core
+
+# ============================================================================
+# Stage 4: Development - For development with hot reload
+# ============================================================================
+FROM base AS development
+
+# Install development tools
+RUN cargo install cargo-watch cargo-edit
+
+# Install debugging tools
+RUN apt-get update && apt-get install -y \
+    gdb \
+    strace \
+    ltrace \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy entire source for development
+COPY components/core .
+
+# Expose ports
+EXPOSE 8080 9229
+
+# Development command (overridden by compose)
+CMD ["cargo", "run"]
+
+# ============================================================================
+# Stage 5: Test - For running tests
+# ============================================================================
+FROM base AS test
+
+WORKDIR /app
+
+# Install test dependencies
+RUN cargo install cargo-tarpaulin cargo-nextest
+
+# Copy source
+COPY components/core .
+COPY components/shared /shared
+
+# Run tests by default
+CMD ["cargo", "test", "--all-features", "--no-fail-fast"]
+
+# ============================================================================
+# Stage 6: Production - Minimal runtime image
+# ============================================================================
+FROM debian:bookworm-slim AS production
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    liblmdb0 \
+    libssl3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r aws && useradd -r -g aws aws
+
+# Create data directories
+RUN mkdir -p /data/lmdb /run /app/config && \
+    chown -R aws:aws /data /run /app
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder --chown=aws:aws /app/target/release/aws-core /app/aws-core
+
+# Copy default configuration
+COPY --chown=aws:aws config/core.yaml /app/config/default.yaml
+
+USER aws
+
+# Expose API port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Run the application
+CMD ["/app/aws-core"]

@@ -1,0 +1,237 @@
+global:
+  resolve_timeout: 5m
+  # SMTP configuration for email alerts
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@academic-workflow-suite.com'
+  smtp_auth_username: 'alerts@academic-workflow-suite.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+  # Slack webhook URL (can also be set via environment variable)
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+
+# Templates for alert messages
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alert routing
+route:
+  # Default receiver for all alerts
+  receiver: 'default'
+
+  # Group alerts by cluster, alertname, and severity
+  group_by: ['cluster', 'alertname', 'severity']
+
+  # Wait time before sending initial notification for a group
+  group_wait: 10s
+
+  # Wait time before sending notification about new alerts in existing group
+  group_interval: 10s
+
+  # Minimum time between two notifications for the same group
+  repeat_interval: 3h
+
+  # Child routes with specific matchers
+  routes:
+    # Critical alerts - notify immediately via all channels
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 30m
+      continue: false
+
+    # Security alerts - notify security team
+    - match:
+        component: security
+      receiver: 'security-team'
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 1h
+      continue: false
+
+    # Database alerts - notify DBA team
+    - match:
+        component: database
+      receiver: 'dba-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 2h
+      continue: false
+
+    # AI jail alerts - notify ML ops team
+    - match:
+        component: ai-jail
+      receiver: 'ml-ops-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 2h
+      continue: false
+
+    # Backend alerts - notify backend team
+    - match:
+        component: backend
+      receiver: 'backend-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 2h
+      continue: false
+
+    # Warning alerts - email only, less frequent
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 1m
+      group_interval: 10m
+      repeat_interval: 4h
+      continue: false
+
+    # Infrastructure alerts
+    - match:
+        component: infrastructure
+      receiver: 'ops-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 2h
+      continue: false
+
+# Inhibition rules to mute certain alerts when others are firing
+inhibit_rules:
+  # Mute warning if critical alert for same issue is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'instance']
+
+  # Mute specific alerts when service is down
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match_re:
+      alertname: '(HighLatency|HighErrorRate|.*)'
+    equal: ['instance']
+
+  # Mute connection pool alerts when database is down
+  - source_match:
+      alertname: 'PostgresDown'
+    target_match_re:
+      alertname: '(HighConnectionPoolUsage|SlowQueries|.*)'
+    equal: ['instance']
+
+  # Mute AI performance alerts when AI jail is down
+  - source_match:
+      alertname: 'AIJailDown'
+    target_match_re:
+      alertname: '(HighAIInferenceLatency|AIQueueDepthHigh|.*)'
+    equal: ['instance']
+
+# Receivers configuration
+receivers:
+  # Default receiver
+  - name: 'default'
+    email_configs:
+      - to: 'ops@academic-workflow-suite.com'
+        headers:
+          Subject: '[AWS] {{ .GroupLabels.alertname }} - {{ .GroupLabels.severity }}'
+        html: |
+          <h2>Alert: {{ .GroupLabels.alertname }}</h2>
+          <p><strong>Severity:</strong> {{ .GroupLabels.severity }}</p>
+          <p><strong>Summary:</strong> {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}</p>
+          <p><strong>Description:</strong> {{ range .Alerts }}{{ .Annotations.description }}{{ end }}</p>
+          <p><strong>Runbook:</strong> {{ range .Alerts }}{{ .Annotations.runbook }}{{ end }}</p>
+
+  # Critical alerts - all channels
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'ops@academic-workflow-suite.com,oncall@academic-workflow-suite.com'
+        headers:
+          Subject: '[CRITICAL] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#critical-alerts'
+        title: 'CRITICAL: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+        color: 'danger'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        description: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        severity: 'critical'
+        details:
+          firing: '{{ .Alerts.Firing | len }}'
+          resolved: '{{ .Alerts.Resolved | len }}'
+
+  # Security team alerts
+  - name: 'security-team'
+    email_configs:
+      - to: 'security@academic-workflow-suite.com'
+        headers:
+          Subject: '[SECURITY] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#security-alerts'
+        title: 'Security Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+
+  # DBA team alerts
+  - name: 'dba-team'
+    email_configs:
+      - to: 'dba@academic-workflow-suite.com'
+        headers:
+          Subject: '[DATABASE] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#database-alerts'
+        title: 'Database Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+
+  # ML Ops team alerts
+  - name: 'ml-ops-team'
+    email_configs:
+      - to: 'ml-ops@academic-workflow-suite.com'
+        headers:
+          Subject: '[AI-JAIL] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#ai-alerts'
+        title: 'AI Jail Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+
+  # Backend team alerts
+  - name: 'backend-team'
+    email_configs:
+      - to: 'backend@academic-workflow-suite.com'
+        headers:
+          Subject: '[BACKEND] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#backend-alerts'
+        title: 'Backend Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+
+  # Warning alerts - email only
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'ops@academic-workflow-suite.com'
+        headers:
+          Subject: '[WARNING] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+
+  # Ops team alerts
+  - name: 'ops-team'
+    email_configs:
+      - to: 'ops@academic-workflow-suite.com'
+        headers:
+          Subject: '[OPS] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    slack_configs:
+      - channel: '#ops-alerts'
+        title: 'Infrastructure Alert: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}{{ end }}'
+        send_resolved: true

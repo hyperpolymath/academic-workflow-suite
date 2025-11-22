@@ -1,0 +1,179 @@
+groups:
+  - name: security_alerts
+    interval: 30s
+    rules:
+      - alert: HighFailedAuthRate
+        expr: rate(aws_auth_failed_total[5m]) * 60 > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High failed authentication rate"
+          description: "{{ $value | humanize }} failed auth attempts per minute (threshold: 10)"
+          runbook: "Check for brute force attacks and enable rate limiting"
+
+      - alert: CriticalFailedAuthRate
+        expr: rate(aws_auth_failed_total[5m]) * 60 > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "Critical failed authentication rate - possible attack"
+          description: "{{ $value | humanize }} failed auth attempts per minute (threshold: 50)"
+          runbook: "Immediately block suspicious IPs and enable CAPTCHA"
+
+      - alert: PIIDetected
+        expr: increase(aws_pii_detected_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "PII detected in system"
+          description: "{{ $value }} PII detection events in last 5 minutes"
+          runbook: "Review PII handling procedures and sanitize data"
+
+      - alert: HighPIIDetectionRate
+        expr: rate(aws_pii_detected_total[5m]) * 60 > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "High rate of PII detection"
+          description: "{{ $value | humanize }} PII detections per minute (threshold: 5)"
+          runbook: "Investigate data leakage and review input validation"
+
+      - alert: ContainerEscapeAttempt
+        expr: increase(aws_container_escape_attempts_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "Container escape attempt detected"
+          description: "{{ $value }} container escape attempts detected"
+          runbook: "Immediately investigate container {{ $labels.container }} and review security policies"
+
+      - alert: SuspiciousIPActivity
+        expr: sum by (ip) (rate(aws_auth_failed_total[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Suspicious activity from IP {{ $labels.ip }}"
+          description: "IP {{ $labels.ip }} has {{ $value | humanize }} failed attempts per second"
+          runbook: "Consider blocking IP {{ $labels.ip }} and review access logs"
+
+      - alert: UnauthorizedAccessAttempt
+        expr: increase(http_requests_total{status="401"}[5m]) > 20
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Multiple unauthorized access attempts"
+          description: "{{ $value }} unauthorized access attempts in last 5 minutes"
+          runbook: "Review authentication logs and check for credential stuffing"
+
+      - alert: ForbiddenAccessAttempts
+        expr: increase(http_requests_total{status="403"}[5m]) > 20
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Multiple forbidden access attempts"
+          description: "{{ $value }} forbidden access attempts in last 5 minutes"
+          runbook: "Review authorization policies and check for privilege escalation attempts"
+
+      - alert: RateLimitExceeded
+        expr: increase(aws_rate_limit_exceeded_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High rate limit violations"
+          description: "{{ $value }} rate limit violations in last 5 minutes"
+          runbook: "Review rate limit policies and potential DDoS attack"
+
+      - alert: SQLInjectionAttempt
+        expr: increase(aws_security_events_total{type="sql_injection"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "SQL injection attempt detected"
+          description: "{{ $value }} SQL injection attempts detected"
+          runbook: "Block source IP immediately and review input validation"
+
+      - alert: XSSAttempt
+        expr: increase(aws_security_events_total{type="xss"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "XSS attack attempt detected"
+          description: "{{ $value }} XSS attempts detected"
+          runbook: "Review input sanitization and Content-Security-Policy headers"
+
+      - alert: PathTraversalAttempt
+        expr: increase(aws_security_events_total{type="path_traversal"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "Path traversal attempt detected"
+          description: "{{ $value }} path traversal attempts detected"
+          runbook: "Block source and review file access controls"
+
+      - alert: AbnormalAuditLogVolume
+        expr: abs(rate(aws_audit_log_entries_total[5m]) - avg_over_time(rate(aws_audit_log_entries_total[5m])[1h])) > avg_over_time(rate(aws_audit_log_entries_total[5m])[1h]) * 2
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Abnormal audit log volume"
+          description: "Audit log volume deviating significantly from baseline"
+          runbook: "Investigate for potential security events or data exfiltration"
+
+      - alert: CertificateExpiringSoon
+        expr: (ssl_certificate_expiry_seconds - time()) / 86400 < 30
+        for: 1h
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "Certificate {{ $labels.cn }} expires in {{ $value | humanize }} days"
+          runbook: "Renew SSL certificate before expiration"
+
+      - alert: CertificateExpiringSoon Critical
+        expr: (ssl_certificate_expiry_seconds - time()) / 86400 < 7
+        for: 1h
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "SSL certificate expiring very soon"
+          description: "Certificate {{ $labels.cn }} expires in {{ $value | humanize }} days"
+          runbook: "Immediately renew SSL certificate"
+
+      - alert: PrivilegeEscalationAttempt
+        expr: increase(aws_security_events_total{type="privilege_escalation"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "Privilege escalation attempt detected"
+          description: "{{ $value }} privilege escalation attempts detected"
+          runbook: "Immediately investigate user {{ $labels.user }} and review permissions"

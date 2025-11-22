@@ -1,0 +1,146 @@
+groups:
+  - name: ai_jail_alerts
+    interval: 30s
+    rules:
+      - alert: AIJailDown
+        expr: up{job="ai-jail"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "AI Jail is down"
+          description: "AI Jail service has been unreachable for more than 1 minute"
+          runbook: "Check AI jail container status and restart if necessary"
+
+      - alert: HighGPUMemoryUsage
+        expr: (aws_gpu_memory_used_bytes / aws_gpu_memory_total_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "High GPU memory usage"
+          description: "GPU memory usage is {{ $value | humanize }}% (threshold: 90%)"
+          runbook: "Check for memory leaks or reduce batch size"
+
+      - alert: CriticalGPUMemoryUsage
+        expr: (aws_gpu_memory_used_bytes / aws_gpu_memory_total_bytes) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "Critical GPU memory usage"
+          description: "GPU memory usage is {{ $value | humanize }}% (threshold: 95%)"
+          runbook: "Immediate action required - restart AI jail or reduce load"
+
+      - alert: GPUUtilizationLow
+        expr: aws_gpu_utilization_percent < 20 and aws_ai_queue_depth > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "Low GPU utilization with pending requests"
+          description: "GPU utilization is {{ $value }}% with {{ $labels.queue_depth }} queued requests"
+          runbook: "Check for bottlenecks in request processing pipeline"
+
+      - alert: HighGPUTemperature
+        expr: aws_gpu_temperature_celsius > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "High GPU temperature"
+          description: "GPU temperature is {{ $value }}°C (threshold: 85°C)"
+          runbook: "Check GPU cooling and reduce workload if necessary"
+
+      - alert: CriticalGPUTemperature
+        expr: aws_gpu_temperature_celsius > 90
+        for: 1m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "Critical GPU temperature"
+          description: "GPU temperature is {{ $value }}°C (threshold: 90°C)"
+          runbook: "Immediate action - reduce load or shutdown to prevent damage"
+
+      - alert: SlowModelLoading
+        expr: avg(aws_model_loading_duration_seconds) > 30
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "Slow model loading"
+          description: "Average model loading time is {{ $value | humanize }}s (threshold: 30s)"
+          runbook: "Check disk I/O and model cache"
+
+      - alert: LowTokenGenerationRate
+        expr: avg(rate(aws_ai_tokens_generated_total[5m]) * 60) < 10
+        for: 10m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "Low token generation rate"
+          description: "Token generation rate is {{ $value | humanize }} tokens/sec (threshold: 10)"
+          runbook: "Check GPU performance and model efficiency"
+
+      - alert: HighAIInferenceLatency
+        expr: histogram_quantile(0.95, rate(aws_ai_inference_duration_seconds_bucket[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "High AI inference latency"
+          description: "p95 inference latency is {{ $value | humanize }}s (threshold: 10s)"
+          runbook: "Check GPU utilization and model optimization"
+
+      - alert: AIQueueDepthHigh
+        expr: aws_ai_queue_depth > 20
+        for: 5m
+        labels:
+          severity: warning
+          component: ai-jail
+        annotations:
+          summary: "High AI request queue depth"
+          description: "AI queue depth is {{ $value }} (threshold: 20)"
+          runbook: "Consider scaling AI jail instances or increasing throughput"
+
+      - alert: AIQueueDepthCritical
+        expr: aws_ai_queue_depth > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "Critical AI request queue depth"
+          description: "AI queue depth is {{ $value }} (threshold: 50)"
+          runbook: "Immediate scaling required - add AI jail instances"
+
+      - alert: AIInferenceFailureRate
+        expr: sum(rate(aws_ai_inference_total{status="failed"}[5m])) / sum(rate(aws_ai_inference_total[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "High AI inference failure rate"
+          description: "Inference failure rate is {{ $value | humanize }}% (threshold: 5%)"
+          runbook: "Check AI jail logs for errors and model status"
+
+      - alert: ModelNotLoaded
+        expr: aws_model_loaded == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: ai-jail
+        annotations:
+          summary: "AI model not loaded"
+          description: "AI model is not loaded in memory"
+          runbook: "Check model loading errors and restart AI jail"

@@ -1,0 +1,58 @@
+version: '3.8'
+
+# Simple Academic Workflow Suite Docker Compose Setup
+# Minimal configuration for quick start
+
+services:
+  # Academic Workflow API
+  awap-api:
+    image: academic-workflow-suite/api:latest
+    container_name: awap-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://awap:awap_password@postgres:5432/awap
+      - REDIS_URL=redis://redis:6379
+      - AI_MODEL=claude-3-opus-20240229
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LOG_LEVEL=info
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: awap-postgres
+    environment:
+      - POSTGRES_USER=awap
+      - POSTGRES_PASSWORD=awap_password
+      - POSTGRES_DB=awap
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U awap"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: awap-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

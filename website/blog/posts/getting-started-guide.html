@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete guide to getting started with Academic Workflow Suite - from installation to your first marked assignment.">
+    <title>Getting Started Guide - Academic Workflow Suite Blog</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                        <rect x="4" y="4" width="24" height="24" rx="4" fill="currentColor" opacity="0.2"/>
+                        <path d="M10 12h12M10 16h12M10 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="logo-text">Academic Workflow Suite</span>
+                </a>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/pages/features.html">Features</a></li>
+                <li><a href="/pages/documentation.html">Docs</a></li>
+                <li><a href="/pages/installation.html">Install</a></li>
+                <li><a href="/pages/security.html">Security</a></li>
+                <li><a href="/blog/" class="active">Blog</a></li>
+                <li><a href="/pages/about.html">About</a></li>
+                <li><a href="/pages/download.html" class="btn btn-primary">Download</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Toggle dark mode">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <circle cx="10" cy="10" r="4" fill="currentColor"/>
+                    <path d="M10 2v2M10 16v2M18 10h-2M4 10H2M15.66 4.34l-1.42 1.42M5.76 14.24l-1.42 1.42M15.66 15.66l-1.42-1.42M5.76 5.76L4.34 4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" fill="currentColor"/>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <article class="blog-post">
+            <header class="post-header">
+                <div class="container">
+                    <a href="/blog/" class="back-link">← Back to Blog</a>
+                    <div class="post-meta">
+                        <span class="category">Tutorials</span>
+                        <span class="date">November 22, 2025</span>
+                        <span class="read-time">8 min read</span>
+                    </div>
+                    <h1 class="post-title">Getting Started with Academic Workflow Suite: A Complete Guide</h1>
+                    <p class="post-excerpt">
+                        New to Academic Workflow Suite? This comprehensive guide walks you through installation,
+                        setup, and marking your first assignment. Learn the fundamentals in just 30 minutes.
+                    </p>
+                    <div class="post-author">
+                        <div class="author-avatar">SC</div>
+                        <div class="author-info">
+                            <p class="author-name">Dr. Sarah Chen</p>
+                            <p class="author-bio">Project Lead & Co-Founder</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container post-content">
+                <div class="post-body">
+                    <p class="lead">
+                        Welcome to Academic Workflow Suite! Whether you're marking your first assignment or looking
+                        to optimize your existing workflow, this guide will help you get up and running quickly.
+                    </p>
+
+                    <h2>What You'll Learn</h2>
+                    <ul>
+                        <li>Installing and configuring Academic Workflow Suite</li>
+                        <li>Creating your first project and importing assignments</li>
+                        <li>Using AI-assisted feedback generation</li>
+                        <li>Customizing rubrics and feedback templates</li>
+                        <li>Exporting feedback to your LMS</li>
+                    </ul>
+
+                    <h2>Prerequisites</h2>
+                    <p>Before you begin, make sure you have:</p>
+                    <ul>
+                        <li>A computer running macOS 11+, Windows 10+, or Linux (kernel 4.15+)</li>
+                        <li>At least 4GB of RAM (8GB recommended)</li>
+                        <li>500MB of free disk space</li>
+                        <li>Optional: Access to your LMS (Moodle, Canvas, etc.) for integration</li>
+                    </ul>
+
+                    <h2>Step 1: Installation</h2>
+                    <p>
+                        The quickest way to get started is using our one-line installer. Open your terminal and run:
+                    </p>
+                    <div class="code-block">
+                        <pre><code># macOS and Linux
+curl -sSL https://install.academic-workflow.org | bash
+
+# Windows (PowerShell)
+irm https://install.academic-workflow.org/windows | iex</code></pre>
+                    </div>
+
+                    <p>
+                        Alternatively, you can <a href="/pages/download.html">download the installer</a> for your
+                        platform and run it manually. The installer will:
+                    </p>
+                    <ol>
+                        <li>Download the latest version of AWS</li>
+                        <li>Install necessary dependencies</li>
+                        <li>Set up the command-line tools</li>
+                        <li>Launch the setup wizard</li>
+                    </ol>
+
+                    <div class="info-box">
+                        <strong>Tip:</strong> The installer supports offline installation. If you're on a
+                        network-restricted system, see our <a href="/pages/installation.html">offline installation guide</a>.
+                    </div>
+
+                    <h2>Step 2: Initial Configuration</h2>
+                    <p>
+                        When you first launch AWS, you'll be greeted by the setup wizard. Let's go through each step:
+                    </p>
+
+                    <h3>2.1 Choose Your Language</h3>
+                    <p>
+                        Select your preferred interface language. AWS supports 20+ languages including English,
+                        Spanish, French, German, Chinese, and more.
+                    </p>
+
+                    <h3>2.2 Set Up Data Storage</h3>
+                    <p>
+                        Choose where AWS will store your data. The default location is <code>~/AcademicWorkflow</code>,
+                        but you can select any folder. All data is encrypted with your passphrase.
+                    </p>
+
+                    <div class="warning-box">
+                        <strong>Important:</strong> Choose a strong passphrase and store it securely. This passphrase
+                        encrypts all your data. If you lose it, your data cannot be recovered.
+                    </div>
+
+                    <h3>2.3 Configure AI Features</h3>
+                    <p>
+                        Decide which AI model to use:
+                    </p>
+                    <ul>
+                        <li><strong>Lightweight (default):</strong> 200MB, faster processing, good for most use cases</li>
+                        <li><strong>Advanced:</strong> 2GB, higher quality feedback, recommended for complex assignments</li>
+                        <li><strong>Manual only:</strong> No AI, all feedback written manually</li>
+                    </ul>
+
+                    <p>
+                        You can always change this later in Settings.
+                    </p>
+
+                    <h3>2.4 Optional: LMS Integration</h3>
+                    <p>
+                        If you use a Learning Management System, you can set up integration now or skip this step
+                        and configure it later. See our <a href="/pages/installation.html#lms-setup">LMS integration guide</a>
+                        for detailed instructions.
+                    </p>
+
+                    <h2>Step 3: Create Your First Project</h2>
+                    <p>
+                        Projects in AWS help you organize courses, assignments, and students. Let's create one:
+                    </p>
+
+                    <div class="code-block">
+                        <pre><code># Create a new project
+aws init "Introduction to Computer Science"
+
+# Or use the GUI: File → New Project</code></pre>
+                    </div>
+
+                    <p>
+                        You'll be prompted to enter:
+                    </p>
+                    <ul>
+                        <li>Project/course name</li>
+                        <li>Academic year or semester</li>
+                        <li>Optional: Default rubric template</li>
+                    </ul>
+
+                    <h2>Step 4: Import Assignments</h2>
+                    <p>
+                        There are several ways to import student submissions:
+                    </p>
+
+                    <h3>Method 1: LMS Integration (Recommended)</h3>
+                    <p>
+                        If you've configured LMS integration:
+                    </p>
+                    <div class="code-block">
+                        <pre><code># List available assignments
+aws lms list
+
+# Import a specific assignment
+aws lms import --assignment "Essay 1: Critical Analysis"</code></pre>
+                    </div>
+
+                    <h3>Method 2: Bulk Upload</h3>
+                    <p>
+                        If you have files in a folder:
+                    </p>
+                    <div class="code-block">
+                        <pre><code># Import all PDFs from a folder
+aws import --folder ~/Downloads/student-essays/ --assignment "Essay 1"</code></pre>
+                    </div>
+
+                    <h3>Method 3: CSV Import</h3>
+                    <p>
+                        If you have a CSV file with student info and file paths:
+                    </p>
+                    <div class="code-block">
+                        <pre><code># CSV format: student_name,email,file_path
+aws import --csv assignments.csv</code></pre>
+                    </div>
+
+                    <h2>Step 5: Create or Load a Rubric</h2>
+                    <p>
+                        Rubrics ensure consistent grading. AWS comes with templates for common assignment types:
+                    </p>
+
+                    <div class="code-block">
+                        <pre><code># List available templates
+aws rubric list-templates
+
+# Create from template
+aws rubric create --template essay --name "Critical Analysis Rubric"
+
+# Or create a custom rubric
+aws rubric create --name "My Custom Rubric"</code></pre>
+                    </div>
+
+                    <p>
+                        You can also create rubrics using the visual editor in the GUI. Here's an example rubric structure:
+                    </p>
+
+                    <div class="code-block">
+                        <pre><code>name: "Essay Rubric"
+total_points: 100
+criteria:
+  - name: "Thesis & Argument"
+    weight: 35
+    levels:
+      - score: 5
+        description: "Exceptional: Clear, original thesis with sophisticated argument"
+      - score: 4
+        description: "Strong: Clear thesis with well-developed argument"
+      - score: 3
+        description: "Adequate: Thesis present with basic argument"
+      # ... more levels
+
+  - name: "Evidence & Analysis"
+    weight: 30
+    # ... criteria levels</code></pre>
+                    </div>
+
+                    <h2>Step 6: Mark Your First Assignment</h2>
+                    <p>
+                        Now for the exciting part—using AI to help with marking!
+                    </p>
+
+                    <h3>Single Assignment Marking</h3>
+                    <div class="code-block">
+                        <pre><code># Mark a specific student's work
+aws mark --assignment "Essay 1" --student "john.doe@university.edu" --rubric "Critical Analysis Rubric"</code></pre>
+                    </div>
+
+                    <p>
+                        This will:
+                    </p>
+                    <ol>
+                        <li>Load the student's submission</li>
+                        <li>Analyze it against your rubric</li>
+                        <li>Generate AI feedback suggestions</li>
+                        <li>Open the feedback editor for your review</li>
+                    </ol>
+
+                    <h3>Understanding the Feedback Editor</h3>
+                    <p>
+                        The feedback editor shows:
+                    </p>
+                    <ul>
+                        <li><strong>Left pane:</strong> Student submission</li>
+                        <li><strong>Right pane:</strong> AI-generated feedback (editable)</li>
+                        <li><strong>Bottom pane:</strong> Rubric scores and justifications</li>
+                    </ul>
+
+                    <div class="tip-box">
+                        <strong>Pro tip:</strong> Use keyboard shortcuts! Press <kbd>Ctrl+G</kbd> to regenerate
+                        feedback, <kbd>Ctrl+Enter</kbd> to save and move to next student.
+                    </div>
+
+                    <h3>Reviewing and Editing Feedback</h3>
+                    <p>
+                        Always review AI-generated feedback. Look for:
+                    </p>
+                    <ul>
+                        <li>Accuracy: Does it correctly identify strengths and weaknesses?</li>
+                        <li>Tone: Is it constructive and encouraging?</li>
+                        <li>Specificity: Does it provide actionable suggestions?</li>
+                        <li>Personalization: Can you add specific examples or personal notes?</li>
+                    </ul>
+
+                    <p>
+                        Make edits directly in the editor. The AI learns from your corrections to improve
+                        future suggestions.
+                    </p>
+
+                    <h2>Step 7: Export and Share Feedback</h2>
+                    <p>
+                        Once you're happy with the feedback:
+                    </p>
+
+                    <h3>Export to LMS</h3>
+                    <div class="code-block">
+                        <pre><code># Sync grades and feedback back to your LMS
+aws lms sync --assignment "Essay 1"</code></pre>
+                    </div>
+
+                    <h3>Export as PDF</h3>
+                    <div class="code-block">
+                        <pre><code># Generate PDF feedback files
+aws export --format pdf --output ~/feedback-pdfs/</code></pre>
+                    </div>
+
+                    <h3>Export as CSV</h3>
+                    <div class="code-block">
+                        <pre><code># Export grades and comments to spreadsheet
+aws export --format csv --output grades.csv</code></pre>
+                    </div>
+
+                    <h2>Next Steps</h2>
+                    <p>
+                        Congratulations! You've marked your first assignment with Academic Workflow Suite. Here's
+                        what to explore next:
+                    </p>
+
+                    <div class="next-steps">
+                        <div class="next-step">
+                            <h3>📚 Learn Batch Processing</h3>
+                            <p>Process multiple assignments at once for maximum efficiency.</p>
+                            <a href="#">Read the batch marking guide →</a>
+                        </div>
+
+                        <div class="next-step">
+                            <h3>🎨 Customize AI Feedback</h3>
+                            <p>Train the AI to match your teaching style and voice.</p>
+                            <a href="/pages/documentation.html#ai-customization">AI customization docs →</a>
+                        </div>
+
+                        <div class="next-step">
+                            <h3>🔐 Enhance Privacy Settings</h3>
+                            <p>Enable AI isolation mode for maximum student privacy.</p>
+                            <a href="/pages/security.html#ai-isolation">Privacy settings →</a>
+                        </div>
+
+                        <div class="next-step">
+                            <h3>💬 Join the Community</h3>
+                            <p>Share tips and ask questions in our community forum.</p>
+                            <a href="https://github.com/academic-workflow-suite/discussions">Community discussions →</a>
+                        </div>
+                    </div>
+
+                    <h2>Common Questions</h2>
+
+                    <h3>How accurate is the AI feedback?</h3>
+                    <p>
+                        AI feedback serves as a starting point, not the final product. In our testing with 500+
+                        educators, users report 85-95% satisfaction with AI suggestions as a draft. You should
+                        always review and personalize feedback before sharing with students.
+                    </p>
+
+                    <h3>Can I use AWS offline?</h3>
+                    <p>
+                        Yes! All core features work completely offline. Internet is only required for LMS sync
+                        and software updates.
+                    </p>
+
+                    <h3>How do I backup my data?</h3>
+                    <p>
+                        Use <code>aws backup create</code> to create encrypted backups. You can also enable
+                        automatic cloud sync to Dropbox, Google Drive, or other providers.
+                    </p>
+
+                    <h3>Can multiple instructors collaborate?</h3>
+                    <p>
+                        Yes! Use team mode to share rubrics and coordinate marking. Each instructor maintains
+                        their own secure environment.
+                    </p>
+
+                    <h2>Getting Help</h2>
+                    <p>
+                        Stuck on something? Here's where to get help:
+                    </p>
+                    <ul>
+                        <li><a href="/pages/documentation.html">Complete documentation</a></li>
+                        <li><a href="https://github.com/academic-workflow-suite/discussions">Community forum</a></li>
+                        <li><a href="https://github.com/academic-workflow-suite/issues">Report bugs</a></li>
+                        <li><a href="/blog/">More tutorials</a></li>
+                    </ul>
+
+                    <hr>
+
+                    <p class="closing">
+                        We hope this guide helps you get started with Academic Workflow Suite. Remember, the goal
+                        is to save you time while improving feedback quality. Start with one assignment, get
+                        comfortable with the workflow, and gradually incorporate more features.
+                    </p>
+
+                    <p class="closing">
+                        Happy marking! 🎓
+                    </p>
+                </div>
+
+                <div class="post-footer">
+                    <div class="post-tags">
+                        <span class="tag">Getting Started</span>
+                        <span class="tag">Tutorial</span>
+                        <span class="tag">Beginner</span>
+                    </div>
+
+                    <div class="post-share">
+                        <p>Share this article:</p>
+                        <a href="#" class="share-btn">Twitter</a>
+                        <a href="#" class="share-btn">LinkedIn</a>
+                        <a href="#" class="share-btn">Email</a>
+                    </div>
+                </div>
+
+                <div class="post-navigation">
+                    <a href="#" class="post-nav-link post-nav-prev">
+                        <span class="nav-label">← Previous Post</span>
+                        <span class="nav-title">Installing on University Managed Devices</span>
+                    </a>
+                    <a href="#" class="post-nav-link post-nav-next">
+                        <span class="nav-label">Next Post →</span>
+                        <span class="nav-title">How Privacy-First AI Feedback Works</span>
+                    </a>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="footer-heading">Academic Workflow Suite</h3>
+                    <p class="footer-description">Open source tools for modern academic workflows.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="/pages/features.html">Features</a></li>
+                        <li><a href="/pages/download.html">Download</a></li>
+                        <li><a href="/pages/documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/pages/security.html">Security</a></li>
+                        <li><a href="/pages/about.html">About</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 Academic Workflow Suite. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

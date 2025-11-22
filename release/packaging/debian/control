@@ -1,0 +1,20 @@
+Package: academic-workflow-suite
+Version: {{VERSION}}
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Academic Workflow Suite Team <maintainers@academicworkflow.org>
+Depends: libc6 (>= 2.31), libssl1.1
+Recommends: git, curl
+Suggests: docker.io
+Homepage: https://github.com/academicworkflow/suite
+Description: Comprehensive academic workflow automation suite
+ The Academic Workflow Suite provides tools and utilities for researchers,
+ students, and academics to manage their work more efficiently.
+ .
+ Features include:
+  - Research paper organization and management
+  - Citation and bibliography tools
+  - Collaboration utilities
+  - Data analysis helpers
+  - Integration with academic databases

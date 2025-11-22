@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>academic-workflow-suite</id>
+    <version>{{VERSION}}</version>
+    <packageSourceUrl>https://github.com/academicworkflow/suite</packageSourceUrl>
+    <owners>Academic Workflow Suite Team</owners>
+    <title>Academic Workflow Suite</title>
+    <authors>Academic Workflow Suite Team</authors>
+    <projectUrl>https://github.com/academicworkflow/suite</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/academicworkflow/suite/main/assets/icon.png</iconUrl>
+    <copyright>2025 Academic Workflow Suite Team</copyright>
+    <licenseUrl>https://github.com/academicworkflow/suite/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/academicworkflow/suite</projectSourceUrl>
+    <docsUrl>https://github.com/academicworkflow/suite/wiki</docsUrl>
+    <bugTrackerUrl>https://github.com/academicworkflow/suite/issues</bugTrackerUrl>
+    <tags>academic research workflow automation cli</tags>
+    <summary>Streamline and automate common academic workflows</summary>
+    <description>
+The Academic Workflow Suite provides comprehensive tools and utilities for researchers,
+students, and academics to manage their work more efficiently.
+
+## Features
+
+- Research paper organization and management
+- Citation and bibliography tools
+- Collaboration utilities
+- Data analysis helpers
+- Integration with academic databases
+
+## Usage
+
+After installation, run `aws --help` to get started.
+    </description>
+    <releaseNotes>https://github.com/academicworkflow/suite/releases/tag/v{{VERSION}}</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Name="Academic Workflow Suite"
+           Language="1033"
+           Version="{{VERSION}}"
+           Manufacturer="Academic Workflow Suite Team"
+           UpgradeCode="12345678-1234-1234-1234-123456789ABC">
+
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Description="Academic Workflow Suite Installer"
+             Comments="Streamline and automate academic workflows" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="Academic Workflow Suite" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="EnvironmentPath" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="Academic Workflow Suite">
+          <Directory Id="BinFolder" Name="bin" />
+          <Directory Id="DocFolder" Name="doc" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Academic Workflow Suite"/>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="ProductComponents" Directory="BinFolder">
+      <Component Id="MainExecutable" Guid="*">
+        <File Id="AwsExe"
+              Source="$(var.BuildPath)\aws.exe"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Component Id="ApplicationShortcut"
+               Directory="ApplicationProgramsFolder"
+               Guid="*">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="Academic Workflow Suite"
+                Description="Academic Workflow Suite Command Line"
+                Target="[BinFolder]aws.exe"
+                WorkingDirectory="INSTALLFOLDER"/>
+      <RemoveFolder Id="CleanUpShortCut"
+                    Directory="ApplicationProgramsFolder"
+                    On="uninstall"/>
+      <RegistryValue Root="HKCU"
+                     Key="Software\AcademicWorkflowSuite"
+                     Name="installed"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes"/>
+    </Component>
+
+    <Component Id="EnvironmentPath"
+               Directory="BinFolder"
+               Guid="*">
+      <Environment Id="PATH"
+                   Name="PATH"
+                   Value="[BinFolder]"
+                   Permanent="no"
+                   Part="last"
+                   Action="set"
+                   System="yes" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\AcademicWorkflowSuite"
+                     Name="path"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes"/>
+    </Component>
+
+    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.BuildPath)\LICENSE.rtf" />
+  </Product>
+</Wix>

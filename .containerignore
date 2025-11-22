@@ -1,0 +1,190 @@
+# Container ignore file (Podman/Buildah)
+# Same exclusions as .dockerignore for Podman compatibility
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab
+
+# CI/CD
+.gitlab-ci.yml
+.github/
+*.yml
+*.yaml
+
+# Documentation
+*.md
+!README.md
+docs/
+CLAUDE.md
+LICENSE
+CONTRIBUTING.md
+
+# IDE and Editor
+.vscode/
+.idea/
+.eclipse/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-*
+
+# Build artifacts
+target/
+_build/
+build/
+dist/
+out/
+bin/
+obj/
+*.o
+*.so
+*.a
+*.lib
+*.exe
+*.dll
+*.dylib
+
+# Rust
+Cargo.lock
+**/.cargo/
+**/target/
+*.rs.bk
+rust-toolchain
+
+# Elixir
+.elixir_ls/
+.mix/
+.hex/
+deps/
+_build/
+*.ez
+*.beam
+/config/*.secret.exs
+.fetch
+priv/static/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.npm/
+.pnp.*
+.yarn/
+*.tgz
+package-lock.json
+yarn.lock
+
+# ReScript
+lib/bs/
+.bsb.lock
+.merlin
+
+# Test coverage
+coverage/
+.coverage
+htmlcov/
+*.coveragerc
+*.lcov
+.nyc_output/
+cov/
+*.gcda
+*.gcno
+
+# Logs
+*.log
+logs/
+*.log.*
+*.out
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+.download/
+
+# Package artifacts
+packages/
+*.deb
+*.msi
+*.dmg
+*.rpm
+*.pkg
+*.tgz
+*.tar.gz
+*.zip
+*.AppImage
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+ssl/
+certs/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+ehthumbs.db
+
+# Testing
+tests/
+test/
+spec/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+__tests__/
+__mocks__/
+.pytest_cache/
+.rspec
+.test/
+
+# Backup files
+*.bak
+*.backup
+*~
+*.orig
+
+# Development
+.devcontainer/
+.vagrant/
+Vagrantfile
+docker-compose.yml
+docker-compose.*.yml
+
+# Scripts (most not needed in container)
+scripts/dev/
+scripts/install/
+scripts/management/
+scripts/ci/
+
+# Development databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Large data files
+data/
+datasets/
+*.csv
+*.json
+*.xml
+!package.json
+!config/*.json

@@ -1,0 +1,51 @@
+[package]
+name = "ai-jail"
+version = "0.1.0"
+edition = "2021"
+authors = ["Academic Workflow Suite Contributors"]
+description = "Network-isolated AI inference container for TMA grading"
+license = "GPL-3.0"
+
+[[bin]]
+name = "ai-jail"
+path = "src/main.rs"
+
+[dependencies]
+# Candle ML framework
+candle-core = { version = "0.6", features = ["cuda"] }
+candle-nn = "0.6"
+candle-transformers = "0.6"
+
+# Tokenization
+tokenizers = { version = "0.19", default-features = false, features = ["onig"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Utilities
+hf-hub = { version = "0.3", features = ["tokio"] }
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.0"
+tempfile = "3.8"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.release-with-debug]
+inherits = "release"
+strip = false
+debug = true

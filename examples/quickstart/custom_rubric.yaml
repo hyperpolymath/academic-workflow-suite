@@ -1,0 +1,294 @@
+# Custom Rubric Example
+# This file demonstrates how to create a custom marking rubric for TMAs
+
+name: "Computer Science Essay Rubric"
+version: "1.0"
+subject: "Computer Science"
+assignment_type: "Essay"
+total_points: 100
+
+# Rubric categories with criteria and point allocations
+categories:
+  - name: "Content and Understanding"
+    weight: 40
+    description: "Depth of understanding and accuracy of content"
+    criteria:
+      - name: "Technical Accuracy"
+        points: 15
+        description: "Correctness of technical concepts and terminology"
+        levels:
+          - score: 15
+            label: "Excellent"
+            description: "All technical concepts are accurate and well-explained"
+          - score: 12
+            label: "Good"
+            description: "Most concepts accurate with minor errors"
+          - score: 9
+            label: "Satisfactory"
+            description: "Several concepts correct but some significant errors"
+          - score: 6
+            label: "Needs Improvement"
+            description: "Major technical inaccuracies present"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "Fundamental misunderstandings of key concepts"
+
+      - name: "Depth of Analysis"
+        points: 15
+        description: "Critical thinking and analysis demonstrated"
+        levels:
+          - score: 15
+            label: "Excellent"
+            description: "Insightful analysis with original thinking"
+          - score: 12
+            label: "Good"
+            description: "Good analysis with some original insights"
+          - score: 9
+            label: "Satisfactory"
+            description: "Basic analysis without much depth"
+          - score: 6
+            label: "Needs Improvement"
+            description: "Superficial analysis"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No meaningful analysis"
+
+      - name: "Use of Examples"
+        points: 10
+        description: "Quality and relevance of examples provided"
+        levels:
+          - score: 10
+            label: "Excellent"
+            description: "Excellent, relevant examples that illuminate concepts"
+          - score: 8
+            label: "Good"
+            description: "Good examples with minor relevance issues"
+          - score: 6
+            label: "Satisfactory"
+            description: "Adequate examples but could be more relevant"
+          - score: 4
+            label: "Needs Improvement"
+            description: "Few or poorly chosen examples"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No examples or completely irrelevant"
+
+  - name: "Structure and Organization"
+    weight: 25
+    description: "Logical flow and organization of ideas"
+    criteria:
+      - name: "Introduction and Thesis"
+        points: 8
+        description: "Clear introduction with well-defined thesis"
+        levels:
+          - score: 8
+            label: "Excellent"
+            description: "Clear, engaging introduction with strong thesis"
+          - score: 6
+            label: "Good"
+            description: "Good introduction and clear thesis"
+          - score: 4
+            label: "Satisfactory"
+            description: "Adequate introduction, thesis could be clearer"
+          - score: 2
+            label: "Needs Improvement"
+            description: "Weak introduction or unclear thesis"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No clear introduction or thesis"
+
+      - name: "Paragraph Structure"
+        points: 9
+        description: "Coherent paragraphs with topic sentences"
+        levels:
+          - score: 9
+            label: "Excellent"
+            description: "All paragraphs well-structured with clear topic sentences"
+          - score: 7
+            label: "Good"
+            description: "Most paragraphs well-structured"
+          - score: 5
+            label: "Satisfactory"
+            description: "Adequate paragraph structure"
+          - score: 3
+            label: "Needs Improvement"
+            description: "Poorly structured paragraphs"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No clear paragraph structure"
+
+      - name: "Conclusion"
+        points: 8
+        description: "Effective conclusion that synthesizes main points"
+        levels:
+          - score: 8
+            label: "Excellent"
+            description: "Strong conclusion that synthesizes and extends discussion"
+          - score: 6
+            label: "Good"
+            description: "Good conclusion that summarizes main points"
+          - score: 4
+            label: "Satisfactory"
+            description: "Adequate conclusion"
+          - score: 2
+            label: "Needs Improvement"
+            description: "Weak or abrupt conclusion"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No conclusion"
+
+  - name: "Research and Citations"
+    weight: 20
+    description: "Use of sources and proper citation"
+    criteria:
+      - name: "Quality of Sources"
+        points: 10
+        description: "Use of credible, relevant academic sources"
+        levels:
+          - score: 10
+            label: "Excellent"
+            description: "Excellent use of high-quality academic sources"
+          - score: 8
+            label: "Good"
+            description: "Good sources, mostly academic"
+          - score: 6
+            label: "Satisfactory"
+            description: "Adequate sources but could be more scholarly"
+          - score: 4
+            label: "Needs Improvement"
+            description: "Limited or low-quality sources"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No credible sources used"
+
+      - name: "Citation Format"
+        points: 10
+        description: "Proper citation format (APA/IEEE/etc.)"
+        levels:
+          - score: 10
+            label: "Excellent"
+            description: "Perfect citation format throughout"
+          - score: 8
+            label: "Good"
+            description: "Mostly correct citations with minor errors"
+          - score: 6
+            label: "Satisfactory"
+            description: "Citations present but several format errors"
+          - score: 4
+            label: "Needs Improvement"
+            description: "Many citation format errors"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "No proper citations"
+
+  - name: "Writing Quality"
+    weight: 15
+    description: "Grammar, spelling, and writing style"
+    criteria:
+      - name: "Grammar and Spelling"
+        points: 8
+        description: "Correct grammar, spelling, and punctuation"
+        levels:
+          - score: 8
+            label: "Excellent"
+            description: "No grammar or spelling errors"
+          - score: 6
+            label: "Good"
+            description: "Few minor errors"
+          - score: 4
+            label: "Satisfactory"
+            description: "Some errors but doesn't impede understanding"
+          - score: 2
+            label: "Needs Improvement"
+            description: "Frequent errors that affect clarity"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "Pervasive errors"
+
+      - name: "Academic Style"
+        points: 7
+        description: "Appropriate academic tone and style"
+        levels:
+          - score: 7
+            label: "Excellent"
+            description: "Perfect academic tone throughout"
+          - score: 5
+            label: "Good"
+            description: "Generally appropriate academic tone"
+          - score: 3
+            label: "Satisfactory"
+            description: "Mostly appropriate with some informal language"
+          - score: 1
+            label: "Needs Improvement"
+            description: "Frequently too informal"
+          - score: 0
+            label: "Unsatisfactory"
+            description: "Inappropriate tone throughout"
+
+# Grading scale
+grading_scale:
+  - grade: "A+"
+    min_score: 95
+    max_score: 100
+  - grade: "A"
+    min_score: 90
+    max_score: 94
+  - grade: "A-"
+    min_score: 85
+    max_score: 89
+  - grade: "B+"
+    min_score: 80
+    max_score: 84
+  - grade: "B"
+    min_score: 75
+    max_score: 79
+  - grade: "B-"
+    min_score: 70
+    max_score: 74
+  - grade: "C+"
+    min_score: 65
+    max_score: 69
+  - grade: "C"
+    min_score: 60
+    max_score: 64
+  - grade: "C-"
+    min_score: 55
+    max_score: 59
+  - grade: "D"
+    min_score: 50
+    max_score: 54
+  - grade: "F"
+    min_score: 0
+    max_score: 49
+
+# AI marking instructions
+ai_instructions:
+  model: "claude-3-opus-20240229"
+  temperature: 0.3
+
+  system_prompt: |
+    You are an experienced computer science professor marking student essays.
+    Be fair, constructive, and consistent in your feedback.
+
+  marking_guidelines:
+    - "Read the entire essay before assigning scores"
+    - "Provide specific examples when noting strengths or weaknesses"
+    - "Be encouraging while maintaining academic rigor"
+    - "Consider the student's level (undergraduate/graduate)"
+    - "Flag any potential plagiarism or academic integrity issues"
+
+  feedback_format:
+    - "Start with overall impressions"
+    - "Provide category-by-category feedback"
+    - "List 3-5 key strengths"
+    - "List 3-5 areas for improvement"
+    - "End with encouraging, actionable advice"
+
+# Metadata
+metadata:
+  created_by: "Dr. Jane Smith"
+  created_date: "2024-01-15"
+  department: "Computer Science"
+  course: "CS301 - Software Engineering"
+  institution: "Example University"
+  valid_until: "2025-12-31"

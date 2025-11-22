@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+# Debian rules file for academic-workflow-suite
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Build is handled externally
+
+override_dh_auto_test:
+	# Tests are run before packaging
+
+override_dh_strip:
+	# Don't strip binaries for better debugging

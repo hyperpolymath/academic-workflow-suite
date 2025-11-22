@@ -1,0 +1,358 @@
+# Academic Workflow Suite - Configuration Template
+# =================================================
+# This is the default configuration file template.
+# Copy this to ~/.config/aws/config.yaml and customize as needed.
+
+# Application Metadata
+app:
+  name: "Academic Workflow Suite"
+  version: "0.1.0"
+  environment: "production"  # production, development, testing
+
+# Installation Settings
+installation:
+  mode: "quick"  # quick, custom, full
+  install_date: ""  # Auto-populated during installation
+  installed_components:
+    - core
+    - backend
+    - office-addin
+  installation_path: "/opt/academic-workflow-suite"
+  data_path: "~/.local/share/aws"
+  config_path: "~/.config/aws"
+  cache_path: "~/.cache/aws"
+  log_path: "~/.local/share/aws/logs"
+
+# Core Engine Settings
+core:
+  enabled: true
+  database:
+    type: "lmdb"
+    path: "~/.local/share/aws/data/core.db"
+    max_size_gb: 10
+    max_readers: 126
+    sync_mode: "async"  # async, sync, nosync
+
+  performance:
+    worker_threads: 4  # Auto-detect based on CPU cores
+    max_concurrent_tasks: 100
+    task_timeout_seconds: 300
+
+  hashing:
+    algorithm: "sha3-256"  # sha3-256, blake3
+    salt_length: 32
+
+  logging:
+    level: "info"  # trace, debug, info, warn, error
+    format: "json"  # json, pretty, compact
+    rotation: "daily"  # daily, hourly, size-based
+    max_files: 30
+    max_file_size_mb: 100
+
+# Backend Service Settings
+backend:
+  enabled: true
+  server:
+    host: "127.0.0.1"
+    port: 8080
+    bind_address: "0.0.0.0"  # Use 0.0.0.0 for remote access
+    use_tls: false
+    tls_cert_path: ""
+    tls_key_path: ""
+
+  api:
+    version: "v1"
+    prefix: "/api/v1"
+    cors_enabled: true
+    cors_origins:
+      - "http://localhost:3000"
+      - "https://localhost:3000"
+    rate_limit:
+      enabled: true
+      max_requests_per_minute: 60
+
+  database:
+    pool_size: 10
+    connection_timeout_seconds: 30
+    idle_timeout_seconds: 600
+
+  authentication:
+    enabled: true
+    jwt_secret: ""  # Auto-generated during installation
+    jwt_expiry_hours: 24
+    refresh_token_expiry_days: 30
+    session_timeout_minutes: 60
+
+  cache:
+    enabled: true
+    type: "memory"  # memory, redis
+    ttl_seconds: 3600
+    max_entries: 10000
+
+# Office Add-in Settings
+office:
+  enabled: true
+  addin:
+    manifest_path: "/opt/academic-workflow-suite/office-addin/manifest.xml"
+    localhost_port: 3000
+    use_https: true
+
+  features:
+    citation_manager: true
+    bibliography_generator: true
+    document_analyzer: true
+    collaboration_tools: true
+
+  word:
+    auto_save_interval_seconds: 60
+    track_changes: true
+    comment_notifications: true
+
+  excel:
+    data_validation: true
+    formula_helpers: true
+    chart_templates: true
+
+# AI Jail (Sandboxed AI) Settings
+ai:
+  enabled: false  # Disabled by default, enable in Custom/Full mode
+
+  models:
+    default_model: "mistral-7b"
+    available_models:
+      - name: "mistral-7b"
+        path: "~/.local/share/aws/models/mistral-7b"
+        type: "gguf"
+        size_gb: 15
+        quantization: "Q4_K_M"
+      - name: "llama2-13b"
+        path: "~/.local/share/aws/models/llama2-13b"
+        type: "gguf"
+        size_gb: 30
+        quantization: "Q4_K_M"
+
+  runtime:
+    container_runtime: "podman"  # podman, docker
+    cpu_limit: 4
+    memory_limit_gb: 8
+    gpu_enabled: false
+    gpu_device: "/dev/nvidia0"
+
+  security:
+    network_isolation: true
+    filesystem_isolation: true
+    max_execution_time_seconds: 300
+    allowed_syscalls:
+      - read
+      - write
+      - open
+      - close
+      - stat
+    disallowed_paths:
+      - /etc
+      - /root
+      - /proc
+      - /sys
+
+  generation:
+    max_tokens: 2048
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.1
+    context_length: 4096
+
+# Academic Tools Settings
+academic:
+  citation:
+    default_style: "apa"  # apa, mla, chicago, harvard, ieee
+    auto_format: true
+    validate_dois: true
+
+  bibliography:
+    export_formats:
+      - bibtex
+      - endnote
+      - ris
+      - json
+    auto_update: true
+
+  research:
+    databases:
+      pubmed:
+        enabled: false
+        api_key: ""
+      arxiv:
+        enabled: true
+        api_key: ""  # No key required
+      google_scholar:
+        enabled: false
+        api_key: ""
+      crossref:
+        enabled: true
+        email: ""  # Required for polite API access
+
+  collaboration:
+    git_integration: true
+    auto_commit: false
+    conflict_resolution: "manual"  # manual, auto
+
+# Service Management
+services:
+  auto_start: true
+  restart_policy: "on-failure"  # always, on-failure, unless-stopped, no
+  restart_max_retries: 3
+
+  systemd:
+    enabled: true
+    user_mode: true  # true for user services, false for system services
+
+  windows:
+    service_type: "automatic"  # automatic, manual, disabled
+    recovery_action: "restart"
+
+# Update Settings
+updates:
+  auto_check: true
+  check_interval_hours: 24
+  auto_download: false
+  auto_install: false
+  channel: "stable"  # stable, beta, nightly
+
+# Telemetry and Analytics
+telemetry:
+  enabled: false  # Opt-in only
+  anonymous: true
+  collect_usage_stats: false
+  collect_crash_reports: false
+  endpoint: "https://telemetry.aws.example.com"
+
+# Backup and Recovery
+backup:
+  enabled: true
+  auto_backup: true
+  backup_interval_hours: 24
+  backup_path: "~/.local/share/aws/backups"
+  max_backups: 7
+  include_databases: true
+  include_models: false  # Models are large, exclude by default
+
+# Developer Settings
+developer:
+  debug_mode: false
+  hot_reload: false
+  profiling: false
+  verbose_logging: false
+  dev_server_port: 8081
+
+  testing:
+    mock_api_enabled: false
+    test_data_enabled: false
+    fixture_path: "tests/fixtures"
+
+# Security Settings
+security:
+  encryption:
+    enabled: true
+    algorithm: "aes-256-gcm"
+    key_derivation: "argon2id"
+
+  audit:
+    enabled: true
+    log_path: "~/.local/share/aws/logs/audit.log"
+    log_api_calls: true
+    log_file_access: true
+    log_authentications: true
+
+  sandboxing:
+    enable_seccomp: true
+    enable_apparmor: true
+    enable_selinux: false
+
+# Network Settings
+network:
+  proxy:
+    enabled: false
+    http_proxy: ""
+    https_proxy: ""
+    no_proxy: "localhost,127.0.0.1"
+
+  timeout:
+    connect_seconds: 10
+    read_seconds: 30
+    write_seconds: 30
+
+  retry:
+    max_retries: 3
+    backoff_multiplier: 2
+    max_backoff_seconds: 60
+
+# Notification Settings
+notifications:
+  enabled: true
+  channels:
+    desktop: true
+    email: false
+    webhook: false
+
+  events:
+    task_completed: true
+    task_failed: true
+    update_available: true
+    backup_completed: false
+
+  email:
+    smtp_host: ""
+    smtp_port: 587
+    smtp_user: ""
+    smtp_password: ""
+    from_address: ""
+    to_address: ""
+
+  webhook:
+    url: ""
+    secret: ""
+    events: []
+
+# Feature Flags
+features:
+  experimental:
+    gpu_acceleration: false
+    distributed_computing: false
+    blockchain_verification: false
+    quantum_resistant_crypto: false
+
+  beta:
+    advanced_analytics: false
+    ai_suggestions: false
+    real_time_collaboration: false
+
+# Resource Limits
+limits:
+  max_file_size_mb: 100
+  max_upload_size_mb: 500
+  max_document_pages: 1000
+  max_concurrent_users: 100
+  max_api_requests_per_hour: 10000
+
+# Locale and Internationalization
+locale:
+  language: "en-US"
+  timezone: "UTC"
+  date_format: "YYYY-MM-DD"
+  time_format: "24h"  # 24h, 12h
+  currency: "USD"
+
+# Accessibility
+accessibility:
+  high_contrast: false
+  screen_reader_optimized: false
+  keyboard_navigation_hints: true
+  font_size_multiplier: 1.0
+
+# Custom User Overrides
+# ======================
+# Add your custom settings below this line
+# These will not be overwritten during updates
+
+user_overrides: {}

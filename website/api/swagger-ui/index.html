@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Academic Workflow Suite</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui.css">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .swagger-ui .topbar {
+            display: none;
+        }
+        .custom-header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .custom-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .custom-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .custom-header a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-header">
+        <h1>Academic Workflow Suite API Documentation</h1>
+        <p>Interactive API reference with try-it-out functionality | <a href="/">Back to Main Site</a></p>
+    </div>
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Specification object - in production, this would be loaded from api-spec.yaml
+            const spec = {
+                "openapi": "3.0.3",
+                "info": {
+                    "title": "Academic Workflow Suite API",
+                    "description": "REST API for Academic Workflow Suite - Automate academic workflows with privacy-first AI assistance.",
+                    "version": "1.0.0",
+                    "contact": {
+                        "name": "API Support",
+                        "email": "api@academic-workflow.org",
+                        "url": "https://academic-workflow.org"
+                    },
+                    "license": {
+                        "name": "MIT",
+                        "url": "https://opensource.org/licenses/MIT"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://localhost:8080/api/v1",
+                        "description": "Local development server"
+                    },
+                    {
+                        "url": "https://api.academic-workflow.org/v1",
+                        "description": "Production API (if using cloud sync)"
+                    }
+                ],
+                "tags": [
+                    {
+                        "name": "Projects",
+                        "description": "Project and course management"
+                    },
+                    {
+                        "name": "Assignments",
+                        "description": "Assignment operations"
+                    },
+                    {
+                        "name": "Feedback",
+                        "description": "AI-assisted feedback generation"
+                    },
+                    {
+                        "name": "Rubrics",
+                        "description": "Rubric management"
+                    },
+                    {
+                        "name": "LMS",
+                        "description": "Learning Management System integration"
+                    }
+                ],
+                "paths": {
+                    "/projects": {
+                        "get": {
+                            "tags": ["Projects"],
+                            "summary": "List all projects",
+                            "description": "Retrieve a list of all projects/courses",
+                            "responses": {
+                                "200": {
+                                    "description": "Successful response",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/Project"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "post": {
+                            "tags": ["Projects"],
+                            "summary": "Create a new project",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/ProjectInput"
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "201": {
+                                    "description": "Project created",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/Project"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/projects/{projectId}/assignments": {
+                        "get": {
+                            "tags": ["Assignments"],
+                            "summary": "List assignments for a project",
+                            "parameters": [
+                                {
+                                    "name": "projectId",
+                                    "in": "path",
+                                    "required": true,
+                                    "schema": {
+                                        "type": "string"
+                                    }
+                                }
+                            ],
+                            "responses": {
+                                "200": {
+                                    "description": "List of assignments",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/Assignment"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/feedback/generate": {
+                        "post": {
+                            "tags": ["Feedback"],
+                            "summary": "Generate AI-assisted feedback",
+                            "description": "Generate feedback for a student submission using AI",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/FeedbackRequest"
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Feedback generated",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/FeedbackResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/rubrics": {
+                        "get": {
+                            "tags": ["Rubrics"],
+                            "summary": "List all rubrics",
+                            "responses": {
+                                "200": {
+                                    "description": "List of rubrics",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/Rubric"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/lms/import": {
+                        "post": {
+                            "tags": ["LMS"],
+                            "summary": "Import assignments from LMS",
+                            "requestBody": {
+                                "required": true,
+                                "content": {
+                                    "application/json": {
+                                        "schema": {
+                                            "$ref": "#/components/schemas/LMSImportRequest"
+                                        }
+                                    }
+                                }
+                            },
+                            "responses": {
+                                "200": {
+                                    "description": "Import successful"
+                                }
+                            }
+                        }
+                    }
+                },
+                "components": {
+                    "schemas": {
+                        "Project": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "proj_abc123"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "Introduction to Computer Science"
+                                },
+                                "semester": {
+                                    "type": "string",
+                                    "example": "Fall 2025"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
+                            }
+                        },
+                        "ProjectInput": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "semester": {
+                                    "type": "string"
+                                },
+                                "default_rubric_id": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "Assignment": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "project_id": {
+                                    "type": "string"
+                                },
+                                "due_date": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "total_submissions": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "FeedbackRequest": {
+                            "type": "object",
+                            "required": ["submission_text", "rubric_id"],
+                            "properties": {
+                                "submission_text": {
+                                    "type": "string",
+                                    "description": "The student's submission content"
+                                },
+                                "rubric_id": {
+                                    "type": "string"
+                                },
+                                "ai_model": {
+                                    "type": "string",
+                                    "enum": ["lightweight", "advanced"],
+                                    "default": "lightweight"
+                                },
+                                "tone": {
+                                    "type": "string",
+                                    "enum": ["encouraging", "neutral", "critical"],
+                                    "default": "neutral"
+                                },
+                                "isolation_mode": {
+                                    "type": "boolean",
+                                    "default": false,
+                                    "description": "Enable privacy-first AI isolation"
+                                }
+                            }
+                        },
+                        "FeedbackResponse": {
+                            "type": "object",
+                            "properties": {
+                                "feedback": {
+                                    "type": "string",
+                                    "description": "Generated feedback text"
+                                },
+                                "rubric_scores": {
+                                    "type": "object",
+                                    "description": "Scores for each rubric criterion"
+                                },
+                                "total_score": {
+                                    "type": "number"
+                                },
+                                "confidence": {
+                                    "type": "number",
+                                    "description": "AI confidence level (0-1)"
+                                }
+                            }
+                        },
+                        "Rubric": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "criteria": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "weight": {
+                                                "type": "number"
+                                            },
+                                            "levels": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "LMSImportRequest": {
+                            "type": "object",
+                            "required": ["lms_type", "assignment_id"],
+                            "properties": {
+                                "lms_type": {
+                                    "type": "string",
+                                    "enum": ["moodle", "canvas", "blackboard", "open_university"]
+                                },
+                                "assignment_id": {
+                                    "type": "string"
+                                },
+                                "api_token": {
+                                    "type": "string",
+                                    "description": "LMS API token (if not configured globally)"
+                                }
+                            }
+                        }
+                    },
+                    "securitySchemes": {
+                        "BearerAuth": {
+                            "type": "http",
+                            "scheme": "bearer"
+                        },
+                        "ApiKeyAuth": {
+                            "type": "apiKey",
+                            "in": "header",
+                            "name": "X-API-Key"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            };
+
+            // Initialize Swagger UI
+            window.ui = SwaggerUIBundle({
+                spec: spec,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                tryItOutEnabled: true,
+                syntaxHighlight: {
+                    activate: true,
+                    theme: "monokai"
+                }
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+# Academic Workflow Suite - Required Dependencies
+# This file specifies the minimum required versions for all dependencies
+
+# Core System Requirements
+# ========================
+
+# Rust toolchain
+rust_version=1.75.0
+rustup_version=1.26.0
+cargo_version=1.75.0
+
+# Elixir/Erlang (for backend services)
+elixir_version=1.15.0
+erlang_version=26.0
+mix_version=1.15.0
+
+# Node.js (for Office Add-in)
+nodejs_version=18.18.0
+npm_version=9.8.0
+
+# Container Runtime
+podman_version=4.6.0
+# OR
+docker_version=24.0.0
+
+# Build Tools
+# ===========
+
+# C/C++ Compiler (for native dependencies)
+gcc_version=9.0.0
+clang_version=10.0.0
+
+# CMake (for some native builds)
+cmake_version=3.20.0
+
+# Git (for source management)
+git_version=2.30.0
+
+# System Libraries
+# ================
+
+# OpenSSL (for cryptographic operations)
+openssl_version=1.1.1
+
+# SQLite (for local database)
+sqlite_version=3.35.0
+
+# LMDB (Lightning Memory-Mapped Database)
+lmdb_version=0.9.29
+
+# Linux-specific
+# ==============
+
+# systemd (for service management on Linux)
+systemd_version=245
+
+# pkg-config (for library detection)
+pkgconfig_version=0.29.0
+
+# Windows-specific
+# ================
+
+# WSL2 (Windows Subsystem for Linux)
+wsl_version=2.0.0
+
+# Windows Terminal (recommended)
+windows_terminal_version=1.18.0
+
+# Visual C++ Build Tools
+msvc_version=2019
+
+# Optional Components
+# ===================
+
+# AI/ML Dependencies (for AI Jail component)
+python_version=3.10.0
+pip_version=23.0.0
+torch_version=2.1.0
+transformers_version=4.35.0
+
+# CUDA (for GPU acceleration - optional)
+cuda_version=12.0.0
+
+# Development Tools (optional)
+# ============================
+
+# Testing frameworks
+nextest_version=0.9.0
+cargo_watch_version=8.4.0
+
+# Linting/Formatting
+clippy_version=0.1.75
+rustfmt_version=1.6.0
+
+# Documentation
+cargo_doc_version=1.75.0
+
+# Package Managers
+# ================
+
+# Linux
+apt_version=2.0.0          # Debian/Ubuntu
+dnf_version=4.0.0          # Fedora
+pacman_version=6.0.0       # Arch
+
+# Windows
+chocolatey_version=1.4.0
+scoop_version=0.3.0
+
+# macOS
+brew_version=4.0.0
+
+# Disk Space Requirements
+# ========================
+
+# Minimum free space (in GB)
+min_disk_space_quick=5
+min_disk_space_custom=10
+min_disk_space_full=20
+
+# AI Models disk space
+ai_model_mistral_7b=15
+ai_model_llama2_13b=30
+
+# Memory Requirements
+# ===================
+
+# Minimum RAM (in GB)
+min_ram_quick=4
+min_ram_custom=8
+min_ram_full=16
+
+# Network Requirements
+# ====================
+
+# Download sizes (in MB)
+download_size_quick=2048
+download_size_custom=4096
+download_size_full=8192
+
+# Model Downloads (in GB)
+download_mistral_7b=15
+download_llama2_13b=30
+
+# Verification Checksums
+# ======================
+# These will be updated with each release
+
+checksum_algorithm=sha256
+
+# Component checksums (placeholder - update on release)
+checksum_core=PLACEHOLDER
+checksum_backend=PLACEHOLDER
+checksum_office_addin=PLACEHOLDER
+checksum_ai_jail=PLACEHOLDER
+
+# Model checksums (from HuggingFace)
+checksum_mistral_7b=PLACEHOLDER
+checksum_llama2_13b=PLACEHOLDER

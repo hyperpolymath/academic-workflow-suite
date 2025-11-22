@@ -1,0 +1,48 @@
+# Code Owners
+#
+# This file defines the code owners for the Academic Workflow Suite project.
+# Code owners are automatically requested for review when someone opens a pull request
+# that modifies code that they own.
+#
+# Learn more about CODEOWNERS: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# * @academic-workflow-suite/maintainers
+
+# Documentation
+*.md @academic-workflow-suite/docs-team
+/docs/ @academic-workflow-suite/docs-team
+
+# Configuration files
+/.github/ @academic-workflow-suite/maintainers
+/.gitlab/ @academic-workflow-suite/maintainers
+*.yml @academic-workflow-suite/maintainers
+*.yaml @academic-workflow-suite/maintainers
+*.toml @academic-workflow-suite/maintainers
+*.json @academic-workflow-suite/maintainers
+
+# Security-related files
+SECURITY.md @academic-workflow-suite/security-team
+/.github/ISSUE_TEMPLATE/security_vulnerability.md @academic-workflow-suite/security-team
+
+# CI/CD
+/.github/workflows/ @academic-workflow-suite/devops-team
+/.gitlab-ci.yml @academic-workflow-suite/devops-team
+
+# Core application code
+# /src/ @academic-workflow-suite/core-team
+# /lib/ @academic-workflow-suite/core-team
+
+# Tests
+# /tests/ @academic-workflow-suite/qa-team
+
+# Dependencies
+requirements.txt @academic-workflow-suite/maintainers
+setup.py @academic-workflow-suite/maintainers
+pyproject.toml @academic-workflow-suite/maintainers
+package.json @academic-workflow-suite/maintainers
+
+# Legal
+LICENSE @academic-workflow-suite/maintainers
+CODE_OF_CONDUCT.md @academic-workflow-suite/maintainers
+CONTRIBUTING.md @academic-workflow-suite/maintainers

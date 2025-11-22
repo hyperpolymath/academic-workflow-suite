@@ -1,0 +1,115 @@
+question_id: tm112_q2
+module: TM112
+title: "Operating System Resource Management"
+total_points: 100
+word_limit: 400
+word_limit_penalty: 5
+
+criteria:
+  - name: "Process Management Explanation"
+    weight: 30
+    description: "Clearly explains OS role in managing processes"
+    levels:
+      - score: 30
+        descriptor: "Excellent: Comprehensive explanation including scheduling, multitasking, context switching, process states, and IPC"
+      - score: 22
+        descriptor: "Good: Clear explanation of scheduling and multitasking with some additional detail"
+      - score: 15
+        descriptor: "Satisfactory: Basic explanation of process management present"
+      - score: 8
+        descriptor: "Poor: Vague or incomplete explanation"
+      - score: 0
+        descriptor: "Absent: No explanation or completely incorrect"
+
+  - name: "Memory Management Explanation"
+    weight: 30
+    description: "Clearly explains OS role in managing memory"
+    levels:
+      - score: 30
+        descriptor: "Excellent: Comprehensive explanation including allocation, virtual memory, paging, page tables, and swapping"
+      - score: 22
+        descriptor: "Good: Clear explanation of memory allocation and virtual memory"
+      - score: 15
+        descriptor: "Satisfactory: Basic explanation of memory management"
+      - score: 8
+        descriptor: "Poor: Vague or incomplete explanation"
+      - score: 0
+        descriptor: "Absent: No explanation or completely incorrect"
+
+  - name: "File System Management Explanation"
+    weight: 30
+    description: "Clearly explains OS role in managing files and storage"
+    levels:
+      - score: 30
+        descriptor: "Excellent: Comprehensive explanation including directory structure, file operations, permissions, metadata, and journaling"
+      - score: 22
+        descriptor: "Good: Clear explanation of file organization and basic operations"
+      - score: 15
+        descriptor: "Satisfactory: Basic explanation of file management"
+      - score: 8
+        descriptor: "Poor: Vague or incomplete explanation"
+      - score: 0
+        descriptor: "Absent: No explanation or completely incorrect"
+
+  - name: "Integration and Efficiency Discussion"
+    weight: 5
+    description: "Explains how functions work together for efficient operation"
+    levels:
+      - score: 5
+        descriptor: "Excellent: Clearly shows how the three functions interrelate and contribute to system efficiency"
+      - score: 3
+        descriptor: "Good: Some discussion of integration or efficiency"
+      - score: 1
+        descriptor: "Poor: Minimal or superficial discussion"
+      - score: 0
+        descriptor: "Absent: No integration discussion"
+
+  - name: "Technical Accuracy"
+    weight: 3
+    description: "Information is factually correct and technically sound"
+    levels:
+      - score: 3
+        descriptor: "No significant errors"
+      - score: 2
+        descriptor: "Minor errors that don't affect overall understanding"
+      - score: 1
+        descriptor: "Some significant errors"
+      - score: 0
+        descriptor: "Major errors throughout"
+
+  - name: "Structure and Clarity"
+    weight: 2
+    description: "Answer is well-organized and clearly written"
+    levels:
+      - score: 2
+        descriptor: "Clear, logical structure with good flow"
+      - score: 1
+        descriptor: "Adequate structure with some clarity issues"
+      - score: 0
+        descriptor: "Poor structure or very unclear"
+
+common_errors:
+  - error: "Confusing RAM with storage (hard drive/SSD)"
+    penalty: 5
+  - error: "Claiming OS stores files rather than manages storage"
+    penalty: 3
+  - error: "Failing to explain that processes share CPU time (believing they run simultaneously on single core)"
+    penalty: 8
+  - error: "No mention of scheduling or how CPU time is allocated"
+    penalty: 10
+
+bonus_points:
+  - description: "Discusses specific scheduling algorithms (round-robin, priority-based, etc.)"
+    points: 3
+  - description: "Explains thrashing or other performance considerations"
+    points: 2
+  - description: "Mentions specific file systems (NTFS, ext4, etc.) or security features"
+    points: 2
+
+passing_grade: 40
+grade_boundaries:
+  distinction: 85
+  pass_2: 70
+  pass_3: 55
+  pass_4: 40
+  fail: 0

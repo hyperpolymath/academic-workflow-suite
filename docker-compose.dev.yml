@@ -1,0 +1,231 @@
+version: '3.8'
+
+# Academic Workflow Suite - Development Environment Overrides
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Core Engine - Development Mode
+  core:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.core
+      target: development  # Multi-stage build target
+      args:
+        RUST_VERSION: 1.75
+    image: aws-core:dev
+    environment:
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
+      AWS_ENV: development
+      CARGO_INCREMENTAL: 1
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      LMDB_PATH: /data/lmdb
+      AI_JAIL_SOCKET: /run/ai-jail.sock
+      REDIS_URL: redis://redis:6379
+    volumes:
+      # Mount source code for hot reload
+      - ./components/core:/app:rw
+      - /app/target  # Anonymous volume for build artifacts
+      - lmdb-data:/data/lmdb
+      - ai-jail-socket:/run
+      - ./config:/app/config:ro
+      # Cargo cache for faster rebuilds
+      - cargo-cache:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+    command: cargo watch -x run
+    ports:
+      - "8080:8080"
+      - "9229:9229"  # Debug port
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
+          memory: 8G
+
+  # Backend Service - Development Mode
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.backend
+      target: development
+      args:
+        ELIXIR_VERSION: 1.15
+        ERLANG_VERSION: 26
+    image: aws-backend:dev
+    environment:
+      MIX_ENV: dev
+      PHX_HOST: backend
+      PHX_SERVER: "true"
+      PORT: 4000
+      DATABASE_URL: postgresql://aws_user:${POSTGRES_PASSWORD:-changeme123}@postgres:5432/academic_workflow_dev
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-dev-secret-key-base-not-for-production}
+    volumes:
+      # Mount source code for hot reload
+      - ./components/backend:/app:rw
+      - /app/_build  # Anonymous volume for build artifacts
+      - /app/deps    # Anonymous volume for dependencies
+      - ./config:/app/config:ro
+    command: mix phx.server
+    ports:
+      - "4000:4000"
+      - "4001:4001"  # LiveReload
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+
+  # AI Jail - Development Mode
+  ai-jail:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.ai-jail
+      target: development
+      args:
+        RUST_VERSION: 1.75
+    image: aws-ai-jail:dev
+    environment:
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
+      AI_JAIL_MODE: "true"
+      SOCKET_PATH: /run/ai-jail.sock
+      MODEL_PATH: /models
+    volumes:
+      # Mount source code for development
+      - ./components/ai-jail:/app:rw
+      - /app/target
+      - ai-models:/models:ro
+      - ai-jail-socket:/run
+      # Cargo cache
+      - cargo-cache:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+    # Relax security for debugging
+    security_opt:
+      - no-new-privileges:true
+    read_only: false  # Allow writes in dev mode
+    tmpfs:
+      - /tmp:size=2G,mode=1777
+    command: cargo watch -x run
+
+  # PostgreSQL - Development Mode
+  postgres:
+    environment:
+      POSTGRES_DB: academic_workflow_dev
+      POSTGRES_USER: aws_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./docker/configs/postgres/init-dev.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./tests/fixtures/postgres:/docker-entrypoint-initdb.d/fixtures:ro
+
+  # Redis - Development Mode
+  redis:
+    command: >
+      redis-server
+      --appendonly no
+      --save ""
+      --loglevel debug
+    ports:
+      - "6379:6379"
+
+  # Nginx - Development Mode
+  nginx:
+    volumes:
+      - ./docker/configs/nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/configs/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./components/office-addin/dist:/usr/share/nginx/html/addin:ro
+    ports:
+      - "80:80"
+      - "443:443"
+
+  # Adminer - Always available in dev
+  adminer:
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: pepa-linha
+    ports:
+      - "8081:8080"
+
+  # Prometheus - Development Mode
+  prometheus:
+    volumes:
+      - ./docker/configs/prometheus/prometheus.dev.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/configs/prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus-dev-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'  # Shorter retention in dev
+      - '--web.enable-lifecycle'
+      - '--log.level=debug'
+
+  # Grafana - Development Mode
+  grafana:
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "true"  # Allow sign-ups in dev
+      GF_SERVER_ROOT_URL: http://localhost:3000
+      GF_LOG_LEVEL: debug
+    volumes:
+      - grafana-dev-data:/var/lib/grafana
+      - ./docker/configs/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/configs/grafana/dashboards:/var/lib/grafana/dashboards:rw
+    ports:
+      - "3000:3000"
+
+  # Development Tools Container
+  dev-tools:
+    image: aws-dev-tools:latest
+    build:
+      context: ./docker/dev-tools
+      dockerfile: Dockerfile
+    container_name: aws-dev-tools
+    networks:
+      - aws-network
+    volumes:
+      - .:/workspace:rw
+      - cargo-cache:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+    command: tail -f /dev/null
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+
+  # MailHog (Email testing in development)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: aws-mailhog
+    networks:
+      - aws-network
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+# Development-specific volumes
+volumes:
+  postgres-dev-data:
+    driver: local
+  prometheus-dev-data:
+    driver: local
+  grafana-dev-data:
+    driver: local
+  cargo-cache:
+    driver: local
+  cargo-git:
+    driver: local

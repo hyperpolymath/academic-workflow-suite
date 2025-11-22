@@ -1,0 +1,58 @@
+[package]
+name = "aws-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Academic Workflow Suite Team"]
+description = "Command-line interface for the Academic Workflow Suite"
+license = "GPL-3.0"
+repository = "https://github.com/yourusername/academic-workflow-suite"
+
+[[bin]]
+name = "aws"
+path = "src/main.rs"
+
+[dependencies]
+# CLI argument parsing
+clap = { version = "4.4", features = ["derive", "cargo", "env"] }
+
+# Terminal output
+colored = "2.1"
+console = "0.15"
+indicatif = "0.17"
+dialoguer = "0.11"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "blocking", "cookies"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# File system
+dirs = "5.0"
+walkdir = "2.4"
+
+# Date and time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Other utilities
+lazy_static = "1.4"
+regex = "1.10"
+
+[dev-dependencies]
+mockito = "1.2"
+tempfile = "3.8"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "z"
+strip = true

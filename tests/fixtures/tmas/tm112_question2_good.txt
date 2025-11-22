@@ -1,0 +1,15 @@
+Question 2: Discuss the role of operating systems in managing computer resources. Explain at least three key functions and how they contribute to efficient system operation. (400 words)
+
+Answer:
+
+Operating systems are essential software that manage computer hardware and provide services to applications. They act as an intermediary between users and the computer hardware. I will discuss three important functions: process management, memory management, and file management.
+
+Process management is how the operating system handles running programs. When you open multiple applications on your computer, like a web browser, word processor, and music player, the OS manages all of these processes. It uses a scheduler to decide which process gets to use the CPU and for how long. The scheduler switches between processes very quickly, which makes it seem like everything is running at the same time, even on a single-core processor. This is called multitasking. The OS also handles what happens when processes need to communicate with each other or share data. Without good process management, your computer would be very slow and unresponsive.
+
+Memory management is another critical function. The operating system keeps track of which parts of memory are being used and by which processes. When a program needs memory, the OS allocates it, and when the program finishes, the OS reclaims that memory for other uses. One clever technique is virtual memory, where the OS uses hard disk space as if it were RAM. This allows computers to run programs that are bigger than the actual physical RAM installed. The OS swaps data between RAM and the hard disk as needed. However, if too much swapping occurs, the computer slows down significantly because disks are much slower than RAM.
+
+File management involves organizing and storing data on storage devices like hard drives or SSDs. The operating system provides a file system that lets users organize files into folders and directories. It handles reading and writing files, keeping track of where each file is stored on the physical disk, and maintaining information about files like their size, creation date, and permissions. The OS also ensures that only authorized users can access certain files, which is important for security. When you save a document, the operating system takes care of all the complex details of actually writing that data to the disk in the correct location.
+
+These three functions work together to make computers usable and efficient. Process management ensures smooth multitasking, memory management maximizes the use of available RAM, and file management provides organized, secure data storage. Without an operating system performing these functions, computers would be extremely difficult to use and unable to run multiple programs effectively.
+
+[Word count: 422]

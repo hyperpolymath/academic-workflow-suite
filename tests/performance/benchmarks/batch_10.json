@@ -1,0 +1,102 @@
+{
+  "batch_id": "BENCH-BATCH-10",
+  "description": "10 TMA submissions for performance benchmarking",
+  "total_submissions": 10,
+  "submissions": [
+    {
+      "submission_id": "BENCH-001",
+      "student_id": "S100001",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 487,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-002",
+      "student_id": "S100002",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 423,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-003",
+      "student_id": "S100003",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 298,
+      "quality": "poor"
+    },
+    {
+      "submission_id": "BENCH-004",
+      "student_id": "S100004",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 2,
+      "word_count": 512,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-005",
+      "student_id": "S100005",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 445,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-006",
+      "student_id": "S100006",
+      "module": "M250",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 389,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-007",
+      "student_id": "S100007",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 3,
+      "word_count": 356,
+      "quality": "satisfactory"
+    },
+    {
+      "submission_id": "BENCH-008",
+      "student_id": "S100008",
+      "module": "TM112",
+      "assignment": "TMA02",
+      "question": 1,
+      "word_count": 491,
+      "quality": "excellent"
+    },
+    {
+      "submission_id": "BENCH-009",
+      "student_id": "S100009",
+      "module": "M250",
+      "assignment": "TMA03",
+      "question": 2,
+      "word_count": 412,
+      "quality": "good"
+    },
+    {
+      "submission_id": "BENCH-010",
+      "student_id": "S100010",
+      "module": "TM112",
+      "assignment": "TMA01",
+      "question": 1,
+      "word_count": 267,
+      "quality": "poor"
+    }
+  ],
+  "expected_performance": {
+    "max_processing_time_ms": 60000,
+    "max_per_submission_ms": 6000,
+    "expected_throughput_per_min": 10
+  }
+}

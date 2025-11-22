@@ -1,0 +1,191 @@
+name: Mark Assignments
+
+on:
+  # Trigger on push to submissions branch
+  push:
+    branches:
+      - 'submissions/**'
+
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      rubric:
+        description: 'Rubric to use'
+        required: false
+        default: 'default'
+
+  # Scheduled run (daily at 2 AM)
+  schedule:
+    - cron: '0 2 * * *'
+
+env:
+  AWAP_API_URL: ${{ secrets.AWAP_API_URL }}
+  AWAP_API_KEY: ${{ secrets.AWAP_API_KEY }}
+
+jobs:
+  mark-submissions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pyyaml
+
+      - name: Find new submissions
+        id: find-submissions
+        run: |
+          # Find PDF files in submissions directory
+          submissions=$(find submissions/ -name "*.pdf" -type f)
+          echo "submissions<<EOF" >> $GITHUB_OUTPUT
+          echo "$submissions" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Mark submissions
+        run: |
+          python << 'EOF'
+          import os
+          import sys
+          import requests
+          import json
+          from pathlib import Path
+
+          api_url = os.environ['AWAP_API_URL']
+          submissions = """${{ steps.find-submissions.outputs.submissions }}""".strip().split('\n')
+
+          results = []
+
+          for submission_path in submissions:
+              if not submission_path:
+                  continue
+
+              student_id = Path(submission_path).stem
+
+              print(f"Processing {student_id}...")
+
+              # Upload submission
+              with open(submission_path, 'rb') as f:
+                  response = requests.post(
+                      f'{api_url}/api/v1/tma/upload',
+                      files={'file': f},
+                      data={'student_id': student_id, 'rubric': 'default'}
+                  )
+
+              if response.status_code == 200:
+                  tma_id = response.json()['tma_id']
+
+                  # Submit for marking
+                  mark_response = requests.post(
+                      f'{api_url}/api/v1/tma/{tma_id}/mark',
+                      json={'rubric': 'default', 'auto_feedback': True}
+                  )
+
+                  job_id = mark_response.json()['job_id']
+                  results.append({
+                      'student_id': student_id,
+                      'tma_id': tma_id,
+                      'job_id': job_id
+                  })
+
+                  print(f"  ✓ Submitted: {tma_id}")
+              else:
+                  print(f"  ✗ Failed: {response.status_code}")
+
+          # Save results
+          with open('marking_jobs.json', 'w') as f:
+              json.dump(results, f, indent=2)
+          EOF
+
+      - name: Wait for marking completion
+        run: |
+          python << 'EOF'
+          import os
+          import sys
+          import requests
+          import json
+          import time
+
+          api_url = os.environ['AWAP_API_URL']
+
+          with open('marking_jobs.json') as f:
+              jobs = json.load(f)
+
+          results = []
+
+          for job in jobs:
+              print(f"Waiting for {job['student_id']}...")
+
+              # Poll for completion
+              for _ in range(60):  # 5 minutes max
+                  status_response = requests.get(
+                      f"{api_url}/api/v1/jobs/{job['job_id']}"
+                  )
+
+                  status = status_response.json()['status']
+
+                  if status == 'completed':
+                      # Get results
+                      results_response = requests.get(
+                          f"{api_url}/api/v1/tma/{job['tma_id']}/results"
+                      )
+
+                      result = results_response.json()
+                      results.append(result)
+
+                      print(f"  ✓ Score: {result['score']}, Grade: {result['grade']}")
+                      break
+
+                  elif status == 'failed':
+                      print(f"  ✗ Marking failed")
+                      break
+
+                  time.sleep(5)
+
+          # Save final results
+          with open('results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+          EOF
+
+      - name: Generate report
+        run: |
+          python << 'EOF'
+          import json
+
+          with open('results.json') as f:
+              results = json.load(f)
+
+          # Generate Markdown report
+          report = "# Marking Results\n\n"
+          report += "| Student ID | Score | Grade |\n"
+          report += "|------------|-------|-------|\n"
+
+          for result in results:
+              report += f"| {result['student_id']} | {result['score']} | {result['grade']} |\n"
+
+          with open('REPORT.md', 'w') as f:
+              f.write(report)
+
+          print(report)
+          EOF
+
+      - name: Commit results
+        run: |
+          git config user.name "AWAP Bot"
+          git config user.email "bot@awap.example"
+          git add results.json REPORT.md
+          git commit -m "Add marking results for $(date +%Y-%m-%d)" || true
+          git push || true
+
+      - name: Create summary
+        run: |
+          echo "## Marking Summary" >> $GITHUB_STEP_SUMMARY
+          cat REPORT.md >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,283 @@
+scenario: "Error Recovery and Resilience"
+description: "Tests system behavior when errors occur and recovery mechanisms"
+version: "1.0"
+test_type: "integration"
+priority: "high"
+
+setup:
+  database:
+    - load_fixture: "students.json"
+    - load_fixture: "modules.yaml"
+  files:
+    - upload: "tm112_question1_good.txt"
+      as_user: "S002156"
+
+test_cases:
+  - name: "AI Service Timeout Recovery"
+    description: "Verify system handles AI service timeouts gracefully"
+    steps:
+      - name: "Submit TMA"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "tm112_question1_good.txt"
+
+      - name: "Simulate AI Timeout"
+        action: "grade_with_ai"
+        parameters:
+          submission_id: "!from_previous.submission_id"
+          simulate_timeout: true
+          timeout_after: 5
+        expected_result:
+          status: "error"
+          error_code: "AI_TIMEOUT"
+
+      - name: "Verify Retry Mechanism"
+        action: "check_retry_status"
+        parameters:
+          submission_id: "!from_step[0].submission_id"
+        expected_result:
+          retry_scheduled: true
+          retry_count: 1
+          max_retries: 3
+
+      - name: "Successful Retry"
+        action: "retry_grading"
+        parameters:
+          submission_id: "!from_step[0].submission_id"
+          simulate_timeout: false
+        expected_result:
+          status: "completed"
+          grade: "!exists"
+
+  - name: "Invalid File Format Handling"
+    description: "Verify rejection of invalid file formats"
+    steps:
+      - name: "Attempt Invalid Upload"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "malicious.exe"
+        expected_result:
+          status: "error"
+          error_code: "INVALID_FILE_FORMAT"
+        assertions:
+          - field: "error_message"
+            operator: "contains"
+            value: "file format not allowed"
+
+      - name: "Verify No Database Entry"
+        action: "check_submission_exists"
+        parameters:
+          student_id: "S002156"
+          file_hash: "!from_previous.file_hash"
+        expected_result:
+          exists: false
+
+  - name: "Word Count Violation Handling"
+    description: "Test behavior with submissions exceeding word limits"
+    steps:
+      - name: "Submit Over-Limit TMA"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          content: "!generate_text[1000]"  # 1000 words for 500-word limit
+        expected_result:
+          status: "warning"
+          warning_code: "WORD_LIMIT_EXCEEDED"
+        assertions:
+          - field: "submission_accepted"
+            operator: "equals"
+            value: true
+          - field: "penalty_applied"
+            operator: "equals"
+            value: true
+          - field: "penalty_amount"
+            operator: "greater_than"
+            value: 0
+
+  - name: "Database Connection Loss Recovery"
+    description: "Test resilience during database outages"
+    steps:
+      - name: "Start Submission Process"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "tm112_question1_good.txt"
+
+      - name: "Simulate DB Disconnect During Processing"
+        action: "simulate_db_failure"
+        parameters:
+          at_step: "grading"
+          duration: 5
+        expected_result:
+          status: "error"
+          error_code: "DB_CONNECTION_LOST"
+
+      - name: "Verify Data Consistency"
+        action: "check_data_integrity"
+        parameters:
+          submission_id: "!from_step[0].submission_id"
+        expected_result:
+          data_consistent: true
+          no_partial_writes: true
+
+      - name: "Resume After Recovery"
+        action: "resume_processing"
+        parameters:
+          submission_id: "!from_step[0].submission_id"
+        expected_result:
+          status: "completed"
+          resumed_successfully: true
+
+  - name: "Concurrent Submission Conflict"
+    description: "Handle duplicate submissions for same question"
+    steps:
+      - name: "Submit TMA First Time"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "tm112_question1_good.txt"
+        expected_result:
+          status: "success"
+
+      - name: "Attempt Duplicate Submission"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "tm112_question1_excellent.txt"
+        expected_result:
+          status: "error"
+          error_code: "DUPLICATE_SUBMISSION"
+        assertions:
+          - field: "error_message"
+            operator: "contains"
+            value: "already submitted"
+
+  - name: "AI Model Failure Fallback"
+    description: "Test fallback when primary AI model fails"
+    steps:
+      - name: "Submit TMA"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          file: "tm112_question1_good.txt"
+
+      - name: "Simulate Primary Model Failure"
+        action: "grade_with_ai"
+        parameters:
+          submission_id: "!from_previous.submission_id"
+          force_primary_failure: true
+        expected_result:
+          fallback_used: true
+          model_used: "fallback-model"
+
+      - name: "Verify Fallback Results"
+        action: "get_grading_results"
+        parameters:
+          submission_id: "!from_step[0].submission_id"
+        expected_result:
+          status: "success"
+          grade: "!exists"
+          human_review_flagged: true
+        assertions:
+          - field: "confidence_score"
+            operator: "less_than"
+            value: 0.9
+
+  - name: "Network Isolation Breach Attempt"
+    description: "Verify AI container cannot access external network"
+    steps:
+      - name: "Submit TMA with Network Test Payload"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          content: "Test submission. Visit http://example.com for more info."
+
+      - name: "Grade with Network Monitoring"
+        action: "grade_with_ai"
+        parameters:
+          submission_id: "!from_previous.submission_id"
+          monitor_network: true
+        expected_result:
+          network_calls_detected: 0
+          isolation_maintained: true
+
+  - name: "PII Detection and Protection"
+    description: "Ensure PII is detected and handled appropriately"
+    steps:
+      - name: "Submit TMA with PII"
+        action: "submit_tma"
+        parameters:
+          student_id: "S002156"
+          module: "TM112"
+          assignment: "TMA01"
+          question: 1
+          content: "My email is student@example.com and phone is 555-1234"
+        expected_result:
+          status: "warning"
+          warning_code: "PII_DETECTED"
+
+      - name: "Verify PII Redaction in Processing"
+        action: "check_processed_content"
+        parameters:
+          submission_id: "!from_previous.submission_id"
+        expected_result:
+          pii_redacted: true
+          original_preserved: true
+        assertions:
+          - field: "processed_content"
+            operator: "not_contains"
+            value: "student@example.com"
+
+validation:
+  error_handling:
+    - all_errors_logged: true
+    - no_unhandled_exceptions: true
+    - proper_error_codes_returned: true
+
+  data_integrity:
+    - no_data_corruption: true
+    - transactions_atomic: true
+    - rollback_on_failure: true
+
+  security:
+    - network_isolation_maintained: true
+    - pii_protected: true
+    - no_information_leakage: true
+
+success_criteria:
+  - all_test_cases_pass: true
+  - recovery_mechanisms_work: true
+  - no_data_loss: true
+  - security_maintained: true
+
+tags:
+  - "error-handling"
+  - "resilience"
+  - "security"
+  - "data-integrity"

@@ -1,0 +1,15 @@
+Question: Explain the difference between procedural and object-oriented programming.
+
+Answer:
+
+Procedural programming organizes code into procedures or functions that operate on data. Programs are structured as a sequence of instructions that modify program state. C is a classic procedural language where functions manipulate data structures.
+
+Object-oriented programming (OOP) organizes code into objects that encapsulate both data and the methods that operate on that data. Key OOP principles include encapsulation, inheritance, and polymorphism. Java and Python are object-oriented languages.
+
+The main advantage of procedural programming is simplicity and directness. Code flows in a straightforward manner, making it easier to understand for small programs.
+
+OOP's advantage is modularity and reusability. Objects can be reused across programs, and inheritance allows code sharing between related classes. This makes OOP better suited for large, complex applications.
+
+In practice, many modern languages support both paradigms, allowing developers to choose the most appropriate approach for their specific problem.
+
+[Word count: 100]

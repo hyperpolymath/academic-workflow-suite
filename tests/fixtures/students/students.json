@@ -1,0 +1,131 @@
+{
+  "students": [
+    {
+      "student_id": "S001234",
+      "anonymous_id": "ANON-8f4e9a2b",
+      "enrolled_modules": ["TM112", "M250"],
+      "enrollment_date": "2024-02-01",
+      "status": "active",
+      "performance_level": "high",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S002156",
+      "anonymous_id": "ANON-3c7d1f9e",
+      "enrolled_modules": ["TM112"],
+      "enrollment_date": "2024-02-01",
+      "status": "active",
+      "performance_level": "medium",
+      "accommodation_requirements": ["extra_time_25"]
+    },
+    {
+      "student_id": "S003421",
+      "anonymous_id": "ANON-1a8b5c2d",
+      "enrolled_modules": ["TM112", "M269"],
+      "enrollment_date": "2024-02-15",
+      "status": "active",
+      "performance_level": "low",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S004789",
+      "anonymous_id": "ANON-9e2f6b4a",
+      "enrolled_modules": ["M250"],
+      "enrollment_date": "2024-02-01",
+      "status": "active",
+      "performance_level": "high",
+      "accommodation_requirements": ["screen_reader"]
+    },
+    {
+      "student_id": "S005234",
+      "anonymous_id": "ANON-7d3c8e1f",
+      "enrolled_modules": ["TM112", "M250", "M269"],
+      "enrollment_date": "2024-01-15",
+      "status": "active",
+      "performance_level": "medium",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S006891",
+      "anonymous_id": "ANON-4f9a2b7c",
+      "enrolled_modules": ["TM112"],
+      "enrollment_date": "2024-02-20",
+      "status": "active",
+      "performance_level": "low",
+      "accommodation_requirements": ["dyslexia_support"]
+    },
+    {
+      "student_id": "S007452",
+      "anonymous_id": "ANON-2e5d3a9b",
+      "enrolled_modules": ["M250"],
+      "enrollment_date": "2024-02-01",
+      "status": "active",
+      "performance_level": "high",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S008123",
+      "anonymous_id": "ANON-6c1f4b8e",
+      "enrolled_modules": ["TM112", "M250"],
+      "enrollment_date": "2024-02-10",
+      "status": "suspended",
+      "performance_level": "medium",
+      "accommodation_requirements": [],
+      "suspension_reason": "medical_leave",
+      "suspension_date": "2024-05-15"
+    },
+    {
+      "student_id": "S009567",
+      "anonymous_id": "ANON-8a7b3d2f",
+      "enrolled_modules": ["M269"],
+      "enrollment_date": "2024-02-01",
+      "status": "active",
+      "performance_level": "medium",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S010234",
+      "anonymous_id": "ANON-5e9c1f6a",
+      "enrolled_modules": ["TM112"],
+      "enrollment_date": "2024-03-01",
+      "status": "active",
+      "performance_level": "high",
+      "accommodation_requirements": []
+    },
+    {
+      "student_id": "S011876",
+      "anonymous_id": "ANON-3b4d7c9e",
+      "enrolled_modules": ["M250"],
+      "enrollment_date": "2024-02-01",
+      "status": "withdrawn",
+      "performance_level": "low",
+      "accommodation_requirements": [],
+      "withdrawal_date": "2024-04-10",
+      "withdrawal_reason": "personal_circumstances"
+    },
+    {
+      "student_id": "S012345",
+      "anonymous_id": "ANON-9f2e6a8b",
+      "enrolled_modules": ["TM112", "M250", "M269"],
+      "enrollment_date": "2024-01-20",
+      "status": "active",
+      "performance_level": "high",
+      "accommodation_requirements": ["extra_time_50", "separate_room"]
+    }
+  ],
+  "metadata": {
+    "total_students": 12,
+    "active_students": 10,
+    "suspended_students": 1,
+    "withdrawn_students": 1,
+    "data_generation_date": "2024-11-22",
+    "privacy_notice": "All student data is fictional and anonymized for testing purposes. No real student information is used.",
+    "accommodation_types": {
+      "extra_time_25": "25% additional time for assessments",
+      "extra_time_50": "50% additional time for assessments",
+      "screen_reader": "Screen reader software required",
+      "dyslexia_support": "Dyslexia-friendly formatting and support",
+      "separate_room": "Assessment in separate room"
+    }
+  }
+}

@@ -1,0 +1,280 @@
+# Health Check Endpoints Configuration
+# Define all health check endpoints for the Academic Workflow Suite
+
+endpoints:
+  # Backend API
+  - name: Backend API
+    url: ${BACKEND_URL}/health
+    method: GET
+    timeout: 5000  # milliseconds
+    interval: 30   # seconds
+    expected_status: 200
+    expected_response:
+      contains: "healthy"
+    critical: true
+    tags:
+      - backend
+      - api
+      - critical
+
+  # Backend API - Detailed Health
+  - name: Backend API (Detailed)
+    url: ${BACKEND_URL}/health/detailed
+    method: GET
+    timeout: 10000
+    interval: 60
+    expected_status: 200
+    critical: false
+    tags:
+      - backend
+      - api
+
+  # Backend API - Database Check
+  - name: Backend Database Connection
+    url: ${BACKEND_URL}/health/db
+    method: GET
+    timeout: 5000
+    interval: 30
+    expected_status: 200
+    critical: true
+    tags:
+      - backend
+      - database
+      - critical
+
+  # AI Jail Service
+  - name: AI Jail
+    url: ${AI_JAIL_URL}/health
+    method: GET
+    timeout: 5000
+    interval: 30
+    expected_status: 200
+    critical: true
+    tags:
+      - ai-jail
+      - critical
+
+  # AI Jail - Model Status
+  - name: AI Jail Model Status
+    url: ${AI_JAIL_URL}/health/model
+    method: GET
+    timeout: 10000
+    interval: 60
+    expected_status: 200
+    expected_response:
+      json:
+        model_loaded: true
+    critical: true
+    tags:
+      - ai-jail
+      - model
+
+  # AI Jail - GPU Status
+  - name: AI Jail GPU Status
+    url: ${AI_JAIL_URL}/health/gpu
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    critical: false
+    tags:
+      - ai-jail
+      - gpu
+
+  # PostgreSQL Database
+  - name: PostgreSQL
+    type: postgres
+    host: ${POSTGRES_HOST}
+    port: ${POSTGRES_PORT}
+    database: ${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    timeout: 5000
+    interval: 30
+    query: "SELECT 1"
+    critical: true
+    tags:
+      - database
+      - postgres
+      - critical
+
+  # PostgreSQL - Connection Pool
+  - name: PostgreSQL Connection Pool
+    type: postgres
+    host: ${POSTGRES_HOST}
+    port: ${POSTGRES_PORT}
+    database: ${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    timeout: 5000
+    interval: 60
+    query: "SELECT count(*) FROM pg_stat_activity"
+    critical: false
+    tags:
+      - database
+      - postgres
+
+  # Prometheus
+  - name: Prometheus
+    url: ${PROMETHEUS_URL}/-/healthy
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    critical: true
+    tags:
+      - monitoring
+      - prometheus
+      - critical
+
+  # Prometheus - Query API
+  - name: Prometheus Query API
+    url: ${PROMETHEUS_URL}/api/v1/query?query=up
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    expected_response:
+      json:
+        status: success
+    critical: false
+    tags:
+      - monitoring
+      - prometheus
+
+  # Grafana
+  - name: Grafana
+    url: ${GRAFANA_URL}/api/health
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    expected_response:
+      json:
+        database: ok
+    critical: false
+    tags:
+      - monitoring
+      - grafana
+
+  # Loki
+  - name: Loki
+    url: ${LOKI_URL}/ready
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    critical: false
+    tags:
+      - monitoring
+      - logging
+      - loki
+
+  # Alertmanager
+  - name: Alertmanager
+    url: ${ALERTMANAGER_URL}/-/healthy
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    critical: true
+    tags:
+      - monitoring
+      - alertmanager
+      - critical
+
+  # Custom Metrics Exporter
+  - name: AWS Metrics Exporter
+    url: http://localhost:9090/health
+    method: GET
+    timeout: 5000
+    interval: 60
+    expected_status: 200
+    critical: false
+    tags:
+      - monitoring
+      - exporter
+
+  # Redis (if used for caching)
+  - name: Redis
+    type: redis
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    timeout: 3000
+    interval: 30
+    critical: false
+    tags:
+      - cache
+      - redis
+
+  # File System Checks
+  - name: Data Volume
+    type: filesystem
+    path: /data
+    check: writable
+    interval: 300
+    critical: true
+    tags:
+      - filesystem
+      - storage
+
+  - name: Logs Volume
+    type: filesystem
+    path: /var/log
+    check: writable
+    interval: 300
+    critical: false
+    tags:
+      - filesystem
+      - logs
+
+# Notification settings
+notifications:
+  # When to send notifications
+  on_failure: true
+  on_recovery: true
+  on_degraded: true
+
+  # Notification channels
+  channels:
+    - type: email
+      recipients:
+        - ops@academic-workflow-suite.com
+      critical_only: false
+
+    - type: slack
+      webhook: ${SLACK_WEBHOOK_URL}
+      channel: '#health-checks'
+      critical_only: false
+
+    - type: pagerduty
+      service_key: ${PAGERDUTY_SERVICE_KEY}
+      critical_only: true
+
+# Health check behavior
+settings:
+  # Number of consecutive failures before marking as down
+  failure_threshold: 3
+
+  # Number of consecutive successes before marking as up
+  success_threshold: 2
+
+  # Retry failed checks with exponential backoff
+  retry_on_failure: true
+  retry_max_attempts: 3
+  retry_backoff_multiplier: 2
+
+  # Global timeout for all checks (can be overridden per endpoint)
+  default_timeout: 5000  # milliseconds
+
+  # Default check interval (can be overridden per endpoint)
+  default_interval: 60   # seconds
+
+  # Store health check history
+  store_history: true
+  history_retention_days: 30
+
+  # Enable detailed logging
+  detailed_logging: true
+  log_file: /var/log/healthchecks/healthcheck.log

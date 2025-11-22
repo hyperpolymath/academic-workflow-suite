@@ -1,0 +1,9 @@
+{
+  "tma_content": "Question 1: Discuss the impact of climate change on global biodiversity. Your answer should reference at least three different ecosystems and explain the mechanisms by which climate change affects species in each.",
+  "rubric": "Award up to 10 marks:\n- 3 marks for discussing impact on marine ecosystems\n- 3 marks for discussing impact on terrestrial ecosystems\n- 3 marks for discussing impact on freshwater ecosystems\n- 1 mark for explaining mechanisms (temperature, precipitation, etc.)\n\nDeduct marks for:\n- Lack of specific examples\n- Overgeneralization\n- Factual errors",
+  "question_number": 1,
+  "student_answer": "Climate change is having significant impacts on biodiversity across the planet. In marine ecosystems, rising ocean temperatures are causing coral bleaching events, which destroy the habitats of thousands of species. The Great Barrier Reef has experienced multiple bleaching events in recent years.\n\nIn terrestrial ecosystems, changing precipitation patterns are affecting forest composition. Some tree species are migrating to higher altitudes or latitudes as their traditional ranges become unsuitable. This affects the entire food web that depends on these trees.\n\nFreshwater ecosystems are also vulnerable. Warmer temperatures can lead to oxygen depletion in lakes and rivers, causing fish kills. Additionally, changing rainfall patterns affect river flow rates and wetland water levels.\n\nThe primary mechanisms are temperature changes, altered precipitation patterns, and ocean acidification in marine environments.",
+  "max_tokens": 512,
+  "temperature": 0.7,
+  "top_p": 0.9
+}

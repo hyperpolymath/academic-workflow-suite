@@ -1,0 +1,202 @@
+# Release Notes - v{{VERSION}}
+
+**Release Date:** {{DATE}}
+
+## Overview
+
+[Brief description of this release - what's the main focus or theme]
+
+## Highlights
+
+- 🎉 [Major new feature or improvement]
+- ⚡ [Performance improvement]
+- 🔧 [Important bug fix]
+- 📚 [Documentation update]
+
+## What's New
+
+### New Features
+
+- **Feature Name**: Description of the feature and how to use it
+  ```bash
+  # Example command
+  aws new-feature --option value
+  ```
+
+- **Another Feature**: More details
+  - Sub-feature 1
+  - Sub-feature 2
+
+### Improvements
+
+- Enhanced performance for [specific operation] by X%
+- Improved error messages for better debugging
+- Better handling of edge cases in [component]
+
+### Bug Fixes
+
+- Fixed issue where [problem description] (#issue-number)
+- Resolved crash when [specific scenario]
+- Corrected behavior of [feature] under [conditions]
+
+## Breaking Changes
+
+> ⚠️ **Important:** This section lists changes that may require action from users
+
+- **[Change 1]**: Description of breaking change
+  - **Migration**: How to update your code/config
+  - **Example**:
+    ```bash
+    # Old way
+    aws old-command
+
+    # New way
+    aws new-command
+    ```
+
+- **[Change 2]**: Another breaking change
+  - **Alternative**: What to use instead
+
+## Deprecations
+
+The following features are deprecated and will be removed in v{{NEXT_MAJOR}}.0:
+
+- `old-feature`: Use `new-feature` instead
+- `deprecated-flag`: Use `new-flag` instead
+
+## Installation
+
+### Quick Install
+
+**Linux/macOS:**
+```bash
+curl -fsSL https://get.academicworkflow.org | sh
+```
+
+**Homebrew:**
+```bash
+brew install academic-workflow-suite
+```
+
+**Windows (Chocolatey):**
+```powershell
+choco install academic-workflow-suite
+```
+
+### Package Downloads
+
+| Platform | Package | Download |
+|----------|---------|----------|
+| Linux (Debian/Ubuntu) | .deb | [Download](https://github.com/academicworkflow/suite/releases/download/v{{VERSION}}/academic-workflow-suite_{{VERSION}}_amd64.deb) |
+| Linux (Fedora/RHEL) | .rpm | [Download](https://github.com/academicworkflow/suite/releases/download/v{{VERSION}}/academic-workflow-suite-{{VERSION}}-1.x86_64.rpm) |
+| macOS | .pkg | [Download](https://github.com/academicworkflow/suite/releases/download/v{{VERSION}}/academic-workflow-suite-{{VERSION}}.pkg) |
+| Windows | .msi | [Download](https://github.com/academicworkflow/suite/releases/download/v{{VERSION}}/academic-workflow-suite-{{VERSION}}.msi) |
+| Source | .tar.gz | [Download](https://github.com/academicworkflow/suite/archive/v{{VERSION}}.tar.gz) |
+
+### Docker
+
+```bash
+docker pull academicworkflow/suite:{{VERSION}}
+docker run academicworkflow/suite:{{VERSION}} --version
+```
+
+## Upgrading
+
+### From v{{PREVIOUS_VERSION}}
+
+```bash
+# Backup your configuration
+cp ~/.config/aws/config.toml ~/.config/aws/config.toml.backup
+
+# Upgrade using your package manager
+# Or download and install new version
+```
+
+### Migration Notes
+
+- Configuration files from v{{PREVIOUS_VERSION}} are compatible
+- No database migrations required
+- [Any specific migration steps]
+
+## Documentation
+
+- 📖 [User Guide](https://docs.academicworkflow.org/guide/)
+- 🚀 [Getting Started](https://docs.academicworkflow.org/getting-started/)
+- 📚 [API Reference](https://docs.academicworkflow.org/api/)
+- 💡 [Examples](https://docs.academicworkflow.org/examples/)
+
+## Known Issues
+
+- [Issue 1]: Description and workaround
+- [Issue 2]: Description and tracking link
+
+## Performance
+
+Performance improvements in this release:
+
+| Operation | v{{PREVIOUS_VERSION}} | v{{VERSION}} | Improvement |
+|-----------|----------------------|--------------|-------------|
+| [Operation 1] | X ms | Y ms | Z% faster |
+| [Operation 2] | X ops/s | Y ops/s | Z% faster |
+
+## Security
+
+### Security Fixes
+
+- **CVE-YYYY-XXXXX**: [Description of vulnerability and fix]
+  - **Severity**: [High/Medium/Low]
+  - **Impact**: [What was affected]
+  - **Action Required**: [What users need to do]
+
+### Security Improvements
+
+- Enhanced encryption for [component]
+- Improved input validation
+- Updated dependencies with security fixes
+
+## Contributors
+
+Thank you to all contributors who made this release possible:
+
+- @contributor1 - [Contribution]
+- @contributor2 - [Contribution]
+- @contributor3 - [Contribution]
+
+[Full list of contributors](https://github.com/academicworkflow/suite/graphs/contributors)
+
+## Statistics
+
+- 📝 Commits: XX
+- 🔀 Pull Requests: XX merged
+- 🐛 Issues Closed: XX
+- 👥 Contributors: XX
+
+## Feedback
+
+We welcome your feedback:
+
+- 🐛 [Report a bug](https://github.com/academicworkflow/suite/issues/new?template=bug_report.md)
+- 💡 [Request a feature](https://github.com/academicworkflow/suite/issues/new?template=feature_request.md)
+- 💬 [Join our Discord](https://discord.gg/academicworkflow)
+- 📧 Email: feedback@academicworkflow.org
+
+## What's Next
+
+Looking ahead to v{{NEXT_VERSION}}:
+
+- [Planned feature 1]
+- [Planned feature 2]
+- [Planned improvement]
+
+See our [roadmap](https://github.com/academicworkflow/suite/projects) for more details.
+
+## Support
+
+- 📖 [Documentation](https://docs.academicworkflow.org)
+- 💬 [Community Forum](https://community.academicworkflow.org)
+- 🐛 [Issue Tracker](https://github.com/academicworkflow/suite/issues)
+- 📧 Support Email: support@academicworkflow.org
+
+---
+
+**Full Changelog**: https://github.com/academicworkflow/suite/compare/v{{PREVIOUS_VERSION}}...v{{VERSION}}
