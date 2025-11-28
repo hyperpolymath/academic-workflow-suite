@@ -39,7 +39,7 @@
     "office-addin-dev-server": "^1.13.2",
     "office-addin-manifest": "^1.13.2",
     "rescript-jest": "^0.10.0",
-    "style-loader": "^3.3.3",
+    "style-loader": "^4.0.0",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
