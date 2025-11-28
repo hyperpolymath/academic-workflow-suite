@@ -21,7 +21,7 @@
   "author": "Academic Workflow Suite",
   "license": "MIT",
   "dependencies": {
-    "@rescript/core": "^1.2.0",
+    "@rescript/core": "^1.6.1",
     "rescript": "^11.0.1"
   },
   "devDependencies": {
