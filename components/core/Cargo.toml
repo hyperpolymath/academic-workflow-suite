@@ -16,7 +16,7 @@ heed = "0.20"  # Modern LMDB wrapper
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 regex = "1.10"
 hex = "0.4"
 chrono = { version = "0.4", features = ["serde"] }
