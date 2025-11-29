@@ -14,7 +14,7 @@ path = "src/main.rs"
 # Candle ML framework
 candle-core = { version = "0.9", features = ["cuda"] }
 candle-nn = "0.9"
-candle-transformers = "0.6"
+candle-transformers = "0.9"
 
 # Tokenization
 tokenizers = { version = "0.19", default-features = false, features = ["onig"] }
