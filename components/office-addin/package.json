@@ -34,7 +34,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^6.8.1",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.4",
+    "html-webpack-plugin": "^5.6.5",
     "office-addin-dev-certs": "^1.13.2",
     "office-addin-dev-server": "^1.13.2",
     "office-addin-manifest": "^1.13.2",
