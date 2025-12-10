@@ -1,0 +1,7 @@
+;; Academic-Workflow-Suite - Guix Channel
+;; Add to ~/.config/guix/channels.scm
+
+(channel
+ (version 0)
+ (url "https://github.com/hyperpolymath/Academic-Workflow-Suite")
+ (branch "main"))

@@ -1,0 +1,36 @@
+= Academic-Workflow-Suite - Citation Guide
+:toc:
+
+== BibTeX
+
+[source,bibtex]
+----
+@software{academic-workflow-suite_2025,
+  author = {Polymath, Hyper},
+  title = {Academic-Workflow-Suite},
+  year = {2025},
+  url = {https://github.com/hyperpolymath/Academic-Workflow-Suite},
+  license = {AGPL-3.0-or-later}
+}
+----
+
+== Harvard Style
+
+Polymath, H. (2025) _Academic-Workflow-Suite_ [Computer software]. Available at: https://github.com/hyperpolymath/Academic-Workflow-Suite
+
+== OSCOLA
+
+Hyper Polymath, 'Academic-Workflow-Suite' (2025) <https://github.com/hyperpolymath/Academic-Workflow-Suite>
+
+== MLA
+
+Polymath, Hyper. "Academic-Workflow-Suite." 2025, github.com/hyperpolymath/Academic-Workflow-Suite.
+
+== APA 7
+
+Polymath, H. (2025). _Academic-Workflow-Suite_ [Computer software]. GitHub. https://github.com/hyperpolymath/Academic-Workflow-Suite
+
+== See Also
+
+* link:../CITATION.cff[CITATION.cff]
+* link:../codemeta.json[codemeta.json]
