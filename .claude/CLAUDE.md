@@ -53,3 +53,7 @@ See TS_CONVERSION_NEEDED.md for migration status.
 - Use `docker` command (use `nerdctl` or `podman`)
 - Use Dockerfile (use Containerfile)
 - Use debian/ubuntu base images (use wolfi/alpine)
+
+## ⚠️ MIGRATION REQUIRED
+Ruby code must be migrated to Rust.
+See `.migration/RUBY_TO_RUST.md`
