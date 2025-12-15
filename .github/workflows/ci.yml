@@ -332,7 +332,7 @@ jobs:
         run: mix test --cover --trace
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: components/backend/cover/cobertura.xml
@@ -364,7 +364,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: components/office-addin/coverage/cobertura-coverage.xml
