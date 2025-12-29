@@ -164,7 +164,7 @@ jobs:
         run: cargo build --release --verbose
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.component }}-${{ runner.os }}
           path: |
@@ -214,7 +214,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: elixir-backend
           path: components/backend/_build/prod/
@@ -245,7 +245,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: office-addin
           path: |
@@ -290,7 +290,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results-${{ matrix.component }}-${{ runner.os }}
           path: components/${{ matrix.component }}/target/nextest/
@@ -409,7 +409,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: integration-test-results
           path: tests/integration/results/
@@ -539,7 +539,7 @@ jobs:
           ./scripts/ci/package.sh deb
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: debian-package
           path: packages/*.deb
@@ -566,7 +566,7 @@ jobs:
           # Add MSI creation logic here
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-installer
           path: packages/*.msi
@@ -592,7 +592,7 @@ jobs:
           # Add DMG creation logic here
 
       - name: Upload package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: macos-dmg
           path: packages/*.dmg
