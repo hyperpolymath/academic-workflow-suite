@@ -14,10 +14,23 @@ name = "academic_shared"
 path = "src/lib.rs"
 
 [dependencies]
-# Cryptography
+# Cryptography - Hyperpolymath Crypto Standard (see CRYPTO-STANDARD.scm)
+# Password hashing: Argon2id (replaces PBKDF2)
+argon2 = "0.5"
+# Hashing: BLAKE3 (primary), SHA3 (secondary)
+blake3 = "1.5"
 sha3 = "0.10"
 hmac = "0.12"
-pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+# Post-quantum signatures: Dilithium5 (ML-DSA-87)
+pqcrypto-dilithium = "0.5"
+pqcrypto-traits = "0.3"
+# Post-quantum key exchange: Kyber-1024 (ML-KEM-1024)
+pqcrypto-kyber = "0.8"
+# Classical signatures: Ed448 preferred, Ed25519 fallback
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+# Memory safety
+zeroize = { version = "1.8", features = ["derive"] }
+# Identifiers
 uuid = { version = "1.6", features = ["v4", "fast-rng"] }
 nanoid = "0.4"
 subtle = "2.5"
