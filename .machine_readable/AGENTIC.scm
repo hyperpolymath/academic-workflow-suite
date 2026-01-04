@@ -7,10 +7,55 @@
       ((model . "claude-opus-4-5-20251101")
        (tools . ("read" "edit" "bash" "grep" "glob"))
        (permissions . "read-all")))
+
     (patterns
-      ((code-review . "thorough")
-       (refactoring . "conservative")
-       (testing . "comprehensive")))
+      ((code-review
+         (style . "thorough")
+         (focus-areas
+           "Privacy vulnerabilities"
+           "Student data handling"
+           "Cryptographic implementation"
+           "Event sourcing correctness"
+           "IPC protocol safety"))
+       (refactoring
+         (style . "conservative")
+         (priorities
+           "Maintain privacy guarantees"
+           "Preserve audit trail"
+           "No behavioral changes without tests"))
+       (testing
+         (style . "comprehensive")
+         (requirements
+           "Property-based tests for crypto"
+           "Integration tests for IPC"
+           "E2E tests for document handling"))))
+
     (constraints
-      ((languages . ())
-       (banned . ("typescript" "go" "python" "makefile"))))))
+      ((languages
+         (allowed
+           "Rust" "ReScript" "Elixir" "Bash" "Nickel")
+         (banned
+           "TypeScript" "Go" "Python" "Makefile"))
+       (security
+         "Never log student IDs"
+         "Always anonymize before AI processing"
+         "Network isolation must be verified"
+         "Event store must be append-only")
+       (architecture
+         "Prefer local-first solutions"
+         "Avoid cloud dependencies"
+         "Keep AI in isolated container")))
+
+    (interaction-guidelines
+      ((document-handling
+         "Parse documents using Office.js APIs"
+         "Extract student ID from metadata"
+         "Anonymize before analysis request")
+       (feedback-generation
+         "Use rubric as primary context"
+         "Generate constructive suggestions"
+         "Allow tutor override always")
+       (audit-trail
+         "Log all analysis requests"
+         "Record all tutor edits"
+         "Never delete events")))))
