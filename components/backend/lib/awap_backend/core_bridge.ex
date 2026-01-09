@@ -255,9 +255,39 @@ defmodule AwapBackend.CoreBridge do
     {:error, {:invalid_response, response}}
   end
 
-  # NIF stubs (would be implemented with Rustler)
-  defp call_nif(_command, _data) do
-    # This would be replaced by actual Rustler NIF implementation
-    {:error, :nif_not_implemented}
+  # NIF implementation using Rustler
+  # When Rustler is configured in mix.exs and the Rust NIF is compiled,
+  # these functions are automatically replaced by their native implementations.
+  #
+  # To enable NIF mode:
+  # 1. Uncomment {:rustler, "~> 0.30"} in mix.exs
+  # 2. Create native/awap_core_nif/src/lib.rs with NIF functions
+  # 3. Add `use Rustler, otp_app: :awap_backend, crate: "awap_core_nif"` to this module
+  # 4. Set config :awap_backend, AwapBackend.CoreBridge, communication_mode: :nif
+
+  @nif_commands ~w(anonymize_student parse_tma generate_feedback query_events health_check)
+
+  defp call_nif(command, data) when command in @nif_commands do
+    # Check if NIF is loaded
+    case Code.ensure_loaded(__MODULE__.Native) do
+      {:module, native_module} ->
+        apply(native_module, String.to_existing_atom(command), [data])
+
+      {:error, _} ->
+        Logger.warning(
+          "NIF mode requested but native module not loaded. " <>
+            "Falling back to Port mode or returning error. " <>
+            "Ensure Rustler is configured and native code is compiled."
+        )
+
+        {:error,
+         {:nif_not_available,
+          "Native module not loaded. To use NIF mode, compile the Rust NIF " <>
+            "with `mix rustler.build` and ensure the native module is properly configured."}}
+    end
+  end
+
+  defp call_nif(command, _data) do
+    {:error, {:unknown_command, command}}
   end
 end
