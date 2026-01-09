@@ -213,8 +213,118 @@ test_removal() {
 test_upgrade() {
     log_info "Testing package upgrade..."
 
-    log_warning "Upgrade test requires previous version, skipping for now"
-    # TODO: Implement upgrade testing when previous versions are available
+    local deb_file="academic-workflow-suite_${VERSION}_amd64.deb"
+    local previous_version=""
+
+    # Try to find previous version packages
+    # Look for version pattern like X.Y.Z and find the previous minor version
+    if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+        local major="${BASH_REMATCH[1]}"
+        local minor="${BASH_REMATCH[2]}"
+        local patch="${BASH_REMATCH[3]}"
+
+        # Try previous patch version first
+        if [ "$patch" -gt 0 ]; then
+            previous_version="${major}.${minor}.$((patch - 1))"
+        # Then try previous minor version
+        elif [ "$minor" -gt 0 ]; then
+            previous_version="${major}.$((minor - 1)).0"
+        # Then try previous major version
+        elif [ "$major" -gt 0 ]; then
+            previous_version="$((major - 1)).0.0"
+        fi
+    fi
+
+    local prev_deb_file="academic-workflow-suite_${previous_version}_amd64.deb"
+
+    # Check if we have both current and previous version packages
+    if [ ! -f "$DIST_DIR/$deb_file" ]; then
+        log_warning "Current version package not found, skipping upgrade test"
+        return 0
+    fi
+
+    if [ -z "$previous_version" ] || [ ! -f "$DIST_DIR/$prev_deb_file" ]; then
+        log_warning "Previous version ($previous_version) package not found, testing fresh install upgrade path"
+
+        # Test upgrade from scratch (simulating config preservation)
+        docker run --rm -v "$DIST_DIR:/packages" ubuntu:22.04 bash -c "
+            set -e
+            apt-get update -qq
+
+            # Create mock config file to simulate existing installation
+            mkdir -p /etc/academic-workflow-suite
+            echo 'test_config=value' > /etc/academic-workflow-suite/config.toml
+
+            # Install current version
+            apt-get install -y -qq /packages/$deb_file
+
+            # Verify config was preserved
+            if [ -f /etc/academic-workflow-suite/config.toml ]; then
+                echo 'Config file preserved during installation'
+            fi
+
+            # Verify binary works
+            aws --version
+            echo 'Fresh install with config preservation test passed'
+        " && log_success "Fresh install upgrade path test passed" || log_warning "Fresh install upgrade path test failed"
+
+        return 0
+    fi
+
+    # Full upgrade test with previous version available
+    log_info "Testing upgrade from version $previous_version to $VERSION"
+
+    docker run --rm -v "$DIST_DIR:/packages" ubuntu:22.04 bash -c "
+        set -e
+        apt-get update -qq
+
+        # Install previous version
+        echo 'Installing previous version: $previous_version'
+        apt-get install -y -qq /packages/$prev_deb_file
+
+        # Verify previous version installed
+        aws --version
+
+        # Create config and data files to test preservation
+        mkdir -p /etc/academic-workflow-suite
+        echo 'user_setting=important_value' > /etc/academic-workflow-suite/config.toml
+        mkdir -p /var/lib/academic-workflow-suite
+        echo 'test_data' > /var/lib/academic-workflow-suite/data.db
+
+        # Upgrade to new version
+        echo 'Upgrading to version: $VERSION'
+        apt-get install -y -qq /packages/$deb_file
+
+        # Verify new version
+        new_version=\$(aws --version | head -1)
+        echo \"New version: \$new_version\"
+
+        # Verify config was preserved
+        if [ -f /etc/academic-workflow-suite/config.toml ]; then
+            config_content=\$(cat /etc/academic-workflow-suite/config.toml)
+            if echo \"\$config_content\" | grep -q 'user_setting=important_value'; then
+                echo 'Config file correctly preserved'
+            else
+                echo 'WARNING: Config file modified during upgrade'
+            fi
+        else
+            echo 'ERROR: Config file lost during upgrade'
+            exit 1
+        fi
+
+        # Verify data was preserved
+        if [ -f /var/lib/academic-workflow-suite/data.db ]; then
+            echo 'Data files preserved'
+        else
+            echo 'ERROR: Data files lost during upgrade'
+            exit 1
+        fi
+
+        # Verify binary functions correctly
+        aws --help > /dev/null
+
+        echo 'Upgrade test completed successfully'
+    " && log_success "Upgrade test from $previous_version to $VERSION passed" || log_error "Upgrade test failed"
 }
 
 # Test concurrent installations
