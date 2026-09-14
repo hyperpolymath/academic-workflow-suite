@@ -37,7 +37,7 @@
     "html-webpack-plugin": "^5.6.8",
     "office-addin-dev-certs": "^2.0.10",
     "office-addin-dev-server": "^1.13.2",
-    "office-addin-manifest": "^2.1.6",
+    "office-addin-manifest": "^3.0.0",
     "affinescript-jest": "^0.10.0",
     "style-loader": "^4.0.0",
     "webpack": "^5.109.2",
