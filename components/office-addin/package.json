@@ -25,7 +25,7 @@
     "affinescript": "^12.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
+    "@babel/core": "^8.0.5",
     "@babel/preset-env": "^8.0.2",
     "@babel/preset-react": "^8.0.1",
     "@types/office-js": "^1.0.608",
