@@ -65,7 +65,7 @@ workflows:
         - 'actions/deploy-pages@v4.0.5'
         - 'actions/upload-pages-artifact@v3.0.1'
     '.github/workflows/push-email-notify.yml':
-        - 'dawidd6/action-send-mail@v3.12.0'
+        - 'hyperpolymath/smtp-notify-action@v0.1.0'
     '.github/workflows/scorecard.yml': []
     '.github/workflows/secret-scanner.yml':
         - 'actions/checkout@v6.0.2'
@@ -182,11 +182,6 @@ dependencies:
         commit: 'sha1-eaaf4bedf32dbdc6b720b63067d99c4d77d6047d'
         owner_id: 8226205
         repo_id: 200299178
-    'dawidd6/action-send-mail@v3.12.0':
-        ref: 'v3.12.0'
-        commit: 'sha1-6e502825a508b867ab2954ad6343b68787624c01'
-        owner_id: 9713907
-        repo_id: 222439721
     'docker/build-push-action@v6.19.2':
         ref: 'v6.19.2'
         commit: 'sha1-10e90e3645eae34f1e60eeb005ba3a3d33f178e8'
@@ -257,6 +252,11 @@ dependencies:
         commit: 'sha1-89f3c2702f4f650a92aa7411502f38da06abd562'
         owner_id: 6759885
         repo_id: 1275650185
+    'hyperpolymath/smtp-notify-action@v0.1.0':
+        ref: 'v0.1.0'
+        commit: 'sha1-1b3b752d39a4fe4c0f28f10905e4608789d3e050'
+        owner_id: 6759885
+        repo_id: 1352485172
     'ludeeus/action-shellcheck@2.0.0':
         ref: '2.0.0'
         commit: 'sha1-00b27aa7cb85167568cb48a3838b75f4265f2bca'

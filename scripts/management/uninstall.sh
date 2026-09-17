@@ -466,7 +466,7 @@ cleanup_cache() {
     for cache_path in "${cache_locations[@]}"; do
         if [[ "$cache_path" == *"*"* ]]; then
             # Glob pattern
-            for item in $cache_path 2>/dev/null; do
+            for item in $cache_path; do
                 if [[ -e "$item" ]]; then
                     log INFO "Removing: $item"
 
