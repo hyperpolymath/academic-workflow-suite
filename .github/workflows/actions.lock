@@ -35,8 +35,8 @@ workflows:
         - 'rustsec/audit-check@v2.0.0'
         - 'softprops/action-gh-release@v2.6.2'
     '.github/workflows/codeql.yml':
-        - 'actions/checkout@v6.0.2'
-        - 'github/codeql-action@v4.34.0'
+        - 'actions/checkout@v7.0.1'
+        - 'github/codeql-action@v4.37.9'
     '.github/workflows/container-policy.yml':
         - 'actions/checkout@v6.0.1'
     '.github/workflows/dogfood-gate.yml':
@@ -128,6 +128,11 @@ dependencies:
     'actions/checkout@v6.0.2':
         ref: 'v6.0.2'
         commit: 'sha1-de0fac2e4500dabe0009e67214ff5f5447ce83dd'
+        owner_id: 44036562
+        repo_id: 197814629
+    'actions/checkout@v7.0.1':
+        ref: 'v7.0.1'
+        commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
         owner_id: 44036562
         repo_id: 197814629
     'actions/configure-pages@v5.0.0':
@@ -227,9 +232,9 @@ dependencies:
         commit: 'sha1-0d579ffd059c29b07949a3cce3983f0780820c98'
         owner_id: 9919
         repo_id: 259445878
-    'github/codeql-action@v4.34.0':
-        ref: 'v4.34.0'
-        commit: 'sha1-c6f931105cb2c34c8f901cc885ba1e2e259cf745'
+    'github/codeql-action@v4.37.9':
+        ref: 'v4.37.9'
+        commit: 'sha1-cdf488f595d80d6e07e03d4674febd5ab45fa938'
         owner_id: 9919
         repo_id: 259445878
     'gitleaks/gitleaks-action@v2.3.9':
