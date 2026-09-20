@@ -8,7 +8,6 @@ variables:
   MIX_HOME: "${CI_PROJECT_DIR}/.mix"
   HEX_HOME: "${CI_PROJECT_DIR}/.hex"
   NODE_ENV: "test"
-  CODECOV_TOKEN: "${CODECOV_TOKEN}"
   DEBIAN_FRONTEND: "noninteractive"
   # Versioning
   VERSION: "0.1.0"
@@ -430,16 +429,6 @@ test:coverage:
     - cd ../ai-jail
     - cargo tarpaulin --out Xml --output-dir ../../coverage/ai-jail --verbose || true
     - cd ../..
-    - |
-      if [ -n "$CODECOV_TOKEN" ]; then
-        curl -Os https://uploader.codecov.io/latest/linux/codecov
-        chmod +x codecov
-        ./codecov -t $CODECOV_TOKEN -f coverage/core/cobertura.xml -F core
-        ./codecov -t $CODECOV_TOKEN -f coverage/ai-jail/cobertura.xml -F ai-jail
-        echo "Coverage uploaded to Codecov"
-      else
-        echo "CODECOV_TOKEN not set, skipping upload"
-      fi
   artifacts:
     paths:
       - coverage/
