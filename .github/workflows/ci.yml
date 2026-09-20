@@ -14,14 +14,12 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
-
 permissions:
   contents: read
 
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   # ==============================================================================
@@ -361,14 +359,6 @@ jobs:
         working-directory: components/backend
         run: mix test --cover --trace
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3.1.4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: components/backend/cover/cobertura.xml
-          flags: elixir-backend
-          fail_ci_if_error: false
-
   test-office-addin:
     name: Test Office Add-in
     runs-on: ubuntu-latest
@@ -394,15 +384,6 @@ jobs:
       - name: Run tests
         working-directory: components/office-addin
         run: npm test || echo "No tests configured"
-        continue-on-error: true
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3.1.4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: components/office-addin/coverage/cobertura-coverage.xml
-          flags: office-addin
-          fail_ci_if_error: false
         continue-on-error: true
 
   test-integration:
