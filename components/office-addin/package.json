@@ -40,7 +40,7 @@
     "office-addin-manifest": "^3.0.1",
     "affinescript-jest": "^0.10.0",
     "style-loader": "^4.0.0",
-    "webpack": "^5.110.3",
+    "webpack": "^5.111.1",
     "webpack-cli": "^7.2.3",
     "webpack-dev-server": "^6.0.0"
   },
