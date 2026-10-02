@@ -66,10 +66,7 @@ workflows:
     '.github/workflows/push-email-notify.yml':
         - 'hyperpolymath/smtp-notify-action@v0.1.0'
     '.github/workflows/scorecard.yml': []
-    '.github/workflows/secret-scanner.yml':
-        - 'actions/checkout@v6.0.2'
-        - 'gitleaks/gitleaks-action@v2.3.9'
-        - 'trufflesecurity/trufflehog@v3.93.8'
+    '.github/workflows/secret-scanner.yml': []
 dependencies:
     'actions/attest-build-provenance@1176ef556905f349f669722abf30bce1a6e16e01':
         ref: 'predicate@1.1.5'
