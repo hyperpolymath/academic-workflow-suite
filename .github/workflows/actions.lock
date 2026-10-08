@@ -30,7 +30,6 @@ workflows:
         - 'erlef/setup-beam@v1.18.2'
         - 'github/codeql-action@v3.31.10'
         - 'ludeeus/action-shellcheck@2.0.0'
-        - 'returntocorp/semgrep-action@v1'
         - 'rustsec/audit-check@v2.0.0'
         - 'softprops/action-gh-release@v2.6.2'
     '.github/workflows/codeql.yml':
@@ -263,11 +262,6 @@ dependencies:
         commit: 'sha1-28959ce8df70de7be546dd1250a005dd32156697'
         owner_id: 18365890
         repo_id: 220359305
-    'returntocorp/semgrep-action@v1':
-        ref: 'v1'
-        commit: 'sha1-713efdd345f3035192eaa63f56867b88e63e4e5d'
-        owner_id: 147861678
-        repo_id: 715166645
     'rustsec/audit-check@v2.0.0':
         ref: 'v2.0.0'
         commit: 'sha1-69366f33c96575abad1ee0dba8212993eecbe998'

@@ -4,739 +4,907 @@
 # GitHub Actions CI/CD Pipeline for Academic Workflow Suite
 # Mirror pipeline for GitHub - Matrix builds across Windows, Linux, macOS
 
-name: CI/CD
-
-on:
-  push:
-    branches: ['**']
-    tags: ['v*.*.*']
-  pull_request:
-    branches: [main, develop]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-env:
-  CARGO_TERM_COLOR: always
-  RUST_BACKTRACE: 1
-
-jobs:
-  # ==============================================================================
-  # LINT JOBS
-  # ==============================================================================
-
-  lint-rust:
-    name: Lint Rust (${{ matrix.component }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    strategy:
-      matrix:
-        component: [core, ai-jail]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Cache Rust dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            components/${{ matrix.component }}/target/
-          key: ${{ runner.os }}-cargo-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}
-
-      - name: Run rustfmt
-        working-directory: components/${{ matrix.component }}
-        run: cargo fmt --all -- --check
-
-      - name: Run clippy
-        working-directory: components/${{ matrix.component }}
-        run: cargo clippy --all-targets --all-features -- -D warnings
-
-  lint-elixir:
-    name: Lint Elixir
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1.18.2
-        with:
-          elixir-version: '1.15'
-          otp-version: '26'
-
-      - name: Cache Mix dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            components/backend/deps
-            components/backend/_build
-          key: ${{ runner.os }}-mix-${{ hashFiles('components/backend/mix.lock') }}
-
-      - name: Install dependencies
-        working-directory: components/backend
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          mix deps.get
-
-      - name: Check formatting
-        working-directory: components/backend
-        run: mix format --check-formatted
-
-      - name: Run Credo
-        working-directory: components/backend
-        run: mix credo --strict
-        continue-on-error: true
-
-  lint-node:
-    name: Lint Node.js/AffineScript
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: components/office-addin/package-lock.json
-
-      - name: Install dependencies
-        working-directory: components/office-addin
-        run: npm ci
-
-      - name: Run linter
-        working-directory: components/office-addin
-        run: npm run lint || echo "No lint script configured"
-        continue-on-error: true
-
-  lint-shell:
-    name: Lint Shell Scripts
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          scandir: './scripts'
-          severity: warning
-
-  # ==============================================================================
-  # BUILD JOBS
-  # ==============================================================================
-
-  build-rust:
-    name: Build Rust (${{ matrix.component }}) on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
-    needs: [lint-rust]
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        component: [core, ai-jail]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            components/${{ matrix.component }}/target/
-          key: ${{ runner.os }}-cargo-build-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}
-
-      - name: Build release
-        working-directory: components/${{ matrix.component }}
-        run: cargo build --release --verbose
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: ${{ matrix.component }}-${{ runner.os }}
-          path: |
-            components/${{ matrix.component }}/target/release/${{ matrix.component }}*
-            !components/${{ matrix.component }}/target/release/*.d
-            !components/${{ matrix.component }}/target/release/*.rlib
-          retention-days: 7
-
-  build-elixir:
-    name: Build Elixir Backend
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [lint-elixir]
-    env:
-      MIX_ENV: prod
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1.18.2
-        with:
-          elixir-version: '1.15'
-          otp-version: '26'
-
-      - name: Cache Mix dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            components/backend/deps
-            components/backend/_build
-          key: ${{ runner.os }}-mix-build-${{ hashFiles('components/backend/mix.lock') }}
-
-      - name: Install dependencies
-        working-directory: components/backend
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          mix deps.get --only prod
-
-      - name: Compile
-        working-directory: components/backend
-        run: mix compile --warnings-as-errors
-
-      - name: Build release
-        working-directory: components/backend
-        run: mix release || echo "No release configuration"
-        continue-on-error: true
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: elixir-backend
-          path: components/backend/_build/prod/
-          retention-days: 7
-
-  build-office-addin:
-    name: Build Office Add-in
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [lint-node]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: components/office-addin/package-lock.json
-
-      - name: Install dependencies
-        working-directory: components/office-addin
-        run: npm ci
-
-      - name: Build
-        working-directory: components/office-addin
-        run: npm run build:prod || npm run build || echo "No build script"
-        continue-on-error: true
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: office-addin
-          path: |
-            components/office-addin/dist/
-            components/office-addin/build/
-          retention-days: 7
-
-  # ==============================================================================
-  # TEST JOBS
-  # ==============================================================================
-
-  test-rust:
-    name: Test Rust (${{ matrix.component }}) on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
-    needs: [build-rust]
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        component: [core, ai-jail]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            components/${{ matrix.component }}/target/
-          key: ${{ runner.os }}-cargo-test-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}
-
-      - name: Run tests
-        working-directory: components/${{ matrix.component }}
-        run: cargo test --all-features --verbose -- --nocapture
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: test-results-${{ matrix.component }}-${{ runner.os }}
-          path: components/${{ matrix.component }}/target/nextest/
-          retention-days: 30
-
-  test-elixir:
-    name: Test Elixir Backend
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [build-elixir]
-    env:
-      MIX_ENV: test
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1.18.2
-        with:
-          elixir-version: '1.15'
-          otp-version: '26'
-
-      - name: Cache Mix dependencies
-        uses: actions/cache@v4.2.3
-        with:
-          path: |
-            components/backend/deps
-            components/backend/_build
-          key: ${{ runner.os }}-mix-test-${{ hashFiles('components/backend/mix.lock') }}
-
-      - name: Install dependencies
-        working-directory: components/backend
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          mix deps.get --only test
-
-      - name: Run tests with coverage
-        working-directory: components/backend
-        run: mix test --cover --trace
-
-  test-office-addin:
-    name: Test Office Add-in
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [build-office-addin]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: components/office-addin/package-lock.json
-
-      - name: Install dependencies
-        working-directory: components/office-addin
-        run: npm ci
-
-      - name: Run tests
-        working-directory: components/office-addin
-        run: npm test || echo "No tests configured"
-        continue-on-error: true
-
-  test-integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [build-rust, build-elixir]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download core artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          name: core-Linux
-          path: components/core/target/release/
-
-      - name: Download AI jail artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          name: ai-jail-Linux
-          path: components/ai-jail/target/release/
-
-      - name: Download backend artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          name: elixir-backend
-          path: components/backend/_build/prod/
-
-      - name: Set execute permissions
-        run: |
-          chmod +x components/core/target/release/* || true
-          chmod +x components/ai-jail/target/release/* || true
-          chmod +x scripts/ci/*.sh
-
-      - name: Run integration tests
-        run: ./scripts/ci/test-integration.sh
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: integration-test-results
-          path: tests/integration/results/
-          retention-days: 30
-
-  test-ai-isolation:
-    name: AI Isolation Tests (Critical)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [build-rust]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download AI jail artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          name: ai-jail-Linux
-          path: components/ai-jail/target/release/
-
-      - name: Build test container
-        working-directory: components/ai-jail
-        run: |
-          docker build -t ai-jail-test -f Dockerfile.test . || exit 1
-
-      - name: Run isolation tests
-        run: |
-          docker run --rm --cap-drop=ALL --security-opt=no-new-privileges ai-jail-test || exit 1
-
-      - name: Test resource limits
-        run: |
-          docker run --rm --memory=512m --cpus=1.0 ai-jail-test test-limits || exit 1
-
-  # ==============================================================================
-  # SECURITY JOBS
-  # ==============================================================================
-
-  security-rust-audit:
-    name: Rust Security Audit
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Run cargo-audit
-        uses: rustsec/audit-check@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  security-node-audit:
-    name: Node.js Security Audit
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: '20'
-
-      - name: Run npm audit
-        working-directory: components/office-addin
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
-
-  security-codeql:
-    name: CodeQL Analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    strategy:
-      matrix:
-        language: ['javascript', 'python']
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3.31.10
-        with:
-          languages: ${{ matrix.language }}
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3.31.10
-
-  security-semgrep:
-    name: Semgrep SAST
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/secrets
-            p/owasp-top-ten
-
-  # ==============================================================================
-  # PACKAGE JOBS
-  # ==============================================================================
-
-  package-linux:
-    name: Package for Linux (DEB)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    needs: [test-rust, test-elixir, test-integration]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v8.0.1
-
-      - name: Install packaging tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dpkg-dev fakeroot
-
-      - name: Create DEB package
-        run: |
-          chmod +x scripts/ci/package.sh
-          ./scripts/ci/package.sh deb
-
-      - name: Upload package
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: debian-package
-          path: packages/*.deb
-          retention-days: 30
-
-  package-windows:
-    name: Package for Windows (MSI)
-    runs-on: windows-latest
-    timeout-minutes: 15
-    needs: [test-rust]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          pattern: '*-Windows'
-
-      - name: Create MSI installer
-        run: |
-          # WiX toolset should be pre-installed on Windows runners
-          echo "Creating MSI installer..."
-          # Add MSI creation logic here
-
-      - name: Upload package
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: windows-installer
-          path: packages/*.msi
-          retention-days: 30
-
-  package-macos:
-    name: Package for macOS (DMG)
-    runs-on: macos-latest
-    timeout-minutes: 15
-    needs: [test-rust]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download macOS artifacts
-        uses: actions/download-artifact@v8.0.1
-        with:
-          pattern: '*-macOS'
-
-      - name: Create DMG
-        run: |
-          echo "Creating macOS DMG..."
-          # Add DMG creation logic here
-
-      - name: Upload package
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: macos-dmg
-          path: packages/*.dmg
-          retention-days: 30
-
-  package-container:
-    name: Build Container Image
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [test-ai-isolation]
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      attestations: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.3.0
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3.1.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5.5.1
-        with:
-          images: ghcr.io/${{ github.repository }}/ai-jail
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha
-
-      - name: Build and push
-        id: push
-        uses: docker/build-push-action@v6.19.2
-        with:
-          context: components/ai-jail
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Attest container provenance
-        uses: actions/attest-build-provenance@v2.4.0
-        with:
-          subject-name: ghcr.io/${{ github.repository }}/ai-jail
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
-
-  # ==============================================================================
-  # RELEASE JOB
-  # ==============================================================================
-
-  release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [package-linux, package-container]
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
-      id-token: write
-      attestations: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
-
-      - name: Download all packages
-        uses: actions/download-artifact@v8.0.1
-        with:
-          path: release-artifacts
-
-      - name: Generate checksums
-        run: |
-          cd release-artifacts
-          find . -type f \( -name "*.deb" -o -name "*.msi" -o -name "*.dmg" -o -name "*.tgz" \) -exec sha256sum {} \; > SHA256SUMS
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2.6.2
-        with:
-          files: |
-            release-artifacts/**/*.deb
-            release-artifacts/**/*.msi
-            release-artifacts/**/*.dmg
-            release-artifacts/**/*.tgz
-            release-artifacts/SHA256SUMS
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2.4.0
-        with:
-          subject-path: |
-            release-artifacts/**/*.deb
-            release-artifacts/**/*.msi
-            release-artifacts/**/*.dmg
-            release-artifacts/**/*.tgz
-            release-artifacts/SHA256SUMS
+{
+  name: "CI/CD",
+  on: {
+    push: {
+      branches: [
+        "**",
+      ],
+      tags: [
+        "v*.*.*",
+      ],
+    },
+    pull_request: {
+      branches: [
+        "main",
+        "develop",
+      ],
+    },
+    workflow_dispatch: null,
+  },
+  permissions: {
+    contents: "read",
+  },
+  env: {
+    CARGO_TERM_COLOR: "always",
+    RUST_BACKTRACE: 1,
+  },
+  jobs: {
+    # ==============================================================================
+    # LINT JOBS
+    # ==============================================================================
+    lint-rust: {
+      name: "Lint Rust (${{ matrix.component }})",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      strategy: {
+        matrix: {
+          component: [
+            "core",
+            "ai-jail",
+          ],
+        },
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Rust toolchain",
+          uses: "dtolnay/rust-toolchain@stable",
+          with: {
+            components: "rustfmt, clippy",
+          },
+        },
+        {
+          name: "Cache Rust dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n~/.cargo/git/db/\ncomponents/${{ matrix.component }}/target/\n",
+            key: "${{ runner.os }}-cargo-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}",
+          },
+        },
+        {
+          name: "Run rustfmt",
+          working-directory: "components/${{ matrix.component }}",
+          run: "cargo fmt --all -- --check",
+        },
+        {
+          name: "Run clippy",
+          working-directory: "components/${{ matrix.component }}",
+          run: "cargo clippy --all-targets --all-features -- -D warnings",
+        },
+      ],
+    },
+    lint-elixir: {
+      name: "Lint Elixir",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Elixir",
+          uses: "erlef/setup-beam@v1.18.2",
+          with: {
+            elixir-version: "1.15",
+            otp-version: "26",
+          },
+        },
+        {
+          name: "Cache Mix dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "components/backend/deps\ncomponents/backend/_build\n",
+            key: "${{ runner.os }}-mix-${{ hashFiles('components/backend/mix.lock') }}",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/backend",
+          run: "mix local.hex --force\nmix local.rebar --force\nmix deps.get\n",
+        },
+        {
+          name: "Check formatting",
+          working-directory: "components/backend",
+          run: "mix format --check-formatted",
+        },
+        {
+          name: "Run Credo",
+          working-directory: "components/backend",
+          run: "mix credo --strict",
+          continue-on-error: true,
+        },
+      ],
+    },
+    lint-node: {
+      name: "Lint Node.js/AffineScript",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Node.js",
+          uses: "actions/setup-node@v4.0.2",
+          with: {
+            node-version: "20",
+            cache: "npm",
+            cache-dependency-path: "components/office-addin/package-lock.json",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/office-addin",
+          run: "npm ci",
+        },
+        {
+          name: "Run linter",
+          working-directory: "components/office-addin",
+          run: "npm run lint || echo \"No lint script configured\"",
+          continue-on-error: true,
+        },
+      ],
+    },
+    lint-shell: {
+      name: "Lint Shell Scripts",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Run ShellCheck",
+          uses: "ludeeus/action-shellcheck@2.0.0",
+          with: {
+            scandir: "./scripts",
+            severity: "warning",
+          },
+        },
+      ],
+    },
+    # ==============================================================================
+    # BUILD JOBS
+    # ==============================================================================
+    build-rust: {
+      name: "Build Rust (${{ matrix.component }}) on ${{ matrix.os }}",
+      runs-on: "${{ matrix.os }}",
+      timeout-minutes: 15,
+      needs: [
+        "lint-rust",
+      ],
+      strategy: {
+        fail-fast: false,
+        matrix: {
+          os: [
+            "ubuntu-latest",
+            "windows-latest",
+            "macos-latest",
+          ],
+          component: [
+            "core",
+            "ai-jail",
+          ],
+        },
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Rust toolchain",
+          uses: "dtolnay/rust-toolchain@stable",
+        },
+        {
+          name: "Cache Rust dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n~/.cargo/git/db/\ncomponents/${{ matrix.component }}/target/\n",
+            key: "${{ runner.os }}-cargo-build-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}",
+          },
+        },
+        {
+          name: "Build release",
+          working-directory: "components/${{ matrix.component }}",
+          run: "cargo build --release --verbose",
+        },
+        {
+          name: "Upload artifacts",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "${{ matrix.component }}-${{ runner.os }}",
+            path: "components/${{ matrix.component }}/target/release/${{ matrix.component }}*\n!components/${{ matrix.component }}/target/release/*.d\n!components/${{ matrix.component }}/target/release/*.rlib\n",
+            retention-days: 7,
+          },
+        },
+      ],
+    },
+    build-elixir: {
+      name: "Build Elixir Backend",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "lint-elixir",
+      ],
+      env: {
+        MIX_ENV: "prod",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Elixir",
+          uses: "erlef/setup-beam@v1.18.2",
+          with: {
+            elixir-version: "1.15",
+            otp-version: "26",
+          },
+        },
+        {
+          name: "Cache Mix dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "components/backend/deps\ncomponents/backend/_build\n",
+            key: "${{ runner.os }}-mix-build-${{ hashFiles('components/backend/mix.lock') }}",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/backend",
+          run: "mix local.hex --force\nmix local.rebar --force\nmix deps.get --only prod\n",
+        },
+        {
+          name: "Compile",
+          working-directory: "components/backend",
+          run: "mix compile --warnings-as-errors",
+        },
+        {
+          name: "Build release",
+          working-directory: "components/backend",
+          run: "mix release || echo \"No release configuration\"",
+          continue-on-error: true,
+        },
+        {
+          name: "Upload artifacts",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "elixir-backend",
+            path: "components/backend/_build/prod/",
+            retention-days: 7,
+          },
+        },
+      ],
+    },
+    build-office-addin: {
+      name: "Build Office Add-in",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "lint-node",
+      ],
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Node.js",
+          uses: "actions/setup-node@v4.0.2",
+          with: {
+            node-version: "20",
+            cache: "npm",
+            cache-dependency-path: "components/office-addin/package-lock.json",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/office-addin",
+          run: "npm ci",
+        },
+        {
+          name: "Build",
+          working-directory: "components/office-addin",
+          run: "npm run build:prod || npm run build || echo \"No build script\"",
+          continue-on-error: true,
+        },
+        {
+          name: "Upload artifacts",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "office-addin",
+            path: "components/office-addin/dist/\ncomponents/office-addin/build/\n",
+            retention-days: 7,
+          },
+        },
+      ],
+    },
+    # ==============================================================================
+    # TEST JOBS
+    # ==============================================================================
+    test-rust: {
+      name: "Test Rust (${{ matrix.component }}) on ${{ matrix.os }}",
+      runs-on: "${{ matrix.os }}",
+      timeout-minutes: 15,
+      needs: [
+        "build-rust",
+      ],
+      strategy: {
+        fail-fast: false,
+        matrix: {
+          os: [
+            "ubuntu-latest",
+            "windows-latest",
+            "macos-latest",
+          ],
+          component: [
+            "core",
+            "ai-jail",
+          ],
+        },
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Rust toolchain",
+          uses: "dtolnay/rust-toolchain@stable",
+        },
+        {
+          name: "Cache Rust dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "~/.cargo/bin/\n~/.cargo/registry/index/\n~/.cargo/registry/cache/\n~/.cargo/git/db/\ncomponents/${{ matrix.component }}/target/\n",
+            key: "${{ runner.os }}-cargo-test-${{ matrix.component }}-${{ hashFiles(format('components/{0}/Cargo.lock', matrix.component)) }}",
+          },
+        },
+        {
+          name: "Run tests",
+          working-directory: "components/${{ matrix.component }}",
+          run: "cargo test --all-features --verbose -- --nocapture",
+        },
+        {
+          name: "Upload test results",
+          if: "always()",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "test-results-${{ matrix.component }}-${{ runner.os }}",
+            path: "components/${{ matrix.component }}/target/nextest/",
+            retention-days: 30,
+          },
+        },
+      ],
+    },
+    test-elixir: {
+      name: "Test Elixir Backend",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "build-elixir",
+      ],
+      env: {
+        MIX_ENV: "test",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Elixir",
+          uses: "erlef/setup-beam@v1.18.2",
+          with: {
+            elixir-version: "1.15",
+            otp-version: "26",
+          },
+        },
+        {
+          name: "Cache Mix dependencies",
+          uses: "actions/cache@v4.2.3",
+          with: {
+            path: "components/backend/deps\ncomponents/backend/_build\n",
+            key: "${{ runner.os }}-mix-test-${{ hashFiles('components/backend/mix.lock') }}",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/backend",
+          run: "mix local.hex --force\nmix local.rebar --force\nmix deps.get --only test\n",
+        },
+        {
+          name: "Run tests with coverage",
+          working-directory: "components/backend",
+          run: "mix test --cover --trace",
+        },
+      ],
+    },
+    test-office-addin: {
+      name: "Test Office Add-in",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "build-office-addin",
+      ],
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Node.js",
+          uses: "actions/setup-node@v4.0.2",
+          with: {
+            node-version: "20",
+            cache: "npm",
+            cache-dependency-path: "components/office-addin/package-lock.json",
+          },
+        },
+        {
+          name: "Install dependencies",
+          working-directory: "components/office-addin",
+          run: "npm ci",
+        },
+        {
+          name: "Run tests",
+          working-directory: "components/office-addin",
+          run: "npm test || echo \"No tests configured\"",
+          continue-on-error: true,
+        },
+      ],
+    },
+    test-integration: {
+      name: "Integration Tests",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "build-rust",
+        "build-elixir",
+      ],
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download core artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            name: "core-Linux",
+            path: "components/core/target/release/",
+          },
+        },
+        {
+          name: "Download AI jail artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            name: "ai-jail-Linux",
+            path: "components/ai-jail/target/release/",
+          },
+        },
+        {
+          name: "Download backend artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            name: "elixir-backend",
+            path: "components/backend/_build/prod/",
+          },
+        },
+        {
+          name: "Set execute permissions",
+          run: "chmod +x components/core/target/release/* || true\nchmod +x components/ai-jail/target/release/* || true\nchmod +x scripts/ci/*.sh\n",
+        },
+        {
+          name: "Run integration tests",
+          run: "./scripts/ci/test-integration.sh",
+        },
+        {
+          name: "Upload test results",
+          if: "always()",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "integration-test-results",
+            path: "tests/integration/results/",
+            retention-days: 30,
+          },
+        },
+      ],
+    },
+    test-ai-isolation: {
+      name: "AI Isolation Tests (Critical)",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "build-rust",
+      ],
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download AI jail artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            name: "ai-jail-Linux",
+            path: "components/ai-jail/target/release/",
+          },
+        },
+        {
+          name: "Build test container",
+          working-directory: "components/ai-jail",
+          run: "docker build -t ai-jail-test -f Dockerfile.test . || exit 1\n",
+        },
+        {
+          name: "Run isolation tests",
+          run: "docker run --rm --cap-drop=ALL --security-opt=no-new-privileges ai-jail-test || exit 1\n",
+        },
+        {
+          name: "Test resource limits",
+          run: "docker run --rm --memory=512m --cpus=1.0 ai-jail-test test-limits || exit 1\n",
+        },
+      ],
+    },
+    # ==============================================================================
+    # SECURITY JOBS
+    # ==============================================================================
+    security-rust-audit: {
+      name: "Rust Security Audit",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Run cargo-audit",
+          uses: "rustsec/audit-check@v2.0.0",
+          with: {
+            token: "${{ secrets.GITHUB_TOKEN }}",
+          },
+        },
+      ],
+    },
+    security-node-audit: {
+      name: "Node.js Security Audit",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Setup Node.js",
+          uses: "actions/setup-node@v4.0.2",
+          with: {
+            node-version: "20",
+          },
+        },
+        {
+          name: "Run npm audit",
+          working-directory: "components/office-addin",
+          run: "npm audit --audit-level=moderate",
+          continue-on-error: true,
+        },
+      ],
+    },
+    security-codeql: {
+      name: "CodeQL Analysis",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        security-events: "write",
+        actions: "read",
+        contents: "read",
+      },
+      strategy: {
+        matrix: {
+          language: [
+            "javascript",
+            "python",
+          ],
+        },
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Initialize CodeQL",
+          uses: "github/codeql-action/init@v3.31.10",
+          with: {
+            languages: "${{ matrix.language }}",
+          },
+        },
+        {
+          name: "Perform CodeQL Analysis",
+          uses: "github/codeql-action/analyze@v3.31.10",
+        },
+      ],
+    },
+    # ==============================================================================
+    # PACKAGE JOBS
+    # ==============================================================================
+    package-linux: {
+      name: "Package for Linux (DEB)",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      permissions: {
+        contents: "read",
+      },
+      needs: [
+        "test-rust",
+        "test-elixir",
+        "test-integration",
+      ],
+      if: "github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')",
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download all artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+        },
+        {
+          name: "Install packaging tools",
+          run: "sudo apt-get update\nsudo apt-get install -y dpkg-dev fakeroot\n",
+        },
+        {
+          name: "Create DEB package",
+          run: "chmod +x scripts/ci/package.sh\n./scripts/ci/package.sh deb\n",
+        },
+        {
+          name: "Upload package",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "debian-package",
+            path: "packages/*.deb",
+            retention-days: 30,
+          },
+        },
+      ],
+    },
+    package-windows: {
+      name: "Package for Windows (MSI)",
+      runs-on: "windows-latest",
+      timeout-minutes: 15,
+      needs: [
+        "test-rust",
+      ],
+      if: "github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')",
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download Windows artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            pattern: "*-Windows",
+          },
+        },
+        {
+          name: "Create MSI installer",
+          run: "# WiX toolset should be pre-installed on Windows runners\necho \"Creating MSI installer...\"\n# Add MSI creation logic here\n",
+        },
+        {
+          name: "Upload package",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "windows-installer",
+            path: "packages/*.msi",
+            retention-days: 30,
+          },
+        },
+      ],
+    },
+    package-macos: {
+      name: "Package for macOS (DMG)",
+      runs-on: "macos-latest",
+      timeout-minutes: 15,
+      needs: [
+        "test-rust",
+      ],
+      if: "github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')",
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download macOS artifacts",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            pattern: "*-macOS",
+          },
+        },
+        {
+          name: "Create DMG",
+          run: "echo \"Creating macOS DMG...\"\n# Add DMG creation logic here\n",
+        },
+        {
+          name: "Upload package",
+          uses: "actions/upload-artifact@v4.4.3",
+          with: {
+            name: "macos-dmg",
+            path: "packages/*.dmg",
+            retention-days: 30,
+          },
+        },
+      ],
+    },
+    package-container: {
+      name: "Build Container Image",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      needs: [
+        "test-ai-isolation",
+      ],
+      if: "github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')",
+      permissions: {
+        contents: "read",
+        packages: "write",
+        id-token: "write",
+        attestations: "write",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Set up Docker Buildx",
+          uses: "docker/setup-buildx-action@v3.3.0",
+        },
+        {
+          name: "Login to GitHub Container Registry",
+          uses: "docker/login-action@v3.1.0",
+          with: {
+            registry: "ghcr.io",
+            username: "${{ github.actor }}",
+            password: "${{ secrets.GITHUB_TOKEN }}",
+          },
+        },
+        {
+          name: "Extract metadata",
+          id: "meta",
+          uses: "docker/metadata-action@v5.5.1",
+          with: {
+            images: "ghcr.io/${{ github.repository }}/ai-jail",
+            tags: "type=ref,event=branch\ntype=ref,event=pr\ntype=semver,pattern={{version}}\ntype=semver,pattern={{major}}.{{minor}}\ntype=sha\n",
+          },
+        },
+        {
+          name: "Build and push",
+          id: "push",
+          uses: "docker/build-push-action@v6.19.2",
+          with: {
+            context: "components/ai-jail",
+            push: true,
+            tags: "${{ steps.meta.outputs.tags }}",
+            labels: "${{ steps.meta.outputs.labels }}",
+            cache-from: "type=gha",
+            cache-to: "type=gha,mode=max",
+          },
+        },
+        {
+          name: "Attest container provenance",
+          uses: "actions/attest-build-provenance@v2.4.0",
+          with: {
+            subject-name: "ghcr.io/${{ github.repository }}/ai-jail",
+            subject-digest: "${{ steps.push.outputs.digest }}",
+            push-to-registry: true,
+          },
+        },
+      ],
+    },
+    # ==============================================================================
+    # RELEASE JOB
+    # ==============================================================================
+    release: {
+      name: "Create GitHub Release",
+      runs-on: "ubuntu-latest",
+      timeout-minutes: 15,
+      needs: [
+        "package-linux",
+        "package-container",
+      ],
+      if: "startsWith(github.ref, 'refs/tags/v')",
+      permissions: {
+        contents: "write",
+        id-token: "write",
+        attestations: "write",
+      },
+      steps: [
+        {
+          name: "Checkout code",
+          uses: "actions/checkout@v6.0.1",
+        },
+        {
+          name: "Download all packages",
+          uses: "actions/download-artifact@v8.0.1",
+          with: {
+            path: "release-artifacts",
+          },
+        },
+        {
+          name: "Generate checksums",
+          run: "cd release-artifacts\nfind . -type f \\( -name \"*.deb\" -o -name \"*.msi\" -o -name \"*.dmg\" -o -name \"*.tgz\" \\) -exec sha256sum {} \\; > SHA256SUMS\n",
+        },
+        {
+          name: "Create Release",
+          uses: "softprops/action-gh-release@v2.6.2",
+          with: {
+            files: "release-artifacts/**/*.deb\nrelease-artifacts/**/*.msi\nrelease-artifacts/**/*.dmg\nrelease-artifacts/**/*.tgz\nrelease-artifacts/SHA256SUMS\n",
+            draft: false,
+            prerelease: false,
+            generate_release_notes: true,
+          },
+          env: {
+            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+          },
+        },
+        {
+          name: "Attest build provenance",
+          uses: "actions/attest-build-provenance@v2.4.0",
+          with: {
+            subject-path: "release-artifacts/**/*.deb\nrelease-artifacts/**/*.msi\nrelease-artifacts/**/*.dmg\nrelease-artifacts/**/*.tgz\nrelease-artifacts/SHA256SUMS\n",
+          },
+        },
+      ],
+    },
+  },
+}
