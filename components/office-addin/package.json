@@ -41,7 +41,7 @@
     "affinescript-jest": "^0.10.0",
     "style-loader": "^4.0.0",
     "webpack": "^5.111.1",
-    "webpack-cli": "^7.2.3",
+    "webpack-cli": "^7.3.1",
     "webpack-dev-server": "^6.0.0"
   },
   "jest": {
