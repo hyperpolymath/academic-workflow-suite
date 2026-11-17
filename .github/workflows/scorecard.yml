@@ -22,4 +22,6 @@ jobs:
       contents: read
       security-events: write
       id-token: write
-    secrets: inherit
+    # No `secrets: inherit`: scorecard-reusable.yml declares no secrets and
+    # reads none (it uses github.token only), so inheriting would hand it
+    # every repository secret for nothing (Sonar githubactions:S7635).
