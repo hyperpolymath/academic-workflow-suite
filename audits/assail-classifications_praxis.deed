@@ -1,0 +1,38 @@
+;; SPDX-License-Identifier: MPL-2.0
+;; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+;;
+;; panic-attack assail user-classification registry (DEED praxis form).
+;; Read first by panic-attack (src/assail/classifications.rs, DEED_PATH);
+;; when this file exists the legacy audits/assail-classifications.a2ml is
+;; never read. Form: see that module's docs. Each (classification ...)
+;; suppresses the finding at :file for :category, so every entry must name
+;; a real audit, not boilerplate.
+;;
+;; This registry is deliberately EMPTY. It replaces the retired
+;; audits/assail-classifications.a2ml, whose 14 entries used a `- suppression:`
+;; YAML dialect that panic-attack's legacy reader never parsed, so none of
+;; them ever suppressed anything. They all carried the same generic text
+;; ("Automated estate triage: reviewed as safe ..."), not an audit of the
+;; file. They are kept below as UNREVIEWED CANDIDATES, NOT ACTIVE. To activate
+;; one, audit the finding at source and add a (classification ...) clause
+;; with a specific :audit and :rationale.
+;;
+;;   CommandInjection     config/validate.sh
+;;   CommandInjection     tests/ai-isolation/network-tests/container_escape_test.sh
+;;   CommandInjection     scripts/install/install.sh
+;;   DynamicCodeExecution examples/demos/web-ui/app.js
+;;   HardcodedSecret      monitoring/healthchecks/healthcheck.sh
+;;   HardcodedSecret      monitoring/scripts/backup_dashboards.sh
+;;   HardcodedSecret      scripts/management/uninstall.sh
+;;   HardcodedSecret      scripts/management/backup.sh
+;;   HardcodedSecret      scripts/management/init-database.sh
+;;   HardcodedSecret      scripts/management/update.sh
+;;   HardcodedSecret      scripts/management/health-check.sh
+;;   UnboundedAllocation  cli/src/commands/feedback.rs
+;;   UnboundedAllocation  cli/src/commands/sync.rs
+;;   UnboundedAllocation  cli/src/config.rs
+(praxis-deed
+  :schema-version "1.0.0"
+  :canonical-name "academic-workflow-suite-assail-classifications"
+  :beholding-chora #uuid"0889b37b-defb-831f-973c-e119500db00e"
+  :profile assail-classifications)

@@ -12,9 +12,16 @@ permissions: read-all
 
 jobs:
   analysis:
-    uses: hyperpolymath/standards/.github/workflows/scorecard-reusable.yml@da2c748aad55c1a1dcba00b60fe4a35017bc6540
+    uses: metadatastician/standards/.github/workflows/scorecard-reusable.yml@c06041366c74df0662e82b2ea356b48959b8ed26
+    # A job-level permissions block REPLACES `read-all` above, so it must
+    # grant every permission a called job asks for. The reusable's
+    # `scorecard` job requests `actions: read` (scorecard-action reads
+    # workflow runs); without it GitHub rejects the whole workflow.
     permissions:
+      actions: read
       contents: read
       security-events: write
       id-token: write
-    secrets: inherit
+    # No `secrets: inherit`: scorecard-reusable.yml declares no secrets and
+    # reads none (it uses github.token only), so inheriting would hand it
+    # every repository secret for nothing (Sonar githubactions:S7635).
