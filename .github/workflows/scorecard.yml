@@ -13,7 +13,12 @@ permissions: read-all
 jobs:
   analysis:
     uses: metadatastician/standards/.github/workflows/scorecard-reusable.yml@c06041366c74df0662e82b2ea356b48959b8ed26
+    # A job-level permissions block REPLACES `read-all` above, so it must
+    # grant every permission a called job asks for. The reusable's
+    # `scorecard` job requests `actions: read` (scorecard-action reads
+    # workflow runs); without it GitHub rejects the whole workflow.
     permissions:
+      actions: read
       contents: read
       security-events: write
       id-token: write
