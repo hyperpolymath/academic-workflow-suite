@@ -240,8 +240,15 @@ jobs:
         # not a silently-ungated scanner (the exact failure mode #35
         # exists to end). The empty-SARIF "clear stale alerts" path is
         # handled in the converter above and does not error here.
+        # hashFiles guard: when an EARLIER step fails (e.g. setup-beam on a
+        # runner image it cannot map), the converter never runs and there
+        # is no hypatia.sarif. Uploading then only adds a second, misleading
+        # red ("Path does not exist: hypatia.sarif") on top of the real
+        # one. The job is already failed by that earlier step, so skipping
+        # here silences nothing: a broken converter is itself a failed step.
         if: >-
           always() &&
+          hashFiles('hypatia.sarif') != '' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.fork != true)
         uses: github/codeql-action/upload-sarif@v4.32.6
