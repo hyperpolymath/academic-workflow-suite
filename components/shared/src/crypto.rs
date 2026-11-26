@@ -895,14 +895,14 @@ mod tests {
 
     #[test]
     fn test_derive_key() {
-        let password = b"my-password";
+        let ikm = b"my-password";
         let salt = b"unique-salt-16bytes!"; // Salt should be 16+ bytes
-        let key = derive_key(password, salt, 32).unwrap();
+        let key = derive_key(ikm, salt, 32).unwrap();
 
         assert_eq!(key.len(), 32);
 
         // Test deterministic
-        let key2 = derive_key(password, salt, 32).unwrap();
+        let key2 = derive_key(ikm, salt, 32).unwrap();
         assert_eq!(&*key, &*key2);
 
         // Different password produces different key
@@ -910,7 +910,7 @@ mod tests {
         assert_ne!(&*key, &*key3);
 
         // Different salt produces different key
-        let key4 = derive_key(password, b"different-salt-16by!", 32).unwrap();
+        let key4 = derive_key(ikm, b"different-salt-16by!", 32).unwrap();
         assert_ne!(&*key, &*key4);
     }
 

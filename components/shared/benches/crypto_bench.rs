@@ -72,7 +72,7 @@ fn bench_nanoid_generation(c: &mut Criterion) {
 }
 
 fn bench_key_derivation(c: &mut Criterion) {
-    let password = b"user-password";
+    let ikm = b"user-password";
     let salt = b"unique-salt-per-user";
 
     let mut group = c.benchmark_group("key_derivation");
@@ -82,7 +82,7 @@ fn bench_key_derivation(c: &mut Criterion) {
             BenchmarkId::new("pbkdf2", iterations),
             &iterations,
             |b, &iters| {
-                b.iter(|| derive_key(black_box(password), black_box(salt), iters, 32))
+                b.iter(|| derive_key(black_box(ikm), black_box(salt), iters, 32))
             },
         );
     }

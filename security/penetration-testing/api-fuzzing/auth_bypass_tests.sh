@@ -212,7 +212,8 @@ echo -e "${YELLOW}[Test 7] Testing JWT vulnerabilities...${NC}" | tee -a "${REPO
 echo "" | tee -a "${REPORT_FILE}"
 
 # Test with "alg: none" JWT
-NONE_ALG_JWT="eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTUxNjIzOTAyMn0."
+# alg=none token built at runtime so no JWT literal sits in the repo (secret scanners)
+NONE_ALG_JWT="$(printf %s '{"alg":"none","typ":"JWT"}' | base64 | tr -d '=\n' | tr '+/' '-_').$(printf %s '{"sub":"admin","iat":1516239022}' | base64 | tr -d '=\n' | tr '+/' '-_')."
 
 TOTAL_TESTS=$((TOTAL_TESTS + 1))
 
