@@ -442,9 +442,9 @@ pub fn verify_password(password: &[u8], hash: &str) -> Result<bool> {
 /// ```
 /// use academic_shared::crypto::{derive_key, DEFAULT_KEY_LENGTH};
 ///
-/// let password = b"secure-password";
+/// let ikm = b"secure-password";
 /// let salt = b"unique-salt-per-user-16b"; // Should be 16+ bytes
-/// let key = derive_key(password, salt, DEFAULT_KEY_LENGTH).unwrap();
+/// let key = derive_key(ikm, salt, DEFAULT_KEY_LENGTH).unwrap();
 /// assert_eq!(key.len(), DEFAULT_KEY_LENGTH);
 /// ```
 pub fn derive_key(password: &[u8], salt: &[u8], output_length: usize) -> Result<Zeroizing<Vec<u8>>> {
@@ -470,9 +470,9 @@ pub fn derive_key(password: &[u8], salt: &[u8], output_length: usize) -> Result<
 /// ```
 /// use academic_shared::crypto::{derive_key_hex, DEFAULT_KEY_LENGTH};
 ///
-/// let password = b"secure-password";
+/// let ikm = b"secure-password";
 /// let salt = b"unique-salt-16bytes!";
-/// let key = derive_key_hex(password, salt, DEFAULT_KEY_LENGTH).unwrap();
+/// let key = derive_key_hex(ikm, salt, DEFAULT_KEY_LENGTH).unwrap();
 /// assert_eq!(key.len(), DEFAULT_KEY_LENGTH * 2); // hex encoding doubles length
 /// ```
 pub fn derive_key_hex(password: &[u8], salt: &[u8], output_length: usize) -> Result<String> {
