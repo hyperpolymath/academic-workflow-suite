@@ -36,8 +36,8 @@ build-backend:
 # Build Office add-in
 build-office-addin:
     @echo "Building Office Add-in (AffineScript)..."
-    cd components/office-addin && npm install
-    cd components/office-addin && npm run build
+    cd components/office-addin && bun install
+    cd components/office-addin && bun run build
 
 # Build CLI tool
 build-cli:
@@ -73,7 +73,7 @@ test-elixir:
 # Run AffineScript tests
 test-affinescript:
     @echo "Running AffineScript tests..."
-    cd components/office-addin && npm test
+    cd components/office-addin && bun run test
 
 # Run integration tests
 test-integration:
