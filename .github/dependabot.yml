@@ -76,6 +76,25 @@ updates:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
 
+  # Bun (bun.lock): same directory and schedule as npm, so Dependabot keeps bun.lock in step
+  - package-ecosystem: "bun"
+    directory: "/components/office-addin"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "academic-workflow-suite/maintainers"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automated"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
