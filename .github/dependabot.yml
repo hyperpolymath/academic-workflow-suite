@@ -3,6 +3,16 @@
 
 version: 2
 
+multi-ecosystem-groups:
+  js-locks:
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
 updates:
   # Rust dependencies (Cargo)
   - package-ecosystem: "cargo"
@@ -62,10 +72,8 @@ updates:
     directories:
       - "/"
       - "/components/office-addin"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
+    multi-ecosystem-group: "js-locks"
+    patterns: ["*"]
     open-pull-requests-limit: 10
     reviewers:
       - "academic-workflow-suite/maintainers"
@@ -74,17 +82,12 @@ updates:
       - "javascript"
       - "automated"
     versioning-strategy: increase
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
 
   # Bun: bun.lock is at the root, so this watches "/". npm also watches "/" (root pnpm-lock.yaml) as well as /components/office-addin
   - package-ecosystem: "bun"
     directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
+    multi-ecosystem-group: "js-locks"
+    patterns: ["*"]
     open-pull-requests-limit: 10
     reviewers:
       - "academic-workflow-suite/maintainers"
@@ -93,9 +96,6 @@ updates:
       - "javascript"
       - "automated"
     versioning-strategy: increase
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
