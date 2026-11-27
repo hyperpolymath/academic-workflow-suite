@@ -59,7 +59,9 @@ updates:
 
   # Node.js dependencies (npm)
   - package-ecosystem: "npm"
-    directory: "/components/office-addin"
+    directories:
+      - "/"
+      - "/components/office-addin"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -76,9 +78,9 @@ updates:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
 
-  # Bun (bun.lock): same directory and schedule as npm, so Dependabot keeps bun.lock in step
+  # Bun: bun.lock is at the root, so this watches "/". npm also watches "/" (root pnpm-lock.yaml) as well as /components/office-addin
   - package-ecosystem: "bun"
-    directory: "/components/office-addin"
+    directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
